@@ -1,0 +1,17 @@
+﻿<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+  </PropertyGroup>
+  <!-- 1. Пакеты должны быть разделены на логические подгруппы. -->
+  <!-- 2. Внутри каждой из подгрупп пакеты должны идти в алфавитном порядке. -->
+  <!-- 3. В проджект-файлах должны быть использованы аналогичные группировка и сортировка. -->
+  <!-- 4. Если в проджект-файле какая-то подгруппа пуста, подгруппа не должна указываться вообще. -->
+  <!-- 5. Избыточные и подключаемые транзитивно зависимости не должны указываться. -->
+  <!-- 6. Сначала должны указываться подключения пакетов, а затем подключения проектов. -->
+  <ItemGroup>
+    <!-- Third-party packages -->
+    <PackageVersion Include="Google.Protobuf" Version="3.31.1" />
+    <PackageVersion Include="Grpc.AspNetCore" Version="2.76.0" />
+  </ItemGroup>
+</Project>

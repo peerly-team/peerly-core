@@ -1,0 +1,60 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CBB1784E-116B-4038-A9D9-6130DADD9966}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{C28C0360-217F-4764-9465-EA56F3BA0B3B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peerly.Core.Api", "src\Peerly.Core.Api\Peerly.Core.Api.csproj", "{01A3AF21-775B-4FEB-B3CA-E370D560C7EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peerly.Core.Tests", "tests\Peerly.Core.Tests\Peerly.Core.Tests.csproj", "{99D96A77-2964-4CC2-9858-EB32BAFEA8B2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = " common", " common", "{87AD09F1-0F80-47D4-AEAF-70A79FF7B3DF}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+		Directory.Packages.props = Directory.Packages.props
+		Directory.Build.targets = Directory.Build.targets
+		Directory.Build.props = Directory.Build.props
+		.gitignore = .gitignore
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peerly.Core", "src\Peerly.Core\Peerly.Core.csproj", "{6A8F85BF-AA38-4BA1-9DD6-FB0BA33E20F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peerly.Core.ApplicationServices", "src\Peerly.Core.ApplicationServices\Peerly.Core.ApplicationServices.csproj", "{2E0962AB-EC2B-41D5-B4AD-8887F3B3BE7A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peerly.Core.Persistence", "src\Peerly.Core.Persistence\Peerly.Core.Persistence.csproj", "{2352748A-7ED5-4321-BDB7-9C1605008800}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{01A3AF21-775B-4FEB-B3CA-E370D560C7EE} = {CBB1784E-116B-4038-A9D9-6130DADD9966}
+		{99D96A77-2964-4CC2-9858-EB32BAFEA8B2} = {C28C0360-217F-4764-9465-EA56F3BA0B3B}
+		{6A8F85BF-AA38-4BA1-9DD6-FB0BA33E20F5} = {CBB1784E-116B-4038-A9D9-6130DADD9966}
+		{2E0962AB-EC2B-41D5-B4AD-8887F3B3BE7A} = {CBB1784E-116B-4038-A9D9-6130DADD9966}
+		{2352748A-7ED5-4321-BDB7-9C1605008800} = {CBB1784E-116B-4038-A9D9-6130DADD9966}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{01A3AF21-775B-4FEB-B3CA-E370D560C7EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01A3AF21-775B-4FEB-B3CA-E370D560C7EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01A3AF21-775B-4FEB-B3CA-E370D560C7EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01A3AF21-775B-4FEB-B3CA-E370D560C7EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99D96A77-2964-4CC2-9858-EB32BAFEA8B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99D96A77-2964-4CC2-9858-EB32BAFEA8B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99D96A77-2964-4CC2-9858-EB32BAFEA8B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99D96A77-2964-4CC2-9858-EB32BAFEA8B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A8F85BF-AA38-4BA1-9DD6-FB0BA33E20F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A8F85BF-AA38-4BA1-9DD6-FB0BA33E20F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A8F85BF-AA38-4BA1-9DD6-FB0BA33E20F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A8F85BF-AA38-4BA1-9DD6-FB0BA33E20F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E0962AB-EC2B-41D5-B4AD-8887F3B3BE7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E0962AB-EC2B-41D5-B4AD-8887F3B3BE7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E0962AB-EC2B-41D5-B4AD-8887F3B3BE7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E0962AB-EC2B-41D5-B4AD-8887F3B3BE7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2352748A-7ED5-4321-BDB7-9C1605008800}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2352748A-7ED5-4321-BDB7-9C1605008800}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2352748A-7ED5-4321-BDB7-9C1605008800}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2352748A-7ED5-4321-BDB7-9C1605008800}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
