@@ -1,9 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <ItemGroup>
     <!-- Third-party packages -->
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="AWSSDK.S3"/>
+    <PackageReference Include="Microsoft.Extensions.Http" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Peerly.Core.Tools\Peerly.Core.Tools.csproj" />
+    <ProjectReference Include="..\Peerly.Core\Peerly.Core.csproj"/>
   </ItemGroup>
+
 </Project>

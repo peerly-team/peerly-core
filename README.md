@@ -1,1 +1,1 @@
-# peerly-api
+# peerly-core

@@ -1,0 +1,10 @@
+version: v2
+modules:
+  - path: src/Peerly.Core.Api/protos
+    name: buf.build/peerly/peerly-core
+lint:
+  use:
+    - STANDARD
+breaking:
+  use:
+    - FILE

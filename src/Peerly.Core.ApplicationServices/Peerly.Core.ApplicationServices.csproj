@@ -1,2 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\Peerly.Core.Tools\Peerly.Core.Tools.csproj" />
+    <ProjectReference Include="..\Peerly.Core\Peerly.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Third-party packages -->
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Scrutor" />
+  </ItemGroup>
 </Project>

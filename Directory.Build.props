@@ -4,8 +4,6 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <ApplicationRepo>Peerly.Core.ApiCore</ApplicationRepo>
   </PropertyGroup>
   <PropertyGroup>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
@@ -14,6 +12,6 @@
   </PropertyGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
-    <InternalsVisibleTo Include="Peerly.Core.ApiCore.Tests" />
+    <InternalsVisibleTo Include="Peerly.Core.Tests" />
   </ItemGroup>
 </Project>

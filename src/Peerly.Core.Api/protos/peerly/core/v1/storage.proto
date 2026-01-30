@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package peerly.core.v1;
+
+option csharp_namespace = "Peerly.Core.V1.Proto";
+
+service StorageService {
+  rpc V1GenerateUploadUrl(V1GenerateUploadUrlRequest) returns (V1GenerateUploadUrlResponse);
+  rpc V1GenerateDownloadUrl(V1GenerateDownloadUrlRequest) returns (V1GenerateDownloadUrlResponse);
+}
+
+message V1GenerateUploadUrlRequest {
+}
+
+message V1GenerateUploadUrlResponse {
+  string storage_id = 1;
+  string url = 2;
+}
+
+message V1GenerateDownloadUrlRequest {
+  string file_id = 1;
+  int64 user_id = 2;
+}
+
+message V1GenerateDownloadUrlResponse {
+  string url = 1;
+}
