@@ -9,4 +9,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Scrutor" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Features\V1\" />
+  </ItemGroup>
 </Project>

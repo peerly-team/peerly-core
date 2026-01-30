@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Peerly.Core.Api.Controllers.Courses;
 using Peerly.Core.Api.Controllers.Storage;
 using Peerly.Core.Api.Extensions;
 using Peerly.Core.ApplicationServices.Extensions;
@@ -68,6 +69,7 @@ public static class Program
         app.UseRouting();
 
         app.MapGrpcService<StorageController>();
+        app.MapGrpcService<CourseController>();
 
         app.MapGrpcReflectionService();
     }

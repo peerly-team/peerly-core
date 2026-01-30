@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package peerly.core.v1;
+
+import "peerly/core/v1/common.proto";
+
+option csharp_namespace = "Peerly.Core.V1.Proto";
+
+service CourseService {
+  rpc V1SearchCourses(V1SearchCoursesRequest) returns (V1SearchCoursesResponse);
+  rpc V1SearchStudentCourses(V1SearchStudentCoursesRequest) returns (V1SearchStudentCoursesResponse);
+}
+
+// todo: добавить сортировку
+message V1SearchCoursesRequest {
+  Filter filter = 1;
+  PaginationInfo pagination_info = 2;
+
+  message Filter {
+    repeated CourseStatus course_statuses = 1;
+  }
+}
+
+message V1SearchCoursesResponse {
+  repeated CourseInfo course_infos = 1;
+}
+
+// todo: добавить сортировку
+message V1SearchStudentCoursesRequest {
+  Filter filter = 1;
+  PaginationInfo pagination_info = 2;
+
+  message Filter {
+    repeated CourseStatus course_statuses = 1;
+  }
+}
+
+message V1SearchStudentCoursesResponse {
+  repeated CourseInfo course_infos = 1;
+}

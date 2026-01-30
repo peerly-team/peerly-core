@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Peerly.Core.ApplicationServices.Abstractions;
-using Peerly.Core.ApplicationServices.Features.Storage.GenerateUploadUrl;
+using Peerly.Core.ApplicationServices.Features.V1.Storage.GenerateUploadUrl;
 using Peerly.Core.Tools;
 using Peerly.Core.Tools.Abstractions;
 

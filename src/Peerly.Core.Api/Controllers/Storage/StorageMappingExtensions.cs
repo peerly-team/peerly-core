@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using Peerly.Core.ApplicationServices.Features.Storage.GenerateUploadUrl;
+using Peerly.Core.ApplicationServices.Features.V1.Storage.GenerateUploadUrl;
 using Proto = Peerly.Core.V1;
 
 namespace Peerly.Core.Api.Controllers.Storage;
@@ -7,7 +7,7 @@ namespace Peerly.Core.Api.Controllers.Storage;
 [ExcludeFromCodeCoverage]
 internal static class StorageMappingExtensions
 {
-    public static GenerateUploadUrlQuery ToV1GenerateUploadUrlQuery(this Proto.V1GenerateUploadUrlRequest request)
+    public static GenerateUploadUrlQuery ToGenerateUploadUrlQuery(this Proto.V1GenerateUploadUrlRequest request)
     {
         return new GenerateUploadUrlQuery();
     }

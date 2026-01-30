@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package peerly.core.v1;
+
+option csharp_namespace = "Peerly.Core.V1.Proto";
+
+message PaginationInfo {
+  int32 page_size = 1;
+  int32 offset = 2;
+}
+
+enum CourseStatus {
+  COURSE_STATUS_UNKNOWN = 0;
+  COURSE_STATUS_DRAFT = 1;
+  COURSE_STATUS_IN_PROGRESS = 2;
+  COURSE_STATUS_FINISHED = 3;
+  COURSE_STATUS_CANCELED = 4;
+}
+
+message CourseInfo {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  CourseStatus status = 4;
+  int64 student_count = 5;
+  int64 homework_count = 6;
+}

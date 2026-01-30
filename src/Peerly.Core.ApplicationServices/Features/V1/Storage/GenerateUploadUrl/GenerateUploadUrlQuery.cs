@@ -1,5 +1,5 @@
 using Peerly.Core.ApplicationServices.Abstractions;
 
-namespace Peerly.Core.ApplicationServices.Features.Storage.GenerateUploadUrl;
+namespace Peerly.Core.ApplicationServices.Features.V1.Storage.GenerateUploadUrl;
 
 public sealed record GenerateUploadUrlQuery : IQuery<GenerateUploadUrlQueryResponse>;
