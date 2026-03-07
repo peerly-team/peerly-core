@@ -1,4 +1,5 @@
 using Peerly.Core.ApplicationServices.Abstractions;
+using Peerly.Core.ApplicationServices.Features.V1.Courses.Shared.SearchCourses;
 using Peerly.Core.Pagination;
 
 namespace Peerly.Core.ApplicationServices.Features.V1.Courses.SearchCourses;

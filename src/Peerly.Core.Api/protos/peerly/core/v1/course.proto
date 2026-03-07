@@ -6,35 +6,55 @@ import "peerly/core/v1/common.proto";
 
 option csharp_namespace = "Peerly.Core.V1.Proto";
 
+// todo: добавить сортировку в Search ручки
 service CourseService {
+  rpc V1CreateCourse(V1CreateCourseRequest) returns (V1CreateCourseResponse);
   rpc V1SearchCourses(V1SearchCoursesRequest) returns (V1SearchCoursesResponse);
   rpc V1SearchStudentCourses(V1SearchStudentCoursesRequest) returns (V1SearchStudentCoursesResponse);
+  rpc V1SearchTeacherCourses(V1SearchTeacherCoursesRequest) returns (V1SearchTeacherCoursesResponse);
 }
 
-// todo: добавить сортировку
-message V1SearchCoursesRequest {
-  Filter filter = 1;
-  PaginationInfo pagination_info = 2;
+message V1CreateCourseRequest {
+  string name = 1;
+  string description = 2;
+  int64 teacher_id = 3;
+}
 
-  message Filter {
-    repeated CourseStatus course_statuses = 1;
+message V1CreateCourseResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
   }
+
+  message Success {}
+}
+
+message V1SearchCoursesRequest {
+  SearchCoursesFilter filter = 1;
+  PaginationInfo pagination_info = 2;
 }
 
 message V1SearchCoursesResponse {
   repeated CourseInfo course_infos = 1;
 }
 
-// todo: добавить сортировку
 message V1SearchStudentCoursesRequest {
-  Filter filter = 1;
-  PaginationInfo pagination_info = 2;
-
-  message Filter {
-    repeated CourseStatus course_statuses = 1;
-  }
+  int64 student_id = 1;
+  SearchCoursesFilter filter = 2;
+  PaginationInfo pagination_info = 3;
 }
 
 message V1SearchStudentCoursesResponse {
+  repeated CourseInfo course_infos = 1;
+}
+
+message V1SearchTeacherCoursesRequest {
+  int64 teacher_id = 1;
+  SearchCoursesFilter filter = 2;
+  PaginationInfo pagination_info = 3;
+}
+
+message V1SearchTeacherCoursesResponse {
   repeated CourseInfo course_infos = 1;
 }

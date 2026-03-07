@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Peerly.Core.Abstractions.Repositories;
+using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Courses;
 using Peerly.Core.Pagination;
 using Peerly.Core.Persistence.Repositories.Courses.Models;
@@ -21,10 +22,46 @@ internal sealed class CourseRepository : ICourseRepository
         _connectionContext = connectionContext;
     }
 
+    public async Task<CourseId> AddAsync(CourseAddItem item, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            item.Name,
+            item.Description,
+            Status = item.Status.ToString(),
+            item.CreationTime
+        };
+
+        const string Query =
+            $"""
+            insert into {CourseTable.TableName} (
+                        {CourseTable.Name},
+                        {CourseTable.Description},
+                        {CourseTable.Status},
+                        {CourseTable.CreationTime})
+                 values (
+                        @{nameof(queryParams.Name)},
+                        @{nameof(queryParams.Description)},
+                        @{nameof(queryParams.Status)},
+                        @{nameof(queryParams.CreationTime)})
+              returning {CourseTable.Id};
+            """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var id = await _connectionContext.Connection.QuerySingleAsync<long>(command);
+
+        return new CourseId(id);
+    }
+
     public async Task<IReadOnlyCollection<Course>> ListAsync(CourseFilter filter, PaginationInfo paginationInfo, CancellationToken cancellationToken)
     {
         var queryParams = new
         {
+            CourseIds = filter.CourseIds.ToArrayBy(courseId => (long)courseId),
             CourseStatuses = filter.CourseStatuses.ToArrayBy(courseStatus => courseStatus.ToString()),
             Limit = paginationInfo.PageSize,
             paginationInfo.Offset,
@@ -37,7 +74,9 @@ internal sealed class CourseRepository : ICourseRepository
                      {CourseTable.Description},
                      {CourseTable.Status}
                 from {CourseTable.TableName}
-               where (CARDINALITY(@{nameof(queryParams.CourseStatuses)}) = 0
+               where (cardinality(@{nameof(queryParams.CourseIds)}) = 0
+                     or {CourseTable.Id} = any(@{nameof(queryParams.CourseIds)}))
+                 and (cardinality(@{nameof(queryParams.CourseStatuses)}) = 0
                      or {CourseTable.Status} = any(@{nameof(queryParams.CourseStatuses)}))
                limit @{nameof(queryParams.Limit)}
               offset @{nameof(queryParams.Offset)};

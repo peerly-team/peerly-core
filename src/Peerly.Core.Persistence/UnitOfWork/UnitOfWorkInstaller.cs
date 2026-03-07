@@ -6,10 +6,10 @@ using Peerly.Core.Abstractions.Repositories;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.Persistence.Extensions;
 using Peerly.Core.Persistence.Repositories.Courses;
+using Peerly.Core.Persistence.Repositories.CourseTeachers;
 using Peerly.Core.Persistence.Repositories.Groups;
 using Peerly.Core.Persistence.Repositories.GroupStudents;
 using Peerly.Core.Persistence.Repositories.Homeworks;
-using Peerly.Core.Persistence.Repositories.Users;
 using Peerly.Core.Tools.Abstractions;
 
 namespace Peerly.Core.Persistence.UnitOfWork;
@@ -25,11 +25,11 @@ public class UnitOfWorkInstaller : IInstaller
             .AddOptions<ConnectionFactoryOptions>()
             .BindConfiguration(ConnectionFactoryOptions.SectionName);
 
-        services.AddRepositoryFactory<IUserRepository, UserRepository>();
         services.AddRepositoryFactory<ICourseRepository, CourseRepository>();
         services.AddRepositoryFactory<IHomeworkRepository, HomeworkRepository>();
         services.AddRepositoryFactory<IGroupRepository, GroupRepository>();
         services.AddRepositoryFactory<IGroupStudentRepository, GroupStudentRepository>();
+        services.AddRepositoryFactory<ICourseTeacherRepository, CourseTeacherRepository>();
 
         services.AddSingleton<NpgsqlDataSource>(sp =>
         {

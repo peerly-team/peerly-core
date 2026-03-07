@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Courses;
 using Peerly.Core.Persistence.Repositories.Courses.Models;
 using Peerly.Core.Tools;
@@ -13,7 +14,7 @@ internal static class CourseRepositoryMapper
         return courseDbs.ToArrayBy(
             courseDb => new Course
             {
-                Id = courseDb.Id,
+                Id = new CourseId(courseDb.Id),
                 Name = courseDb.Name,
                 Description = courseDb.Description,
                 Status = Enum.Parse<CourseStatus>(courseDb.Status)
