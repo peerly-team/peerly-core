@@ -70,7 +70,11 @@ internal sealed class SearchStudentCoursesHandler : IQueryHandler<SearchStudentC
             CourseIds = groups.ToArrayBy(group => group.CourseId),
             CourseStatuses = query.Filter.CourseStatuses
         };
-        return await unitOfWork.ReadOnlyCourseRepository.ListAsync(courseFilter, query.PaginationInfo, cancellationToken);
+        var courses = await unitOfWork.ReadOnlyCourseRepository.ListAsync(courseFilter, query.PaginationInfo, cancellationToken);
+
+        return courses
+            .Where(course => course.Status != CourseStatus.Draft && course.Status != CourseStatus.Deleted)
+            .ToArray();
     }
 
     private static async Task<Dictionary<CourseId, int>> GetHomeworkCountByCourseIdAsync(

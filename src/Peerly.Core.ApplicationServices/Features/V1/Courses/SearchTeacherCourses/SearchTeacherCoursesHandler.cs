@@ -30,12 +30,7 @@ internal sealed class SearchTeacherCoursesHandler : IQueryHandler<SearchTeacherC
         var teacherCourseIds = await unitOfWork.ReadOnlyCourseTeacherRepository.ListCourseIdAsync(query.TeacherId, cancellationToken);
         if (teacherCourseIds.Count == 0) { return new SearchTeacherCoursesQueryResponse { CourseInfos = [] }; }
 
-        var courseFilter = new CourseFilter
-        {
-            CourseIds = teacherCourseIds,
-            CourseStatuses = query.Filter.CourseStatuses
-        };
-        var courses = await unitOfWork.ReadOnlyCourseRepository.ListAsync(courseFilter, query.PaginationInfo, cancellationToken);
+        var courses = await GetCoursesAsync(teacherCourseIds, query, unitOfWork, cancellationToken);
         var courseIds = courses.ToArrayBy(course => course.Id);
         var homeworkCountByCourseId = await GetHomeworkCountByCourseIdAsync(courseIds, unitOfWork, cancellationToken);
         var studentCountByCourseId = await GetStudentCountByCourseIdAsync(courseIds, unitOfWork, cancellationToken);
@@ -50,6 +45,24 @@ internal sealed class SearchTeacherCoursesHandler : IQueryHandler<SearchTeacherC
                     HomeworkCount = homeworkCountByCourseId[course.Id]
                 })
         };
+    }
+
+    private static async Task<IReadOnlyCollection<Course>> GetCoursesAsync(
+        IReadOnlyCollection<CourseId> courseIds,
+        SearchTeacherCoursesQuery query,
+        ICommonReadOnlyUnitOfWork unitOfWork,
+        CancellationToken cancellationToken)
+    {
+        var courseFilter = new CourseFilter
+        {
+            CourseIds = courseIds,
+            CourseStatuses = query.Filter.CourseStatuses
+        };
+        var courses = await unitOfWork.ReadOnlyCourseRepository.ListAsync(courseFilter, query.PaginationInfo, cancellationToken);
+
+        return courses
+            .Where(course => course.Status != CourseStatus.Deleted)
+            .ToArray();
     }
 
     private static async Task<Dictionary<CourseId, int>> GetHomeworkCountByCourseIdAsync(

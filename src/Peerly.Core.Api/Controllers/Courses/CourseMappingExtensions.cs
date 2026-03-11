@@ -2,10 +2,12 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using OneOf.Types;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourse;
+using Peerly.Core.ApplicationServices.Features.V1.Courses.DeleteCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.SearchCourses;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.SearchStudentCourses;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.SearchTeacherCourses;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.Shared.SearchCourses;
+using Peerly.Core.ApplicationServices.Features.V1.Courses.UpdateCourse;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Courses;
@@ -18,15 +20,6 @@ namespace Peerly.Core.Api.Controllers.Courses;
 [ExcludeFromCodeCoverage]
 internal static class CourseMappingExtensions
 {
-    public static SearchCoursesQuery ToSearchCoursesQuery(this Proto.V1SearchCoursesRequest request)
-    {
-        return new SearchCoursesQuery
-        {
-            Filter = request.Filter.ToFilter(),
-            PaginationInfo = request.PaginationInfo.ToPaginationInfo()
-        };
-    }
-
     public static CreateCourseCommand ToCreateCourseCommand(this Proto.V1CreateCourseRequest request)
     {
         return new CreateCourseCommand
@@ -46,6 +39,58 @@ internal static class CourseMappingExtensions
                 ValidationError = validationError.ToProto<CreateCourseCommand, Proto.V1CreateCourseRequest>()
             },
             otherError => new Proto.V1CreateCourseResponse { OtherError = otherError.ToProto() });
+    }
+
+    public static DeleteCourseCommand ToDeleteCourseCommand(this Proto.V1DeleteCourseRequest request)
+    {
+        return new DeleteCourseCommand
+        {
+            CourseId = new CourseId(request.CourseId),
+            TeacherId = new TeacherId(request.TeacherId)
+        };
+    }
+
+    public static Proto.V1DeleteCourseResponse ToV1DeleteCourseResponse(this CommandResponse<Success> commandResponse)
+    {
+        return commandResponse.Match(
+            _ => new Proto.V1DeleteCourseResponse { SuccessResponse = new Proto.V1DeleteCourseResponse.Types.Success() },
+            validationError => new Proto.V1DeleteCourseResponse
+            {
+                ValidationError = validationError.ToProto<DeleteCourseCommand, Proto.V1DeleteCourseRequest>()
+            },
+            otherError => new Proto.V1DeleteCourseResponse { OtherError = otherError.ToProto() });
+    }
+
+    public static UpdateCourseCommand ToUpdateCourseCommand(this Proto.V1UpdateCourseRequest request)
+    {
+        return new UpdateCourseCommand
+        {
+            CourseId = new CourseId(request.CourseId),
+            TeacherId = new TeacherId(request.TeacherId),
+            Name = request.Name,
+            Description = request.Description,
+            Status = request.Status.ToModel()
+        };
+    }
+
+    public static Proto.V1UpdateCourseResponse ToV1UpdateCourseResponse(this CommandResponse<Success> commandResponse)
+    {
+        return commandResponse.Match(
+            _ => new Proto.V1UpdateCourseResponse { SuccessResponse = new Proto.V1UpdateCourseResponse.Types.Success() },
+            validationError => new Proto.V1UpdateCourseResponse
+            {
+                ValidationError = validationError.ToProto<UpdateCourseCommand, Proto.V1UpdateCourseRequest>()
+            },
+            otherError => new Proto.V1UpdateCourseResponse { OtherError = otherError.ToProto() });
+    }
+
+    public static SearchCoursesQuery ToSearchCoursesQuery(this Proto.V1SearchCoursesRequest request)
+    {
+        return new SearchCoursesQuery
+        {
+            Filter = request.Filter.ToFilter(),
+            PaginationInfo = request.PaginationInfo.ToPaginationInfo()
+        };
     }
 
     public static Proto.V1SearchCoursesResponse ToV1SearchCoursesResponse(
@@ -126,6 +171,7 @@ internal static class CourseMappingExtensions
             Proto.CourseStatus.InProgress => CourseStatus.InProgress,
             Proto.CourseStatus.Finished => CourseStatus.Finished,
             Proto.CourseStatus.Canceled => CourseStatus.Canceled,
+            Proto.CourseStatus.Deleted => CourseStatus.Deleted,
             _ => throw new ArgumentOutOfRangeException(nameof(courseStatusProto), courseStatusProto, null)
         };
     }
@@ -138,6 +184,7 @@ internal static class CourseMappingExtensions
             CourseStatus.InProgress => Proto.CourseStatus.InProgress,
             CourseStatus.Finished => Proto.CourseStatus.Finished,
             CourseStatus.Canceled => Proto.CourseStatus.Canceled,
+            CourseStatus.Deleted => Proto.CourseStatus.Deleted,
             _ => throw new ArgumentOutOfRangeException(nameof(courseStatus), courseStatus, null)
         };
     }

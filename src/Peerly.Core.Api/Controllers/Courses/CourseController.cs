@@ -4,9 +4,11 @@ using Grpc.Core;
 using OneOf.Types;
 using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourse;
+using Peerly.Core.ApplicationServices.Features.V1.Courses.DeleteCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.SearchCourses;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.SearchStudentCourses;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.SearchTeacherCourses;
+using Peerly.Core.ApplicationServices.Features.V1.Courses.UpdateCourse;
 using Peerly.Core.V1;
 
 namespace Peerly.Core.Api.Controllers.Courses;
@@ -18,17 +20,23 @@ public sealed class CourseController : CourseService.CourseServiceBase
     private readonly IQueryHandler<SearchStudentCoursesQuery, SearchStudentCoursesQueryResponse> _searchStudentCoursesHandler;
     private readonly IQueryHandler<SearchTeacherCoursesQuery, SearchTeacherCoursesQueryResponse> _searchTeacherCoursesHandler;
     private readonly ICommandHandler<CreateCourseCommand, Success> _createCourseHandler;
+    private readonly ICommandHandler<DeleteCourseCommand, Success> _deleteCourseHandler;
+    private readonly ICommandHandler<UpdateCourseCommand, Success> _updateCourseHandler;
 
     public CourseController(
         IQueryHandler<SearchCoursesQuery, SearchCoursesQueryResponse> searchCoursesHandler,
         IQueryHandler<SearchStudentCoursesQuery, SearchStudentCoursesQueryResponse> searchStudentCoursesHandler,
         IQueryHandler<SearchTeacherCoursesQuery, SearchTeacherCoursesQueryResponse> searchTeacherCoursesHandler,
-        ICommandHandler<CreateCourseCommand, Success> createCourseHandler)
+        ICommandHandler<CreateCourseCommand, Success> createCourseHandler,
+        ICommandHandler<DeleteCourseCommand, Success> deleteCourseHandler,
+        ICommandHandler<UpdateCourseCommand, Success> updateCourseHandler)
     {
         _searchCoursesHandler = searchCoursesHandler;
         _searchStudentCoursesHandler = searchStudentCoursesHandler;
         _searchTeacherCoursesHandler = searchTeacherCoursesHandler;
         _createCourseHandler = createCourseHandler;
+        _deleteCourseHandler = deleteCourseHandler;
+        _updateCourseHandler = updateCourseHandler;
     }
 
     public override async Task<V1CreateCourseResponse> V1CreateCourse(V1CreateCourseRequest request, ServerCallContext context)
@@ -59,5 +67,19 @@ public sealed class CourseController : CourseService.CourseServiceBase
         var query = request.ToSearchTeacherCoursesQuery();
         var queryResponse = await _searchTeacherCoursesHandler.ExecuteAsync(query, context.CancellationToken);
         return queryResponse.ToV1SearchTeacherCoursesResponse();
+    }
+
+    public override async Task<V1DeleteCourseResponse> V1DeleteCourse(V1DeleteCourseRequest request, ServerCallContext context)
+    {
+        var command = request.ToDeleteCourseCommand();
+        var responseCommand = await _deleteCourseHandler.ExecuteAsync(command, context.CancellationToken);
+        return responseCommand.ToV1DeleteCourseResponse();
+    }
+
+    public override async Task<V1UpdateCourseResponse> V1UpdateCourse(V1UpdateCourseRequest request, ServerCallContext context)
+    {
+        var command = request.ToUpdateCourseCommand();
+        var responseCommand = await _updateCourseHandler.ExecuteAsync(command, context.CancellationToken);
+        return responseCommand.ToV1UpdateCourseResponse();
     }
 }

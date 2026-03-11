@@ -9,6 +9,22 @@ namespace Peerly.Core.Persistence.Repositories.Courses;
 
 internal static class CourseRepositoryMapper
 {
+    public static Course? ToCourse(this CourseDb? courseDb)
+    {
+        if (courseDb is null)
+        {
+            return null;
+        }
+
+        return new Course
+        {
+            Id = new CourseId(courseDb.Id),
+            Name = courseDb.Name,
+            Description = courseDb.Description,
+            Status = Enum.Parse<CourseStatus>(courseDb.Status)
+        };
+    }
+
     public static IReadOnlyCollection<Course> ToCourses(this IEnumerable<CourseDb> courseDbs)
     {
         return courseDbs.ToArrayBy(

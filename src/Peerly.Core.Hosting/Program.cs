@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Peerly.Core.Api.Controllers.Courses;
 using Peerly.Core.Api.Controllers.Storage;
 using Peerly.Core.Api.Extensions;
+using Peerly.Core.Api.Infrastructure.Configuration;
 using Peerly.Core.ApplicationServices.Extensions;
 using Peerly.Core.FileStorage.Extensions;
 using Peerly.Core.Persistence.Extensions;
@@ -72,5 +73,8 @@ public static class Program
         app.MapGrpcService<CourseController>();
 
         app.MapGrpcReflectionService();
+
+        // infrastructure configuration
+        ValidationPropertyMappingConfiguration.Configure();
     }
 }

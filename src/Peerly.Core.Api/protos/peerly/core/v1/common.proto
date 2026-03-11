@@ -39,6 +39,7 @@ enum CourseStatus {
   COURSE_STATUS_IN_PROGRESS = 2;
   COURSE_STATUS_FINISHED = 3;
   COURSE_STATUS_CANCELED = 4;
+  COURSE_STATUS_DELETED = 5;
 }
 
 message SearchCoursesFilter {
