@@ -3,8 +3,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Peerly.Core.Abstractions.Repositories;
-using Peerly.Core.Models.Courses;
+using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Homeworks;
+using Peerly.Core.Persistence.Repositories.Homeworks.Models;
 using Peerly.Core.Persistence.UnitOfWork;
 using Peerly.Core.Tools;
 using static Peerly.Core.Persistence.Schemas.PeerlyCommonScheme;
@@ -20,9 +21,30 @@ internal sealed class HomeworkRepository : IHomeworkRepository
         _connectionContext = connectionContext;
     }
 
-    public async Task<IReadOnlyCollection<CourseHomeworkCount>> ListCourseHomeworkCountAsync(
-        HomeworkFilter filter,
-        CancellationToken cancellationToken)
+    public async Task<int> GetHomeworkCountAsync(CourseId courseId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            CourseId = (long)courseId
+        };
+
+        const string Query =
+            $"""
+             select count(*)
+               from {HomeworkTable.TableName}
+              where {HomeworkTable.CourseId} = @{nameof(queryParams.CourseId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+
+        return await _connectionContext.Connection.ExecuteScalarAsync<int>(command);
+    }
+
+    public async Task<IReadOnlyCollection<Homework>> ListAsync(HomeworkFilter filter, CancellationToken cancellationToken)
     {
         var queryParams = new
         {
@@ -32,15 +54,19 @@ internal sealed class HomeworkRepository : IHomeworkRepository
 
         const string Query =
             $"""
-              select c.{CourseTable.Id} as course_id,
-                     count(*) as homework_count
-                from {CourseTable.TableName} c
-                left join {HomeworkTable.TableName} h on h.{HomeworkTable.CourseId} = c.{CourseTable.Id}
+              select {HomeworkTable.Id},
+                     {HomeworkTable.CourseId},
+                     {HomeworkTable.TeacherId},
+                     {HomeworkTable.Name},
+                     {HomeworkTable.Description},
+                     {HomeworkTable.Checklist},
+                     {HomeworkTable.Deadline},
+                     {HomeworkTable.ReviewDeadline}
+                from {HomeworkTable.TableName}
                where (cardinality(@{nameof(queryParams.CourseIds)}) = 0
-                     or c.{CourseTable.Id} = any(@{nameof(queryParams.CourseIds)}))
+                     or {HomeworkTable.CourseId} = any(@{nameof(queryParams.CourseIds)}))
                  and (cardinality(@{nameof(queryParams.HomeworkStatuses)}) = 0
-                     or h.{HomeworkTable.Status} = any(@{nameof(queryParams.HomeworkStatuses)}))
-              group by c.{HomeworkTable.Id};
+                     or {HomeworkTable.Status} = any(@{nameof(queryParams.HomeworkStatuses)}));
               """;
 
         var command = new CommandDefinition(
@@ -48,7 +74,8 @@ internal sealed class HomeworkRepository : IHomeworkRepository
             parameters: queryParams,
             transaction: _connectionContext.Transaction,
             cancellationToken: cancellationToken);
+        var homeworkDbs = await _connectionContext.Connection.QueryAsync<HomeworkDb>(command);
 
-        return [.. await _connectionContext.Connection.QueryAsync<CourseHomeworkCount>(command)];
+        return homeworkDbs.ToArrayBy(homeworkDb => homeworkDb.ToHomework());
     }
 }

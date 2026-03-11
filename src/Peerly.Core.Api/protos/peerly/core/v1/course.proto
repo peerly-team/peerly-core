@@ -9,12 +9,32 @@ option csharp_namespace = "Peerly.Core.V1.Proto";
 
 // todo: добавить сортировку в Search ручки
 service CourseService {
+  rpc V1GetTeacherCourse(V1GetTeacherCourseRequest) returns (V1GetTeacherCourseResponse);
+  rpc V1GetStudentCourse(V1GetStudentCourseRequest) returns (V1GetStudentCourseResponse);
   rpc V1CreateCourse(V1CreateCourseRequest) returns (V1CreateCourseResponse);
   rpc V1SearchCourses(V1SearchCoursesRequest) returns (V1SearchCoursesResponse);
   rpc V1SearchStudentCourses(V1SearchStudentCoursesRequest) returns (V1SearchStudentCoursesResponse);
   rpc V1SearchTeacherCourses(V1SearchTeacherCoursesRequest) returns (V1SearchTeacherCoursesResponse);
   rpc V1UpdateCourse(V1UpdateCourseRequest) returns (V1UpdateCourseResponse);
   rpc V1DeleteCourse(V1DeleteCourseRequest) returns (V1DeleteCourseResponse);
+}
+
+message V1GetTeacherCourseRequest {
+  int64 course_id = 1;
+  int64 teacher_id = 2;
+}
+
+message V1GetTeacherCourseResponse {
+  CourseInfo course_info = 1;
+}
+
+message V1GetStudentCourseRequest {
+  int64 course_id = 1;
+  int64 student_id = 2;
+}
+
+message V1GetStudentCourseResponse {
+  CourseInfo course_info = 1;
 }
 
 message V1CreateCourseRequest {

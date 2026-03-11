@@ -38,7 +38,7 @@ internal sealed class SearchTeacherCoursesHandler : IQueryHandler<SearchTeacherC
         return new SearchTeacherCoursesQueryResponse
         {
             CourseInfos = courses.ToArrayBy(
-                course => new SearchCoursesQueryResponseItem
+                course => new CourseQueryResponseItem
                 {
                     Course = course,
                     StudentCount = studentCountByCourseId[course.Id],
@@ -71,11 +71,9 @@ internal sealed class SearchTeacherCoursesHandler : IQueryHandler<SearchTeacherC
         CancellationToken cancellationToken)
     {
         var filter = HomeworkFilter.Empty() with { CourseIds = courseIds };
-        var courseHomeworkCounts = await unitOfWork.ReadOnlyHomeworkRepository.ListCourseHomeworkCountAsync(filter, cancellationToken);
+        var homeworks = await unitOfWork.ReadOnlyHomeworkRepository.ListAsync(filter, cancellationToken);
 
-        return courseHomeworkCounts.ToDictionary(
-            courseHomeworkCount => courseHomeworkCount.CourseId,
-            courseHomeworkCount => courseHomeworkCount.HomeworkCount);
+        return homeworks.ToHomeworkCountByCourseId(courseIds);
     }
 
     private static async Task<Dictionary<CourseId, int>> GetStudentCountByCourseIdAsync(

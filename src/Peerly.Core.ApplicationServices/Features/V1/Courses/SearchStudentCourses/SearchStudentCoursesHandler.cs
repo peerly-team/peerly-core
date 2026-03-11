@@ -38,7 +38,7 @@ internal sealed class SearchStudentCoursesHandler : IQueryHandler<SearchStudentC
         return new SearchStudentCoursesQueryResponse
         {
             CourseInfos = courses.ToArrayBy(
-                course => new SearchCoursesQueryResponseItem
+                course => new CourseQueryResponseItem
                 {
                     Course = course,
                     StudentCount = studentCountByCourseId[course.Id],
@@ -52,10 +52,11 @@ internal sealed class SearchStudentCoursesHandler : IQueryHandler<SearchStudentC
         ICommonReadOnlyUnitOfWork unitOfWork,
         CancellationToken cancellationToken)
     {
-        var groupIds = await unitOfWork.ReadOnlyGroupStudentRepository.ListGroupIdAsync(studentId, cancellationToken);
-        if (groupIds.Count == 0) { return []; }
+        var groupStudentFilter = GroupStudentFilter.Empty() with { StudentIds = [studentId] };
+        var groupStudents = await unitOfWork.ReadOnlyGroupStudentRepository.ListAsync(groupStudentFilter, cancellationToken);
+        if (groupStudents.Count == 0) { return []; }
 
-        var groupFilter = GroupFilter.Empty() with { GroupIds = groupIds };
+        var groupFilter = GroupFilter.Empty() with { GroupIds = groupStudents.ToArrayBy(groupStudent => groupStudent.GroupId) };
         return await unitOfWork.ReadOnlyGroupRepository.ListAsync(groupFilter, cancellationToken);
     }
 
@@ -73,7 +74,7 @@ internal sealed class SearchStudentCoursesHandler : IQueryHandler<SearchStudentC
         var courses = await unitOfWork.ReadOnlyCourseRepository.ListAsync(courseFilter, query.PaginationInfo, cancellationToken);
 
         return courses
-            .Where(course => course.Status != CourseStatus.Draft && course.Status != CourseStatus.Deleted)
+            .Where(course => course.Status != CourseStatus.Deleted)
             .ToArray();
     }
 
@@ -87,10 +88,8 @@ internal sealed class SearchStudentCoursesHandler : IQueryHandler<SearchStudentC
             CourseIds = courseIds,
             HomeworkStatuses = [HomeworkStatus.Published, HomeworkStatus.Review, HomeworkStatus.Closed]
         };
-        var courseHomeworkCounts = await unitOfWork.ReadOnlyHomeworkRepository.ListCourseHomeworkCountAsync(filter, cancellationToken);
+        var homeworks = await unitOfWork.ReadOnlyHomeworkRepository.ListAsync(filter, cancellationToken);
 
-        return courseHomeworkCounts.ToDictionary(
-            courseHomeworkCount => courseHomeworkCount.CourseId,
-            courseHomeworkCount => courseHomeworkCount.HomeworkCount);
+        return homeworks.ToHomeworkCountByCourseId(courseIds);
     }
 }

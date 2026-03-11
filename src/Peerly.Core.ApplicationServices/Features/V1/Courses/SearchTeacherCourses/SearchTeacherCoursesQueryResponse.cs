@@ -5,5 +5,5 @@ namespace Peerly.Core.ApplicationServices.Features.V1.Courses.SearchTeacherCours
 
 public sealed record SearchTeacherCoursesQueryResponse
 {
-    public required IReadOnlyCollection<SearchCoursesQueryResponseItem> CourseInfos { get; init; }
+    public required IReadOnlyCollection<CourseQueryResponseItem> CourseInfos { get; init; }
 }

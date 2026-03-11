@@ -3,6 +3,8 @@ using System.Diagnostics.CodeAnalysis;
 using OneOf.Types;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.DeleteCourse;
+using Peerly.Core.ApplicationServices.Features.V1.Courses.GetStudentCourse;
+using Peerly.Core.ApplicationServices.Features.V1.Courses.GetTeacherCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.SearchCourses;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.SearchStudentCourses;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.SearchTeacherCourses;
@@ -20,6 +22,42 @@ namespace Peerly.Core.Api.Controllers.Courses;
 [ExcludeFromCodeCoverage]
 internal static class CourseMappingExtensions
 {
+    public static GetTeacherCourseQuery ToGetTeacherCourseQuery(this Proto.V1GetTeacherCourseRequest request)
+    {
+        return new GetTeacherCourseQuery
+        {
+            CourseId = new CourseId(request.CourseId),
+            TeacherId = new TeacherId(request.TeacherId)
+        };
+    }
+
+    public static Proto.V1GetTeacherCourseResponse ToV1GetTeacherCourseResponse(
+        this GetTeacherCourseQueryResponse queryResponse)
+    {
+        return new Proto.V1GetTeacherCourseResponse
+        {
+            CourseInfo = queryResponse.CourseInfo.ToProto()
+        };
+    }
+
+    public static GetStudentCourseQuery ToGetStudentCourseQuery(this Proto.V1GetStudentCourseRequest request)
+    {
+        return new GetStudentCourseQuery
+        {
+            CourseId = new CourseId(request.CourseId),
+            StudentId = new StudentId(request.StudentId)
+        };
+    }
+
+    public static Proto.V1GetStudentCourseResponse ToV1GetStudentCourseResponse(
+        this GetStudentCourseQueryResponse queryResponse)
+    {
+        return new Proto.V1GetStudentCourseResponse
+        {
+            CourseInfo = queryResponse.CourseInfo.ToProto()
+        };
+    }
+
     public static CreateCourseCommand ToCreateCourseCommand(this Proto.V1CreateCourseRequest request)
     {
         return new CreateCourseCommand
@@ -140,7 +178,7 @@ internal static class CourseMappingExtensions
         };
     }
 
-    private static Proto.CourseInfo ToProto(this SearchCoursesQueryResponseItem queryResponseItem)
+    private static Proto.CourseInfo ToProto(this CourseQueryResponseItem queryResponseItem)
     {
         var course = queryResponseItem.Course;
 

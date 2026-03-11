@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Peerly.Core.Abstractions.UnitOfWork;
@@ -37,7 +36,7 @@ internal sealed class SearchCoursesHandler : IQueryHandler<SearchCoursesQuery, S
         return new SearchCoursesQueryResponse
         {
             CourseInfos = courses.ToArrayBy(
-                course => new SearchCoursesQueryResponseItem
+                course => new CourseQueryResponseItem
                 {
                     Course = course,
                     StudentCount = studentCountByCourseId[course.Id],
@@ -61,11 +60,9 @@ internal sealed class SearchCoursesHandler : IQueryHandler<SearchCoursesQuery, S
         CancellationToken cancellationToken)
     {
         var filter = HomeworkFilter.Empty() with { CourseIds = courseIds };
-        var courseHomeworkCounts = await unitOfWork.ReadOnlyHomeworkRepository.ListCourseHomeworkCountAsync(filter, cancellationToken);
+        var homeworks = await unitOfWork.ReadOnlyHomeworkRepository.ListAsync(filter, cancellationToken);
 
-        return courseHomeworkCounts.ToDictionary(
-            courseHomeworkCount => courseHomeworkCount.CourseId,
-            courseHomeworkCount => courseHomeworkCount.HomeworkCount);
+        return homeworks.ToHomeworkCountByCourseId(courseIds);
     }
 
     private static async Task<Dictionary<CourseId, int>> GetStudentCountByCourseIdAsync(

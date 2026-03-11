@@ -3,7 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Peerly.Core.Abstractions.Repositories;
-using Peerly.Core.Identifiers;
+using Peerly.Core.Models.Groups;
+using Peerly.Core.Persistence.Repositories.GroupStudents.Models;
 using Peerly.Core.Persistence.UnitOfWork;
 using Peerly.Core.Tools;
 using static Peerly.Core.Persistence.Schemas.PeerlyCommonScheme;
@@ -19,18 +20,23 @@ internal sealed class GroupStudentRepository : IGroupStudentRepository
         _connectionContext = connectionContext;
     }
 
-    public async Task<IReadOnlyCollection<GroupId>> ListGroupIdAsync(StudentId studentId, CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<GroupStudent>> ListAsync(GroupStudentFilter filter, CancellationToken cancellationToken)
     {
         var queryParams = new
         {
-            StudentId = studentId
+            StudentIds = filter.StudentIds.ToArrayBy(studentId => (long)studentId),
+            GroupIds = filter.GroupIds.ToArrayBy(groupId => (long)groupId)
         };
 
         const string Query =
             $"""
-             select {GroupStudentTable.GroupId}
+             select {GroupStudentTable.GroupId},
+                    {GroupStudentTable.StudentId}
                from {GroupStudentTable.TableName}
-              where {GroupStudentTable.StudentId} = @{nameof(queryParams.StudentId)};
+              where (cardinality(@{nameof(queryParams.StudentIds)}) = 0
+                    or {GroupStudentTable.StudentId} = any(@{nameof(queryParams.StudentIds)}))
+                and (cardinality(@{nameof(queryParams.GroupIds)}) = 0
+                    or {GroupStudentTable.GroupId} = any(@{nameof(queryParams.GroupIds)}));
              """;
 
         var command = new CommandDefinition(
@@ -38,8 +44,8 @@ internal sealed class GroupStudentRepository : IGroupStudentRepository
             parameters: queryParams,
             transaction: _connectionContext.Transaction,
             cancellationToken: cancellationToken);
-        var groupIds = await _connectionContext.Connection.QueryAsync<long>(command);
+        var groupStudentDbs = await _connectionContext.Connection.QueryAsync<GroupStudentDb>(command);
 
-        return groupIds.ToArrayBy(groupId => new GroupId(groupId));
+        return groupStudentDbs.ToArrayBy(groupStudentDb => groupStudentDb.ToGroupStudent());
     }
 }
