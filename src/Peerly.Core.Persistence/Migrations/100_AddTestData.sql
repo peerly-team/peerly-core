@@ -1,209 +1,357 @@
 -- +goose Up
 -- +goose StatementBegin
 
-insert into courses (id, name, description, status, creation_time, update_time)
-values
-    (1, 'Go Basics', 'Введение в Go: переменные, функции, структуры.', 'Draft', '2025-01-10 10:00:00+00', null),
-    (2, 'Go Concurrency', 'Горутины, каналы, select.', 'InProgress', '2025-01-12 09:30:00+00', '2025-01-15 14:00:00+00'),
-    (3, 'PostgreSQL Basics', 'Основы SQL и PostgreSQL.', 'Finished', '2025-01-14 08:15:00+00', '2025-01-20 11:20:00+00'),
-    (4, 'REST API on Go', 'Создание REST API на Go.', 'InProgress', '2025-01-16 12:00:00+00', '2025-01-18 16:45:00+00'),
-    (5, 'Docker Essentials', 'Контейнеры, образы и compose.', 'Finished', '2025-01-18 07:45:00+00', '2025-01-25 10:10:00+00'),
-    (6, 'Kubernetes Intro', 'Базовые сущности Kubernetes.', 'Draft', '2025-01-20 13:25:00+00', null),
-    (7, 'Testing in Go', 'Unit-тесты, table-driven tests.', 'Draft', '2025-01-28 09:00:00+00', null),
-    (8, 'Microservices', 'Подходы к микросервисной архитектуре.', 'InProgress', '2025-02-01 08:20:00+00', '2025-02-05 13:15:00+00');
+-- Seed teachers
+INSERT INTO teachers (id, email, name, creation_time, update_time)
+VALUES (1, 'ivanov@peerly.dev', 'Иван Иванов', NOW() - INTERVAL '90 days', NOW() - INTERVAL '2 days'),
+       (2, 'petrova@peerly.dev', 'Анна Петрова', NOW() - INTERVAL '85 days', NOW() - INTERVAL '3 days'),
+       (3, 'smirnov@peerly.dev', 'Дмитрий Смирнов', NOW() - INTERVAL '80 days', NOW() - INTERVAL '4 days'),
+       (4, 'kozlova@peerly.dev', 'Елена Козлова', NOW() - INTERVAL '75 days', NOW() - INTERVAL '1 days');
 
-insert into teachers (id, email, name, creation_time, update_time)
-values
-    (1, 'ivan.petrov@example.com', 'Иван Петров', '2025-01-10 09:00:00+00', null),
-    (2, 'anna.smirnova@example.com', 'Анна Смирнова', '2025-01-11 09:15:00+00', '2025-01-20 10:00:00+00'),
-    (3, 'dmitry.kozlov@example.com', 'Дмитрий Козлов', '2025-01-12 10:30:00+00', null),
-    (4, 'elena.popova@example.com', 'Елена Попова', '2025-01-13 11:00:00+00', '2025-01-18 12:20:00+00'),
-    (5, 'sergey.volkov@example.com', 'Сергей Волков', '2025-01-14 08:40:00+00', null),
-    (6, 'olga.sokolova@example.com', 'Ольга Соколова', '2025-01-15 13:10:00+00', '2025-01-22 14:45:00+00');
+-- Seed students
+INSERT INTO students (id, email, name, creation_time, update_time)
+VALUES (1, 'alex.morozov@student.peerly.dev', 'Алексей Морозов', NOW() - INTERVAL '70 days', NOW() - INTERVAL '1 days'),
+       (2, 'maria.volkova@student.peerly.dev', 'Мария Волкова', NOW() - INTERVAL '69 days', NOW() - INTERVAL '2 days'),
+       (3, 'nikita.sokolov@student.peerly.dev', 'Никита Соколов', NOW() - INTERVAL '68 days',
+        NOW() - INTERVAL '3 days'),
+       (4, 'olga.romanova@student.peerly.dev', 'Ольга Романова', NOW() - INTERVAL '67 days', NOW() - INTERVAL '2 days'),
+       (5, 'egor.fedorov@student.peerly.dev', 'Егор Фёдоров', NOW() - INTERVAL '66 days', NOW() - INTERVAL '1 days'),
+       (6, 'sofia.lebedeva@student.peerly.dev', 'София Лебедева', NOW() - INTERVAL '65 days',
+        NOW() - INTERVAL '2 days'),
+       (7, 'artem.kozlov@student.peerly.dev', 'Артём Козлов', NOW() - INTERVAL '64 days', NOW() - INTERVAL '4 days'),
+       (8, 'alisa.novikova@student.peerly.dev', 'Алиса Новикова', NOW() - INTERVAL '63 days',
+        NOW() - INTERVAL '2 days'),
+       (9, 'maxim.belyaev@student.peerly.dev', 'Максим Беляев', NOW() - INTERVAL '62 days', NOW() - INTERVAL '3 days'),
+       (10, 'polina.tarasova@student.peerly.dev', 'Полина Тарасова', NOW() - INTERVAL '61 days',
+        NOW() - INTERVAL '2 days'),
+       (11, 'kirill.orlov@student.peerly.dev', 'Кирилл Орлов', NOW() - INTERVAL '60 days', NOW() - INTERVAL '1 days'),
+       (12, 'vera.zaitseva@student.peerly.dev', 'Вера Зайцева', NOW() - INTERVAL '59 days', NOW() - INTERVAL '1 days');
 
-insert into students (id, email, name, creation_time, update_time)
-values
-    (1, 'alex.ivanov@example.com', 'Алексей Иванов', '2025-02-01 09:00:00+00', null),
-    (2, 'irina.morozova@example.com', 'Ирина Морозова', '2025-02-01 09:10:00+00', null),
-    (3, 'pavel.novikov@example.com', 'Павел Новиков', '2025-02-01 09:20:00+00', '2025-02-05 10:00:00+00'),
-    (4, 'tatiana.orlova@example.com', 'Татьяна Орлова', '2025-02-01 09:30:00+00', null),
-    (5, 'roman.belov@example.com', 'Роман Белов', '2025-02-01 09:40:00+00', null),
-    (6, 'sofia.egorova@example.com', 'София Егорова', '2025-02-01 09:50:00+00', '2025-02-06 11:15:00+00'),
-    (7, 'maxim.zaitsev@example.com', 'Максим Зайцев', '2025-02-01 10:00:00+00', null),
-    (8, 'alisa.pavlova@example.com', 'Алиса Павлова', '2025-02-01 10:10:00+00', null),
-    (9, 'kirill.stepanov@example.com', 'Кирилл Степанов', '2025-02-01 10:20:00+00', null),
-    (10, 'vera.bogdanova@example.com', 'Вера Богданова', '2025-02-01 10:30:00+00', '2025-02-07 12:00:00+00'),
-    (11, 'artem.kiselev@example.com', 'Артем Киселев', '2025-02-01 10:40:00+00', null),
-    (12, 'yulia.titova@example.com', 'Юлия Титова', '2025-02-01 10:50:00+00', null);
+-- Seed courses
+INSERT INTO courses (id, name, status, description, creation_time, update_time)
+VALUES (1, 'C# Backend Academy', 'active', 'Практический курс по backend-разработке на C# и ASP.NET Core',
+        NOW() - INTERVAL '50 days', NOW() - INTERVAL '1 days'),
+       (2, 'PostgreSQL Deep Dive', 'active', 'Курс по проектированию БД, индексам, транзакциям и оптимизации запросов',
+        NOW() - INTERVAL '48 days', NOW() - INTERVAL '2 days'),
+       (3, 'System Design Basics', 'draft', 'Введение в проектирование распределённых систем',
+        NOW() - INTERVAL '45 days', NOW() - INTERVAL '5 days');
 
-insert into groups (id, name, course_id, creation_time, update_time)
-values
-    (1, 'Go Basics A', 1, '2025-02-10 09:00:00+00', null),
-    (2, 'Go Basics B', 1, '2025-02-10 09:20:00+00', null),
-    (3, 'Go Concurrency A', 2, '2025-02-11 10:00:00+00', '2025-02-15 12:00:00+00'),
-    (4, 'PostgreSQL A', 3, '2025-02-11 10:30:00+00', null),
-    (5, 'REST API A', 4, '2025-02-12 11:00:00+00', null),
-    (6, 'Docker A', 5, '2025-02-12 11:30:00+00', '2025-02-18 09:45:00+00'),
-    (7, 'Kubernetes A', 6, '2025-02-13 12:00:00+00', null),
-    (8, 'Testing in Go A', 7, '2025-02-13 12:20:00+00', null),
-    (9, 'Microservices A', 8, '2025-02-14 13:00:00+00', '2025-02-20 15:10:00+00');
+-- Seed groups
+INSERT INTO groups (id, name, course_id, creation_time, update_time)
+VALUES (1, 'Backend Evening Group', 1, NOW() - INTERVAL '44 days', NOW() - INTERVAL '1 days'),
+       (2, 'Backend Weekend Group', 1, NOW() - INTERVAL '43 days', NOW() - INTERVAL '1 days'),
+       (3, 'SQL Morning Group', 2, NOW() - INTERVAL '42 days', NOW() - INTERVAL '2 days'),
+       (4, 'SQL Intensive Group', 2, NOW() - INTERVAL '41 days', NOW() - INTERVAL '2 days'),
+       (5, 'Architecture Pilot Group', 3, NOW() - INTERVAL '40 days', NOW() - INTERVAL '5 days');
 
-insert into course_teachers (id, course_id, teacher_id, creation_time)
-values
-    (1, 1, 1, '2025-02-15 09:00:00+00'),
-    (2, 1, 2, '2025-02-15 09:05:00+00'),
-    (3, 2, 1, '2025-02-15 09:10:00+00'),
-    (4, 3, 3, '2025-02-15 09:15:00+00'),
-    (5, 4, 2, '2025-02-15 09:20:00+00'),
-    (6, 4, 5, '2025-02-15 09:25:00+00'),
-    (7, 5, 6, '2025-02-15 09:30:00+00'),
-    (8, 6, 4, '2025-02-15 09:35:00+00'),
-    (9, 7, 1, '2025-02-15 09:40:00+00'),
-    (10, 8, 5, '2025-02-15 09:45:00+00');
+-- Seed course_teachers
+INSERT INTO course_teachers (course_id, teacher_id, creation_time)
+VALUES (1, 1, NOW() - INTERVAL '40 days'),
+       (1, 2, NOW() - INTERVAL '39 days'),
+       (2, 2, NOW() - INTERVAL '38 days'),
+       (2, 3, NOW() - INTERVAL '37 days'),
+       (3, 4, NOW() - INTERVAL '36 days');
 
-insert into group_teachers (id, group_id, teacher_id, creation_time)
-values
-    (1, 1, 1, '2025-02-16 09:00:00+00'),
-    (2, 1, 2, '2025-02-16 09:05:00+00'),
-    (3, 2, 2, '2025-02-16 09:10:00+00'),
-    (4, 3, 1, '2025-02-16 09:15:00+00'),
-    (5, 4, 3, '2025-02-16 09:20:00+00'),
-    (6, 5, 2, '2025-02-16 09:25:00+00'),
-    (7, 5, 5, '2025-02-16 09:30:00+00'),
-    (8, 6, 6, '2025-02-16 09:35:00+00'),
-    (9, 7, 4, '2025-02-16 09:40:00+00'),
-    (10, 8, 1, '2025-02-16 09:45:00+00'),
-    (11, 9, 5, '2025-02-16 09:50:00+00');
+-- Seed group_teachers
+INSERT INTO group_teachers (group_id, teacher_id, creation_time)
+VALUES (1, 1, NOW() - INTERVAL '35 days'),
+       (1, 2, NOW() - INTERVAL '35 days'),
+       (2, 1, NOW() - INTERVAL '34 days'),
+       (3, 2, NOW() - INTERVAL '33 days'),
+       (3, 3, NOW() - INTERVAL '33 days'),
+       (4, 3, NOW() - INTERVAL '32 days'),
+       (5, 4, NOW() - INTERVAL '31 days');
 
-insert into group_students (id, group_id, student_id, creation_time)
-values
-    (1, 1, 1, '2025-02-17 09:00:00+00'),
-    (2, 1, 2, '2025-02-17 09:01:00+00'),
-    (3, 1, 3, '2025-02-17 09:02:00+00'),
-    (4, 2, 4, '2025-02-17 09:03:00+00'),
-    (5, 2, 5, '2025-02-17 09:04:00+00'),
-    (6, 2, 6, '2025-02-17 09:05:00+00'),
-    (7, 3, 7, '2025-02-17 09:06:00+00'),
-    (8, 3, 8, '2025-02-17 09:07:00+00'),
-    (9, 4, 9, '2025-02-17 09:08:00+00'),
-    (10, 4, 10, '2025-02-17 09:09:00+00'),
-    (11, 5, 11, '2025-02-17 09:10:00+00'),
-    (12, 5, 12, '2025-02-17 09:11:00+00');
+-- Seed group_students
+INSERT INTO group_students (group_id, student_id, creation_time)
+VALUES (1, 1, NOW() - INTERVAL '30 days'),
+       (1, 2, NOW() - INTERVAL '30 days'),
+       (1, 3, NOW() - INTERVAL '30 days'),
+       (1, 4, NOW() - INTERVAL '30 days'),
+       (2, 5, NOW() - INTERVAL '29 days'),
+       (2, 6, NOW() - INTERVAL '29 days'),
+       (2, 7, NOW() - INTERVAL '29 days'),
+       (3, 8, NOW() - INTERVAL '28 days'),
+       (3, 9, NOW() - INTERVAL '28 days'),
+       (3, 10, NOW() - INTERVAL '28 days'),
+       (4, 11, NOW() - INTERVAL '27 days'),
+       (4, 12, NOW() - INTERVAL '27 days'),
+       (5, 2, NOW() - INTERVAL '26 days'),
+       (5, 6, NOW() - INTERVAL '26 days');
 
-insert into homeworks (id, course_id, teacher_id, name, description, checklist, status, deadline, review_deadline, creation_time, update_time)
-values
-    (1, 1, 1, 'Go Variables', 'Практика по переменным и типам.', '1. Создать переменные; 2. Вывести значения; 3. Проверить типы', 'Published', '2025-03-10 20:00:00+00', '2025-03-15 20:00:00+00', '2025-03-01 10:00:00+00', null),
-    (2, 1, 2, 'Go Functions', 'Практика по функциям.', '1. Написать 3 функции; 2. Покрыть тестами', 'Published', '2025-03-12 20:00:00+00', '2025-03-17 20:00:00+00', '2025-03-02 10:00:00+00', null),
-    (3, 2, 1, 'Channels', 'Работа с каналами.', '1. Producer/consumer; 2. Select; 3. Timeout', 'Draft', '2025-03-18 20:00:00+00', '2025-03-22 20:00:00+00', '2025-03-03 10:00:00+00', null),
-    (4, 3, 3, 'SQL Queries', 'Набор запросов по PostgreSQL.', '1. SELECT; 2. JOIN; 3. GROUP BY', 'Published', '2025-03-09 20:00:00+00', '2025-03-14 20:00:00+00', '2025-03-01 11:00:00+00', null),
-    (5, 4, 2, 'REST CRUD', 'Реализовать CRUD API.', '1. GET; 2. POST; 3. PUT; 4. DELETE', 'Published', '2025-03-20 20:00:00+00', '2025-03-25 20:00:00+00', '2025-03-04 10:00:00+00', null),
-    (6, 8, 5, 'Service Split', 'Выделить сервис и описать взаимодействие.', '1. Выделить границы; 2. Описать API', 'Closed', '2025-03-05 20:00:00+00', '2025-03-08 20:00:00+00', '2025-02-25 10:00:00+00', '2025-03-08 09:00:00+00');
+INSERT INTO files (id, storage_id, name, size, creation_time)
+VALUES
+    (1,  '11111111-1111-1111-1111-111111111001', 'backend-intro.pdf', 245760, NOW() - INTERVAL '25 days'),
+    (2,  '11111111-1111-1111-1111-111111111002', 'backend-roadmap.pdf', 184320, NOW() - INTERVAL '25 days'),
+    (3,  '11111111-1111-1111-1111-111111111003', 'sql-indexes.pdf', 221184, NOW() - INTERVAL '24 days'),
+    (4,  '11111111-1111-1111-1111-111111111004', 'sql-transactions.pdf', 196608, NOW() - INTERVAL '24 days'),
+    (5,  '11111111-1111-1111-1111-111111111005', 'system-design-overview.pdf', 262144, NOW() - INTERVAL '23 days'),
+    (6,  '11111111-1111-1111-1111-111111111006', 'hw1-requirements.md', 16384, NOW() - INTERVAL '22 days'),
+    (7,  '11111111-1111-1111-1111-111111111007', 'hw1-template.zip', 524288, NOW() - INTERVAL '22 days'),
+    (8,  '11111111-1111-1111-1111-111111111008', 'hw2-db-schema.drawio', 98304, NOW() - INTERVAL '21 days'),
+    (9,  '11111111-1111-1111-1111-111111111009', 'hw2-dataset.csv', 655360, NOW() - INTERVAL '21 days'),
+    (10, '11111111-1111-1111-1111-111111111010', 'hw3-checklist.txt', 8192, NOW() - INTERVAL '20 days'),
+    (11, '11111111-1111-1111-1111-111111111011', 'morozov-solution.zip', 712345, NOW() - INTERVAL '10 days'),
+    (12, '11111111-1111-1111-1111-111111111012', 'volkova-solution.zip', 689123, NOW() - INTERVAL '10 days'),
+    (13, '11111111-1111-1111-1111-111111111013', 'sokolov-solution.zip', 701245, NOW() - INTERVAL '9 days'),
+    (14, '11111111-1111-1111-1111-111111111014', 'romanova-query.sql', 20480, NOW() - INTERVAL '9 days'),
+    (15, '11111111-1111-1111-1111-111111111015', 'fedorov-query.sql', 19456, NOW() - INTERVAL '8 days'),
+    (16, '11111111-1111-1111-1111-111111111016', 'lebedeva-analysis.pdf', 312456, NOW() - INTERVAL '8 days'),
+    (17, '11111111-1111-1111-1111-111111111017', 'novikova-index-report.pdf', 278900, NOW() - INTERVAL '7 days'),
+    (18, '11111111-1111-1111-1111-111111111018', 'belyaev-index-report.pdf', 281400, NOW() - INTERVAL '7 days'),
+    (19, '11111111-1111-1111-1111-111111111019', 'orlov-final.docx', 156789, NOW() - INTERVAL '6 days'),
+    (20, '11111111-1111-1111-1111-111111111020', 'zaitseva-final.docx', 148321, NOW() - INTERVAL '6 days');
+-- Seed course_files
+INSERT INTO course_files (course_id, file_id, teacher_id)
+VALUES (1, 1, '1'),
+       (1, 2, '2'),
+       (2, 3, '2'),
+       (2, 4, '3'),
+       (3, 5, '4');
 
-insert into group_homeworks (id, group_id, name, description, checklist, status, deadline, review_deadline, creation_time, update_time)
-values
-    (1, 1, 'Go Variables - Group 1', 'Домашняя работа для группы Go Basics A.', '1. Переменные; 2. Константы; 3. Форматирование', 'Published', '2025-03-10 20:00:00+00', '2025-03-15 20:00:00+00', '2025-03-01 12:00:00+00', null),
-    (2, 2, 'Go Functions - Group 2', 'Домашняя работа для группы Go Basics B.', '1. Функции; 2. Возврат ошибок', 'Published', '2025-03-12 20:00:00+00', '2025-03-17 20:00:00+00', '2025-03-02 12:00:00+00', null),
-    (3, 3, 'Channels - Group 3', 'Домашняя работа по каналам.', '1. Channels; 2. Buffered channels; 3. Select', 'Draft', '2025-03-18 20:00:00+00', '2025-03-22 20:00:00+00', '2025-03-03 12:00:00+00', null),
-    (4, 4, 'SQL Queries - Group 4', 'Практика SQL-запросов.', '1. JOIN; 2. Aggregates', 'Published', '2025-03-09 20:00:00+00', '2025-03-14 20:00:00+00', '2025-03-01 13:00:00+00', null),
-    (5, 5, 'REST CRUD - Group 5', 'CRUD API для группы REST.', '1. CRUD; 2. Validation; 3. Errors', 'Published', '2025-03-20 20:00:00+00', '2025-03-25 20:00:00+00', '2025-03-04 12:00:00+00', null),
-    (6, 9, 'Service Split - Group 9', 'Проектирование микросервиса.', '1. Boundaries; 2. Endpoints', 'Closed', '2025-03-05 20:00:00+00', '2025-03-08 20:00:00+00', '2025-02-25 12:00:00+00', '2025-03-08 09:00:00+00');
+-- Seed homeworks
+INSERT INTO homeworks
+(id, course_id, group_id, teacher_id, name, status, amount_of_reviewers, description, checklist, deadline,
+ review_deadline, creation_time, update_time)
+VALUES (1, 1, 1, 1, 'ASP.NET Core REST API', 'published', 2, 'Сделать REST API для заметок с CRUD и авторизацией',
+        '["Есть CRUD","Есть валидация","Есть авторизация"]', NOW() + INTERVAL '5 days', NOW() + INTERVAL '10 days',
+        NOW() - INTERVAL '20 days', NOW() - INTERVAL '2 days'),
+       (2, 1, 2, 1, 'Background Jobs', 'published', 2, 'Реализовать фоновые задачи и ретраи',
+        '["Есть scheduler","Есть retry policy","Есть логирование"]', NOW() + INTERVAL '6 days',
+        NOW() + INTERVAL '11 days', NOW() - INTERVAL '19 days', NOW() - INTERVAL '2 days'),
+       (3, 2, 3, 2, 'SQL Index Analysis', 'published', 2, 'Подобрать индексы и сравнить планы запросов',
+        '["Есть explain analyze","Есть сравнение без индекса","Есть выводы"]', NOW() + INTERVAL '4 days',
+        NOW() + INTERVAL '9 days', NOW() - INTERVAL '18 days', NOW() - INTERVAL '1 days'),
+       (4, 2, 4, 3, 'Transaction Isolation Demo', 'review', 1, 'Продемонстрировать уровни изоляции транзакций',
+        '["Есть сценарий dirty read","Есть repeatable read","Есть выводы"]', NOW() - INTERVAL '1 days',
+        NOW() + INTERVAL '3 days', NOW() - INTERVAL '17 days', NOW() - INTERVAL '1 days'),
+       (5, 3, 5, 4, 'Design URL Shortener', 'draft', 2, 'Спроектировать сервис коротких ссылок',
+        '["Есть API","Есть storage","Есть scaling notes"]', NOW() + INTERVAL '12 days', NOW() + INTERVAL '16 days',
+        NOW() - INTERVAL '10 days', NOW() - INTERVAL '5 days'),
+       (6, 1, 1, 2, 'Unit Tests for Services', 'closed', 2, 'Покрыть сервисы модульными тестами',
+        '["Есть happy path","Есть edge cases","Есть mocks"]', NOW() - INTERVAL '10 days', NOW() - INTERVAL '5 days',
+        NOW() - INTERVAL '30 days', NOW() - INTERVAL '4 days');
 
-insert into student_homeworks (id, student_id, group_homework_id, date, status, mark, creation_time, update_time)
-values
-    (1, 1, 1, '2025-03-09 18:00:00+00', 'Submitted', 85, '2025-03-01 12:10:00+00', '2025-03-09 18:00:00+00'),
-    (2, 2, 1, '2025-03-10 17:30:00+00', 'Reviewed', 92, '2025-03-01 12:11:00+00', '2025-03-14 10:00:00+00'),
-    (3, 3, 1, null, 'InProgress', null, '2025-03-01 12:12:00+00', '2025-03-05 09:00:00+00'),
-    (4, 4, 2, '2025-03-11 19:10:00+00', 'Submitted', 78, '2025-03-02 12:10:00+00', '2025-03-11 19:10:00+00'),
-    (5, 5, 2, null, 'NotStarted', null, '2025-03-02 12:11:00+00', null),
-    (6, 6, 2, '2025-03-12 18:40:00+00', 'Reviewed', 88, '2025-03-02 12:12:00+00', '2025-03-16 11:00:00+00'),
-    (7, 7, 3, null, 'InProgress', null, '2025-03-03 12:10:00+00', null),
-    (8, 8, 3, null, 'NotStarted', null, '2025-03-03 12:11:00+00', null),
-    (9, 9, 4, '2025-03-08 16:20:00+00', 'Reviewed', 95, '2025-03-01 13:10:00+00', '2025-03-13 10:30:00+00'),
-    (10, 10, 4, '2025-03-09 14:05:00+00', 'Submitted', 81, '2025-03-01 13:11:00+00', '2025-03-09 14:05:00+00'),
-    (11, 11, 5, null, 'InProgress', null, '2025-03-04 12:10:00+00', null),
-    (12, 12, 5, '2025-03-19 15:30:00+00', 'Submitted', 90, '2025-03-04 12:11:00+00', '2025-03-19 15:30:00+00');
+-- Seed homework_files
+INSERT INTO homework_files (homework_id, file_id, teacher_id)
+VALUES (1, 6, 1),
+       (1, 7, 1),
+       (3, 8, 2),
+       (3, 9, 2),
+       (4, 10, 3);
 
-insert into student_homework_marks (id, student_id, student_homework_id, mark, creation_time, update_time)
-values
-    (1, 1, 1, 85, '2025-03-14 09:00:00+00', null),
-    (2, 2, 2, 92, '2025-03-14 10:00:00+00', '2025-03-14 10:05:00+00'),
-    (3, 4, 4, 78, '2025-03-16 09:30:00+00', null),
-    (4, 6, 6, 88, '2025-03-16 11:00:00+00', '2025-03-16 11:10:00+00'),
-    (5, 9, 9, 95, '2025-03-13 10:30:00+00', null),
-    (6, 10, 10, 81, '2025-03-13 11:00:00+00', null),
-    (7, 12, 12, 90, '2025-03-24 12:00:00+00', '2025-03-24 12:05:00+00');
+-- Seed homework_submissions
+INSERT INTO homework_submissions (id, homework_id, student_id, comment, creation_time, update_time)
+VALUES (1, 1, 1, 'Сделал API на ASP.NET Core с JWT auth', NOW() - INTERVAL '3 days', NOW() - INTERVAL '2 days'),
+       (2, 1, 2, 'Добавила swagger, fluent validation и postgres', NOW() - INTERVAL '3 days',
+        NOW() - INTERVAL '2 days'),
+       (3, 1, 3, 'Реализовал CRUD и middleware для ошибок', NOW() - INTERVAL '2 days', NOW() - INTERVAL '1 days'),
+       (4, 3, 8, 'Сравнил btree и hash индексы', NOW() - INTERVAL '2 days', NOW() - INTERVAL '1 days'),
+       (5, 3, 9, 'Разобрал explain analyze на нескольких запросах', NOW() - INTERVAL '2 days',
+        NOW() - INTERVAL '1 days'),
+       (6, 3, 10, 'Подготовила отчёт с замерами', NOW() - INTERVAL '1 days', NOW() - INTERVAL '1 days'),
+       (7, 4, 11, 'Показал read committed и repeatable read', NOW() - INTERVAL '4 days', NOW() - INTERVAL '2 days'),
+       (8, 4, 12, 'Описала race condition сценарии', NOW() - INTERVAL '4 days', NOW() - INTERVAL '2 days'),
+       (9, 6, 4, 'Добавила unit tests и мокирование репозиториев', NOW() - INTERVAL '12 days',
+        NOW() - INTERVAL '8 days'),
+       (10, 6, 2, 'Покрыла сервисы тестами и проверила edge cases', NOW() - INTERVAL '11 days',
+        NOW() - INTERVAL '7 days');
 
-insert into files (id, name, extension, creation_time)
-values
-    (1, 'go-variables-task', 'pdf', '2025-03-01 08:00:00+00'),
-    (2, 'go-functions-examples', 'md', '2025-03-02 08:00:00+00'),
-    (3, 'channels-homework', 'pdf', '2025-03-03 08:00:00+00'),
-    (4, 'sql-queries-template', 'sql', '2025-03-01 08:30:00+00'),
-    (5, 'rest-crud-contract', 'yaml', '2025-03-04 08:00:00+00'),
-    (6, 'service-split-diagram', 'png', '2025-02-25 08:00:00+00'),
-    (7, 'student-ivanov-solution', 'zip', '2025-03-09 18:05:00+00'),
-    (8, 'student-orlova-solution', 'zip', '2025-03-11 19:15:00+00'),
-    (9, 'student-bogdanova-solution', 'sql', '2025-03-09 14:10:00+00'),
-    (10, 'student-titova-solution', 'zip', '2025-03-19 15:35:00+00');
+-- Seed homework_submission_files
+INSERT INTO homework_submission_files (homework_submission_id, file_id)
+VALUES (1, 11),
+       (2, 12),
+       (3, 13),
+       (4, 17),
+       (5, 18),
+       (6, 16),
+       (7, 19),
+       (8, 20),
+       (9, 14),
+       (10, 15);
 
-insert into homework_files (id, homework_id, file_id, creation_time)
-values
-    (1, 1, 1, '2025-03-01 08:10:00+00'),
-    (2, 2, 2, '2025-03-02 08:10:00+00'),
-    (3, 3, 3, '2025-03-03 08:10:00+00'),
-    (4, 4, 4, '2025-03-01 08:40:00+00'),
-    (5, 5, 5, '2025-03-04 08:10:00+00'),
-    (6, 6, 6, '2025-02-25 08:10:00+00');
+-- Seed homework_distributions
+INSERT INTO homework_distributions (homework_id, distribute_in, creation_time, process_status, fail_count, process_time,
+                                    taken_time, error)
+VALUES (1, NOW() - INTERVAL '1 days', NOW() - INTERVAL '1 days', 'completed', 0, NOW() - INTERVAL '1 days',
+        NOW() - INTERVAL '1 days', NULL),
+       (3, NOW() - INTERVAL '12 hours', NOW() - INTERVAL '12 hours', 'completed', 0, NOW() - INTERVAL '12 hours',
+        NOW() - INTERVAL '12 hours', NULL),
+       (4, NOW() - INTERVAL '6 hours', NOW() - INTERVAL '6 hours', 'processing', 1, NOW() - INTERVAL '6 hours',
+        NOW() - INTERVAL '5 hours', 'One reviewer skipped due to duplicate assignment');
 
-insert into student_homework_files (id, student_homework_id, file_id, creation_time)
-values
-    (1, 1, 7, '2025-03-09 18:06:00+00'),
-    (2, 4, 8, '2025-03-11 19:16:00+00'),
-    (3, 10, 9, '2025-03-09 14:11:00+00'),
-    (4, 12, 10, '2025-03-19 15:36:00+00');
+-- Seed distribution_reviewers
+INSERT INTO distribution_reviewers (homework_id, student_id)
+VALUES (1, 1),
+       (1, 2),
+       (1, 3),
+       (3, 8),
+       (3, 9),
+       (3, 10),
+       (4, 11),
+       (4, 12);
 
-insert into teacher_homework_approvals (id, teacher_id, group_homework_id, creation_time)
-values
-    (1, 1, 1, '2025-03-01 12:30:00+00'),
-    (2, 2, 2, '2025-03-02 12:30:00+00'),
-    (3, 1, 3, '2025-03-03 12:30:00+00'),
-    (4, 3, 4, '2025-03-01 13:30:00+00'),
-    (5, 2, 5, '2025-03-04 12:30:00+00'),
-    (6, 5, 6, '2025-02-25 12:30:00+00');
+-- Seed review_submissions
+INSERT INTO review_submissions (id, homework_id, student_id, mark, comment, creation_time)
+VALUES (1, 1, 2, 9, 'Хорошая структура проекта и понятные контроллеры', NOW() - INTERVAL '1 days'),
+       (2, 1, 3, 8, 'Не хватает пары негативных кейсов, но в целом хорошо', NOW() - INTERVAL '20 hours'),
+       (3, 1, 1, 10, 'Отличная работа со swagger и валидацией', NOW() - INTERVAL '19 hours'),
+       (4, 3, 8, 9, 'Хорошее сравнение планов выполнения', NOW() - INTERVAL '10 hours'),
+       (5, 3, 9, 8, 'Есть выводы, но можно глубже по селективности индекса', NOW() - INTERVAL '9 hours'),
+       (6, 4, 11, 7, 'Демо рабочее, но описание сценариев кратковато', NOW() - INTERVAL '4 hours');
 
-select setval('courses_id_seq', (select max(id) from courses));
-select setval('groups_id_seq', (select max(id) from groups));
-select setval('course_teachers_id_seq', (select max(id) from course_teachers));
-select setval('group_teachers_id_seq', (select max(id) from group_teachers));
-select setval('group_students_id_seq', (select max(id) from group_students));
-select setval('homeworks_id_seq', (select max(id) from homeworks));
-select setval('group_homeworks_id_seq', (select max(id) from group_homeworks));
-select setval('student_homeworks_id_seq', (select max(id) from student_homeworks));
-select setval('student_homework_marks_id_seq', (select max(id) from student_homework_marks));
-select setval('homework_files_id_seq', (select max(id) from homework_files));
-select setval('student_homework_files_id_seq', (select max(id) from student_homework_files));
-select setval('files_id_seq', (select max(id) from files));
-select setval('teacher_homework_approvals_id_seq', (select max(id) from teacher_homework_approvals));
+INSERT INTO homework_submission_marks (homework_submission_id, reviewers_mark, teacher_mark, teacher_id, creation_time, update_time)
+VALUES
+    (1,  8,  9, 1, NOW() - INTERVAL '18 hours', NOW() - INTERVAL '12 hours'),
+    (2, 10, 10, 1, NOW() - INTERVAL '17 hours', NOW() - INTERVAL '11 hours'),
+    (4,  8,  9, 2, NOW() - INTERVAL '8 hours',  NOW() - INTERVAL '7 hours'),
+    (5,  8,  8, 2, NOW() - INTERVAL '8 hours',  NOW() - INTERVAL '6 hours'),
+    (7,  7,  8, 3, NOW() - INTERVAL '3 hours',  NOW() - INTERVAL '2 hours'),
+    (9,  9,  9, 2, NOW() - INTERVAL '6 days',   NOW() - INTERVAL '5 days'),
+    (10, 8,  9, 2, NOW() - INTERVAL '6 days',   NOW() - INTERVAL '5 days');
+
+-- Fix sequences
+SELECT setval('teachers_id_seq', (SELECT MAX(id) FROM teachers));
+SELECT setval('students_id_seq', (SELECT MAX(id) FROM students));
+SELECT setval('courses_id_seq', (SELECT MAX(id) FROM courses));
+SELECT setval('groups_id_seq', (SELECT MAX(id) FROM groups));
+SELECT setval('homeworks_id_seq', (SELECT MAX(id) FROM homeworks));
+SELECT setval('homework_submissions_id_seq', (SELECT MAX(id) FROM homework_submissions));
+SELECT setval('review_submissions_id_seq', (SELECT MAX(id) FROM review_submissions));
+SELECT setval('files_id_seq', (SELECT MAX(id) FROM files));
 
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
 
-delete from teacher_homework_approvals where id between 1 and 6;
-delete from student_homework_files where id between 1 and 4;
-delete from homework_files where id between 1 and 6;
-delete from files where id between 1 and 10;
-delete from student_homework_marks where id between 1 and 7;
-delete from student_homeworks where id between 1 and 12;
-delete from group_homeworks where id between 1 and 6;
-delete from homeworks where id between 1 and 6;
-delete from group_students where id between 1 and 12;
-delete from group_teachers where id between 1 and 11;
-delete from course_teachers where id between 1 and 10;
-delete from groups where id between 1 and 9;
-delete from students where id between 1 and 12;
-delete from teachers where id between 1 and 6;
-delete from courses where id between 1 and 8;
+DELETE
+FROM homework_submission_marks
+WHERE homework_submission_id IN (1, 2, 4, 5, 7, 9, 10);
+
+DELETE
+FROM review_submissions
+WHERE id IN (1, 2, 3, 4, 5, 6);
+
+DELETE
+FROM distribution_reviewers
+WHERE (homework_id, student_id) IN (
+                                    (1, 1),
+                                    (1, 2),
+                                    (1, 3),
+                                    (3, 8),
+                                    (3, 9),
+                                    (3, 10),
+                                    (4, 11),
+                                    (4, 12)
+    );
+
+DELETE
+FROM homework_distributions
+WHERE homework_id IN (1, 3, 4);
+
+DELETE
+FROM homework_submission_files
+WHERE (homework_submission_id, file_id) IN (
+                                            (1, 11),
+                                            (2, 12),
+                                            (3, 13),
+                                            (4, 17),
+                                            (5, 18),
+                                            (6, 16),
+                                            (7, 19),
+                                            (8, 20),
+                                            (9, 14),
+                                            (10, 15)
+    );
+
+DELETE
+FROM homework_submissions
+WHERE id IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+
+DELETE
+FROM homework_files
+WHERE (homework_id, file_id, teacher_id) IN (
+                                             (1, 6, 1),
+                                             (1, 7, 1),
+                                             (3, 8, 2),
+                                             (3, 9, 2),
+                                             (4, 10, 3)
+    );
+
+DELETE
+FROM homeworks
+WHERE id IN (1, 2, 3, 4, 5, 6);
+
+DELETE
+FROM course_files
+WHERE (course_id, file_id, teacher_id) IN (
+                                           (1, 1, '1'),
+                                           (1, 2, '2'),
+                                           (2, 3, '2'),
+                                           (2, 4, '3'),
+                                           (3, 5, '4')
+    );
+
+DELETE
+FROM files
+WHERE id IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20);
+
+DELETE
+FROM group_students
+WHERE (group_id, student_id) IN (
+                                 (1, 1),
+                                 (1, 2),
+                                 (1, 3),
+                                 (1, 4),
+                                 (2, 5),
+                                 (2, 6),
+                                 (2, 7),
+                                 (3, 8),
+                                 (3, 9),
+                                 (3, 10),
+                                 (4, 11),
+                                 (4, 12),
+                                 (5, 2),
+                                 (5, 6)
+    );
+
+DELETE
+FROM group_teachers
+WHERE (group_id, teacher_id) IN (
+                                 (1, 1),
+                                 (1, 2),
+                                 (2, 1),
+                                 (3, 2),
+                                 (3, 3),
+                                 (4, 3),
+                                 (5, 4)
+    );
+
+DELETE
+FROM course_teachers
+WHERE (course_id, teacher_id) IN (
+                                  (1, 1),
+                                  (1, 2),
+                                  (2, 2),
+                                  (2, 3),
+                                  (3, 4)
+    );
+
+DELETE
+FROM groups
+WHERE id IN (1, 2, 3, 4, 5);
+
+DELETE
+FROM courses
+WHERE id IN (1, 2, 3);
+
+DELETE
+FROM students
+WHERE id IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
+
+DELETE
+FROM teachers
+WHERE id IN (1, 2, 3, 4);
 
 -- +goose StatementEnd

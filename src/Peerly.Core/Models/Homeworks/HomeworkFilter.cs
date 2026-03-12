@@ -6,6 +6,7 @@ namespace Peerly.Core.Models.Homeworks;
 public sealed record HomeworkFilter
 {
     public required IReadOnlyCollection<CourseId> CourseIds { get; init; }
+    public required IReadOnlyCollection<GroupId> GroupIds { get; init; }
     public required IReadOnlyCollection<HomeworkStatus> HomeworkStatuses { get; init; }
 
     public static HomeworkFilter Empty()
@@ -13,6 +14,7 @@ public sealed record HomeworkFilter
         return new HomeworkFilter
         {
             CourseIds = [],
+            GroupIds = [],
             HomeworkStatuses = []
         };
     }

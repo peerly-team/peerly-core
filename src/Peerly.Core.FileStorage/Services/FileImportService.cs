@@ -17,7 +17,7 @@ internal sealed class FileImportService : IFileImportService
 
     public async Task<GeneratedUploadUrlInfo> GenerateUploadUrl()
     {
-        var storageId = (TemporaryStorageId)Guid.NewGuid();
+        var storageId = (StorageId)Guid.NewGuid();
         var url = await _storage.GenerateUploadUrlAsync(storageId);
 
         return new GeneratedUploadUrlInfo

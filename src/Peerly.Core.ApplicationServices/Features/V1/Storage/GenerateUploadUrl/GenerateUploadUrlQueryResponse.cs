@@ -6,5 +6,5 @@ namespace Peerly.Core.ApplicationServices.Features.V1.Storage.GenerateUploadUrl;
 public sealed record GenerateUploadUrlQueryResponse
 {
     public required Uri Url { get; init; }
-    public required TemporaryStorageId StorageId { get; init; }
+    public required StorageId StorageId { get; init; }
 }

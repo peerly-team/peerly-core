@@ -83,10 +83,12 @@ internal sealed class SearchStudentCoursesHandler : IQueryHandler<SearchStudentC
         ICommonReadOnlyUnitOfWork unitOfWork,
         CancellationToken cancellationToken)
     {
+        // todo: поменять алгоритм, вытащив информацию о группе пользователя, а затем отдав только его домашки
         var filter = new HomeworkFilter
         {
             CourseIds = courseIds,
-            HomeworkStatuses = [HomeworkStatus.Published, HomeworkStatus.Review, HomeworkStatus.Closed]
+            GroupIds = [],
+            HomeworkStatuses = [HomeworkStatus.Published, HomeworkStatus.Reviewing, HomeworkStatus.Confirmation, HomeworkStatus.Finished]
         };
         var homeworks = await unitOfWork.ReadOnlyHomeworkRepository.ListAsync(filter, cancellationToken);
 

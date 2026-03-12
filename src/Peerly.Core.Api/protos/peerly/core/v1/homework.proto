@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+package peerly.core.v1;
+
+import "peerly/core/v1/common.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "Peerly.Core.V1.Proto";
+
+// todo: добавить сортировку в Search ручки
+service HomeworkService {
+  rpc V1CreateHomework(V1CreateHomeworkRequest) returns (V1CreateHomeworkResponse);
+  rpc V1UpdateHomeworkStatus(V1UpdateHomeworkStatusRequest) returns (V1UpdateHomeworkStatusResponse);
+
+  // todo: реализовать
+  rpc V1CreateHomeworkAttachment(V1CreateHomeworkAttachmentRequest) returns (V1CreateHomeworkAttachmentResponse);
+  // todo: закончить реализацию ручек (поправить логику)
+  rpc V1SearchStudentCourseHomeworks(V1SearchStudentCourseHomeworksRequest) returns (V1SearchStudentCourseHomeworksResponse);
+  rpc V1SearchTeacherCoursesHomeworks(V1SearchTeacherCoursesHomeworksRequest) returns (V1SearchTeacherCoursesHomeworksResponse);
+}
+
+message V1CreateHomeworkRequest {
+  int64 course_id = 1;
+  google.protobuf.Int64Value group_id = 2;
+  int64 teacher_id = 3;
+  string name = 4;
+  int32 amount_of_reviewers = 5;
+  google.protobuf.StringValue description = 6;
+  string checklist = 7;
+  google.protobuf.Timestamp deadline = 8;
+  google.protobuf.Timestamp review_deadline = 9;
+}
+
+message V1CreateHomeworkResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {
+    int64 homework_id = 1;
+  }
+}
+
+message V1CreateHomeworkAttachmentRequest {
+  int64 homework_id = 1;
+  string storage_id = 2;
+  string file_name = 3;
+  int64 file_size = 4;
+  int64 teacher_id = 5;
+}
+
+message V1CreateHomeworkAttachmentResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {
+    int64 file_id = 1;
+  }
+}
+
+message V1UpdateHomeworkStatusRequest {
+  int64 homework_id = 1;
+  int64 teacher_id = 2;
+  HomeworkStatus homework_status = 3;
+}
+
+message V1UpdateHomeworkStatusResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}
+
+message V1SearchStudentCourseHomeworksRequest {
+  int64 student_id = 1;
+  int64 course_id = 2;
+  SearchCourseHomeworksFilter filter = 3;
+  PaginationInfo pagination_info = 4;
+}
+
+message V1SearchStudentCourseHomeworksResponse {
+  repeated HomeworkInfo homework_infos = 1;
+}
+
+message V1SearchTeacherCoursesHomeworksRequest {
+  int64 teacher_id = 1;
+  int64 course_id = 2;
+  SearchCourseHomeworksFilter filter = 3;
+  PaginationInfo pagination_info = 4;
+}
+
+message V1SearchTeacherCoursesHomeworksResponse {
+  repeated HomeworkInfo homework_infos = 1;
+}

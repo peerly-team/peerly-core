@@ -23,7 +23,7 @@ internal sealed class CephStorage : IStorage
         _options = options.Value;
     }
 
-    public async Task<Uri> GenerateUploadUrlAsync(TemporaryStorageId temporaryStorageId)
+    public async Task<Uri> GenerateUploadUrlAsync(StorageId storageId)
     {
         using var client = _amazonClientFactory.Create();
         var stringUri = await client.GetPreSignedURLAsync(
@@ -31,7 +31,7 @@ internal sealed class CephStorage : IStorage
             {
                 Expires = DateTime.Now.Add(_options.ExpirationTime),
                 BucketName = _options.BucketName,
-                Key = temporaryStorageId.ToString(),
+                Key = storageId.ToString(),
                 Protocol = Protocol.HTTPS,
                 Verb = HttpVerb.PUT
             });

@@ -6,5 +6,5 @@ namespace Peerly.Core.Abstractions.ApplicationServices;
 
 public interface IStorage
 {
-    Task<Uri> GenerateUploadUrlAsync(TemporaryStorageId temporaryStorageId);
+    Task<Uri> GenerateUploadUrlAsync(StorageId storageId);
 }

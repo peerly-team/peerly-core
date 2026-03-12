@@ -4,6 +4,7 @@ public enum HomeworkStatus
 {
     Draft = 1,
     Published = 2,
-    Review = 3,
-    Closed = 4
+    Reviewing = 3,
+    Confirmation = 4,
+    Finished = 5
 }

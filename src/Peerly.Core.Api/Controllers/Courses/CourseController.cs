@@ -75,6 +75,7 @@ public sealed class CourseController : CourseService.CourseServiceBase
         return queryResponse.ToV1SearchCoursesResponse();
     }
 
+    // todo: поправить ручку
     public override async Task<V1SearchStudentCoursesResponse> V1SearchStudentCourses(
         V1SearchStudentCoursesRequest request,
         ServerCallContext context)
@@ -84,7 +85,10 @@ public sealed class CourseController : CourseService.CourseServiceBase
         return queryResponse.ToV1SearchStudentCoursesResponse();
     }
 
-    public override async Task<V1SearchTeacherCoursesResponse> V1SearchTeacherCourses(V1SearchTeacherCoursesRequest request, ServerCallContext context)
+    // todo: поправить ручку
+    public override async Task<V1SearchTeacherCoursesResponse> V1SearchTeacherCourses(
+        V1SearchTeacherCoursesRequest request,
+        ServerCallContext context)
     {
         var query = request.ToSearchTeacherCoursesQuery();
         var queryResponse = await _searchTeacherCoursesHandler.ExecuteAsync(query, context.CancellationToken);

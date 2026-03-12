@@ -4,8 +4,8 @@ create table courses
 (
     id            bigserial primary key not null,
     name          text                  not null,
+    status        text                  not null,
     description   text,
-    status        text                  not null, -- Draft, InProgress, Finished, Canceled, Deleted
     creation_time timestamptz           not null,
     update_time   timestamptz
 );

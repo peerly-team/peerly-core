@@ -47,7 +47,7 @@ internal sealed class SearchTeacherCoursesHandler : IQueryHandler<SearchTeacherC
         };
     }
 
-    private static async Task<IReadOnlyCollection<Course>> GetCoursesAsync(
+    private static async Task<IReadOnlyCollection<Core.Models.Courses.Course>> GetCoursesAsync(
         IReadOnlyCollection<CourseId> courseIds,
         SearchTeacherCoursesQuery query,
         ICommonReadOnlyUnitOfWork unitOfWork,

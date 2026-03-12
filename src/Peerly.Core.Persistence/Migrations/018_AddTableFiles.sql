@@ -1,15 +1,16 @@
 -- +goose Up
 -- +goose StatementBegin
-create table group_students
+create table files
 (
     id            bigserial primary key not null,
-    group_id      bigint                not null,
-    student_id    bigint                not null,
+    storage_id    uuid                  not null,
+    name          text                  not null,
+    size          int                   not null,
     creation_time timestamptz           not null
 );
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-drop table group_students;
+drop table files;
 -- +goose StatementEnd

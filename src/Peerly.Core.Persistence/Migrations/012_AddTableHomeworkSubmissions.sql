@@ -1,10 +1,11 @@
 -- +goose Up
 -- +goose StatementBegin
-create table groups
+create table homework_submissions
 (
     id            bigserial primary key not null,
-    name          text                  not null,
-    course_id     bigint                not null,
+    homework_id   bigint                not null,
+    student_id    bigint                not null,
+    comment       text                  not null,
     creation_time timestamptz           not null,
     update_time   timestamptz
 );
@@ -12,5 +13,5 @@ create table groups
 
 -- +goose Down
 -- +goose StatementBegin
-drop table groups;
+drop table homework_submissions;
 -- +goose StatementEnd

@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package peerly.core.v1;
 
+import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 
 option csharp_namespace = "Peerly.Core.V1.Proto";
@@ -53,4 +54,28 @@ message CourseInfo {
   CourseStatus status = 4;
   int64 student_count = 5;
   int64 homework_count = 6;
+}
+
+enum HomeworkStatus {
+  HOMEWORK_STATUS_UNKNOWN = 0;
+  HOMEWORK_STATUS_DRAFT = 1;
+  HOMEWORK_STATUS_PUBLISHED = 2;
+  HOMEWORK_STATUS_REVIEWING = 3;
+  HOMEWORK_STATUS_CONFIRMATION = 4;
+  HOMEWORK_STATUS_FINISHED = 5;
+}
+
+message SearchCourseHomeworksFilter {
+  repeated HomeworkStatus homework_statuses = 1;
+}
+
+message HomeworkInfo {
+  int64 id = 1;
+  string name = 2;
+  HomeworkStatus status = 3;
+  google.protobuf.StringValue description = 4;
+  google.protobuf.StringValue checklist = 5;
+  google.protobuf.Timestamp deadline = 6;
+  google.protobuf.Timestamp review_deadline = 7;
+  int32 amount_of_reviewers = 8;
 }

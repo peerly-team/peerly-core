@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using OneOf.Types;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.DeleteCourse;
@@ -19,8 +18,7 @@ using Proto = Peerly.Core.V1;
 
 namespace Peerly.Core.Api.Controllers.Courses;
 
-[ExcludeFromCodeCoverage]
-internal static class CourseMappingExtensions
+internal static class CourseMappingMapper
 {
     public static GetTeacherCourseQuery ToGetTeacherCourseQuery(this Proto.V1GetTeacherCourseRequest request)
     {

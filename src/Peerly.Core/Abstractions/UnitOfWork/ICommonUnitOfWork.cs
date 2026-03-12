@@ -9,6 +9,7 @@ public interface ICommonUnitOfWork : IUnitOfWork
     IGroupRepository GroupRepository { get; }
     IGroupStudentRepository GroupStudentRepository { get; }
     ICourseTeacherRepository CourseTeacherRepository { get; }
+    IHomeworkSubmissionRepository HomeworkSubmissionRepository { get; }
 }
 
 public interface ICommonReadOnlyUnitOfWork : IUnitOfWork
@@ -18,4 +19,5 @@ public interface ICommonReadOnlyUnitOfWork : IUnitOfWork
     IReadOnlyGroupRepository ReadOnlyGroupRepository { get; }
     IReadOnlyGroupStudentRepository ReadOnlyGroupStudentRepository { get; }
     IReadOnlyCourseTeacherRepository ReadOnlyCourseTeacherRepository { get; }
+    IReadOnlyHomeworkSubmissionRepository ReadOnlyHomeworkSubmissionRepository { get; }
 }
