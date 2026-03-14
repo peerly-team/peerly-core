@@ -7,7 +7,7 @@ namespace Peerly.Core.Abstractions.Repositories;
 
 public interface IFileRepository : IReadOnlyFileRepository
 {
-
+    Task<FileId> AddAsync(FileAddItem item, CancellationToken cancellationToken);
 }
 
 public interface IReadOnlyFileRepository

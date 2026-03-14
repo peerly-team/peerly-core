@@ -22,7 +22,7 @@ internal sealed class GetStudentCourseHandler : IQueryHandler<GetStudentCourseQu
 
     public async Task<GetStudentCourseQueryResponse> ExecuteAsync(GetStudentCourseQuery query, CancellationToken cancellationToken)
     {
-        var unitOfWork = await _commonUnitOfWorkFactory.CreateReadOnlyAsync(cancellationToken);
+        await using var unitOfWork = await _commonUnitOfWorkFactory.CreateReadOnlyAsync(cancellationToken);
 
         var isCourseStudentExists = await IsCourseStudentExistsAsync(query, unitOfWork, cancellationToken);
         if (!isCourseStudentExists)

@@ -20,7 +20,7 @@ internal sealed class DeleteCourseHandler : ICommandHandler<DeleteCourseCommand,
 
     public async Task<CommandResponse<Success>> ExecuteAsync(DeleteCourseCommand command, CancellationToken cancellationToken)
     {
-        var unitOfWork = await _commonUnitOfWorkFactory.CreateAsync(cancellationToken);
+        await using var unitOfWork = await _commonUnitOfWorkFactory.CreateAsync(cancellationToken);
 
         var courseTeacherExistsItem = command.ToCourseTeacherExistsItem();
         var isCourseTeacherExists = await unitOfWork.CourseTeacherRepository.ExistsAsync(courseTeacherExistsItem, cancellationToken);

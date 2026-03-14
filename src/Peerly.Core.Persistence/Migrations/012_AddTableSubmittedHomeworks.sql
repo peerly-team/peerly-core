@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-create table homework_submissions
+create table submitted_homeworks
 (
     id            bigserial primary key not null,
     homework_id   bigint                not null,
@@ -13,5 +13,5 @@ create table homework_submissions
 
 -- +goose Down
 -- +goose StatementBegin
-drop table homework_submissions;
+drop table submitted_homeworks;
 -- +goose StatementEnd

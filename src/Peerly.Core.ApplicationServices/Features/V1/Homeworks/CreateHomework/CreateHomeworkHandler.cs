@@ -23,7 +23,7 @@ internal sealed class CreateHomeworkHandler : ICommandHandler<CreateHomeworkComm
         CreateHomeworkCommand command,
         CancellationToken cancellationToken)
     {
-        var unitOfWork = await _commonUnitOfWorkFactory.CreateAsync(cancellationToken);
+        await using var unitOfWork = await _commonUnitOfWorkFactory.CreateAsync(cancellationToken);
 
         // todo: добавить проверку, что препод может добавлять домашку на курс
         // todo: добавить проверку, что курс и группа существуют

@@ -1,9 +1,9 @@
 using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.Identifiers;
 
-namespace Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateHomeworkSubmission;
+namespace Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomework;
 
-public sealed record CreateHomeworkSubmissionCommand : ICommand<CreateHomeworkSubmissionCommandResponse>
+public sealed record CreateSubmittedHomeworkCommand : ICommand<CreateSubmittedHomeworkCommandResponse>
 {
     public required HomeworkId HomeworkId { get; init; }
     public required StudentId StudentId { get; init; }

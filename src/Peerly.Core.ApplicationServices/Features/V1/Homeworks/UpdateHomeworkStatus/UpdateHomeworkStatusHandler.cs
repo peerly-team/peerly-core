@@ -18,7 +18,7 @@ internal sealed class UpdateHomeworkStatusHandler : ICommandHandler<UpdateHomewo
 
     public async Task<CommandResponse<Success>> ExecuteAsync(UpdateHomeworkStatusCommand command, CancellationToken cancellationToken)
     {
-        var unitOfWork = await _commonUnitOfWorkFactory.CreateAsync(cancellationToken);
+        await using var unitOfWork = await _commonUnitOfWorkFactory.CreateAsync(cancellationToken);
 
         // todo: добавить проверку, что препод может редактировать статусы на этой домашке (относится к курсу, для которой эта домашка)
         // todo: добавить проверку на переходы статусов (продумать статусную модель и отрисовать в miro)

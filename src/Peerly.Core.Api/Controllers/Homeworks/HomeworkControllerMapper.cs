@@ -2,6 +2,7 @@ using System;
 using Google.Protobuf.WellKnownTypes;
 using OneOf.Types;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomework;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.SearchStudentCourseHomeworks;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.Shared.SearchCourseHomeworks;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.UpdateHomeworkStatus;
@@ -70,6 +71,36 @@ internal static class HomeworkControllerMapper
                 ValidationError = validationError.ToProto<UpdateHomeworkStatusCommand, Proto.V1UpdateHomeworkStatusRequest>()
             },
             otherError => new Proto.V1UpdateHomeworkStatusResponse { OtherError = otherError.ToProto() });
+    }
+
+    public static CreateHomeworkFileCommand ToCreateHomeworkFileCommand(this Proto.V1CreateHomeworkFileRequest request)
+    {
+        return new CreateHomeworkFileCommand
+        {
+            HomeworkId = new HomeworkId(request.HomeworkId),
+            StorageId = (StorageId)Guid.Parse(request.StorageId),
+            FileName = request.FileName,
+            FileSize = request.FileSize,
+            TeacherId = new TeacherId(request.TeacherId)
+        };
+    }
+
+    public static Proto.V1CreateHomeworkFileResponse ToV1CreateHomeworkAttachmentResponse(
+        this CommandResponse<CreateHomeworkFileCommandResponse> commandResponse)
+    {
+        return commandResponse.Match(
+            success => new Proto.V1CreateHomeworkFileResponse
+            {
+                SuccessResponse = new Proto.V1CreateHomeworkFileResponse.Types.Success
+                {
+                    FileId = (long)success.FileId
+                }
+            },
+            validationError => new Proto.V1CreateHomeworkFileResponse
+            {
+                ValidationError = validationError.ToProto<CreateHomeworkFileCommand, Proto.V1CreateHomeworkFileRequest>()
+            },
+            otherError => new Proto.V1CreateHomeworkFileResponse { OtherError = otherError.ToProto() });
     }
 
     public static SearchStudentCourseHomeworksQuery ToSearchStudentCoursesQuery(this Proto.V1SearchStudentCourseHomeworksRequest request)

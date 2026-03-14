@@ -2,8 +2,10 @@ using Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.DeleteCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.UpdateCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomework;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.UpdateHomeworkStatus;
-using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateHomeworkSubmission;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomework;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomeworkFile;
 using Peerly.Core.V1;
 
 namespace Peerly.Core.Api.Infrastructure.Configuration;
@@ -40,7 +42,15 @@ public static class ValidationPropertyMappingConfiguration
             .Build();
 
         ValidationPropertyMapping
-            .AddMapping<CreateHomeworkSubmissionCommand, V1CreateHomeworkSubmissionRequest>()
+            .AddMapping<CreateSubmittedHomeworkCommand, V1CreateSubmittedHomeworkRequest>()
+            .Build();
+
+        ValidationPropertyMapping
+            .AddMapping<CreateHomeworkFileCommand, V1CreateHomeworkFileRequest>()
+            .Build();
+
+        ValidationPropertyMapping
+            .AddMapping<CreateSubmittedHomeworkFileCommand, V1CreateSubmittedHomeworkFileRequest>()
             .Build();
     }
 }

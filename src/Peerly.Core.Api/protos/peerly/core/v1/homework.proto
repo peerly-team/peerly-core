@@ -12,9 +12,8 @@ option csharp_namespace = "Peerly.Core.V1.Proto";
 service HomeworkService {
   rpc V1CreateHomework(V1CreateHomeworkRequest) returns (V1CreateHomeworkResponse);
   rpc V1UpdateHomeworkStatus(V1UpdateHomeworkStatusRequest) returns (V1UpdateHomeworkStatusResponse);
+  rpc V1CreateHomeworkFile(V1CreateHomeworkFileRequest) returns (V1CreateHomeworkFileResponse);
 
-  // todo: реализовать
-  rpc V1CreateHomeworkAttachment(V1CreateHomeworkAttachmentRequest) returns (V1CreateHomeworkAttachmentResponse);
   // todo: закончить реализацию ручек (поправить логику)
   rpc V1SearchStudentCourseHomeworks(V1SearchStudentCourseHomeworksRequest) returns (V1SearchStudentCourseHomeworksResponse);
   rpc V1SearchTeacherCoursesHomeworks(V1SearchTeacherCoursesHomeworksRequest) returns (V1SearchTeacherCoursesHomeworksResponse);
@@ -44,15 +43,15 @@ message V1CreateHomeworkResponse {
   }
 }
 
-message V1CreateHomeworkAttachmentRequest {
+message V1CreateHomeworkFileRequest {
   int64 homework_id = 1;
   string storage_id = 2;
   string file_name = 3;
-  int64 file_size = 4;
+  int32 file_size = 4;
   int64 teacher_id = 5;
 }
 
-message V1CreateHomeworkAttachmentResponse {
+message V1CreateHomeworkFileResponse {
   oneof response {
     Success success_response = 1;
     ValidationError validation_error = 2;

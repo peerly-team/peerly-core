@@ -1,8 +1,8 @@
 -- +goose Up
 -- +goose StatementBegin
-create table homework_submission_marks
+create table submitted_homework_marks
 (
-    homework_submission_id bigint primary key not null,
+    submitted_homework_id bigint primary key not null,
     reviewers_mark         int                not null,
     teacher_mark           int,
     teacher_id             bigint,
@@ -13,5 +13,5 @@ create table homework_submission_marks
 
 -- +goose Down
 -- +goose StatementBegin
-drop table homework_submission_marks;
+drop table submitted_homework_marks;
 -- +goose StatementEnd

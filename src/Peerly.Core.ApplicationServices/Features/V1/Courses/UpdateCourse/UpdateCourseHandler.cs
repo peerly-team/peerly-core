@@ -25,7 +25,7 @@ internal sealed class UpdateCourseHandler : ICommandHandler<UpdateCourseCommand,
             return ValidationError.From(CourseErrors.ForbiddenUpdateCourseStatusToDelete);
         }
 
-        var unitOfWork = await _commonUnitOfWorkFactory.CreateAsync(cancellationToken);
+        await using var unitOfWork = await _commonUnitOfWorkFactory.CreateAsync(cancellationToken);
 
         var course = await unitOfWork.CourseRepository.GetAsync(command.CourseId, cancellationToken);
         if (course is null)

@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-create table review_submissions
+create table submitted_reviews
 (
     id            bigint primary key not null,
     homework_id   bigint             not null,
@@ -13,5 +13,5 @@ create table review_submissions
 
 -- +goose Down
 -- +goose StatementBegin
-drop table review_submissions;
+drop table submitted_reviews;
 -- +goose StatementEnd

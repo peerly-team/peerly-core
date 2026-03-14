@@ -3,7 +3,7 @@ using Peerly.Core.Identifiers;
 
 namespace Peerly.Core.Models.Submissions;
 
-public sealed record HomeworkSubmissionAddItem
+public sealed record SubmittedHomeworkAddItem
 {
     public required HomeworkId HomeworkId { get; init; }
     public required StudentId StudentId { get; init; }

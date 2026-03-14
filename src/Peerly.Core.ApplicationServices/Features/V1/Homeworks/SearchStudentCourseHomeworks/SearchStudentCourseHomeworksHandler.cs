@@ -22,7 +22,7 @@ internal sealed class SearchStudentCourseHomeworksHandler : IQueryHandler<Search
         SearchStudentCourseHomeworksQuery query,
         CancellationToken cancellationToken)
     {
-        var unitOfWork = await _commonUnitOfWorkFactory.CreateReadOnlyAsync(cancellationToken);
+        await using var unitOfWork = await _commonUnitOfWorkFactory.CreateReadOnlyAsync(cancellationToken);
 
         var groupFilter = GroupFilter.Empty() with { CourseIds = [query.CourseId] };
         var groups = await unitOfWork.ReadOnlyGroupRepository.ListAsync(groupFilter, cancellationToken);

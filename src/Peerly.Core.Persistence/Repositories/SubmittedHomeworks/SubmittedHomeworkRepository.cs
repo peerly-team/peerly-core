@@ -7,18 +7,18 @@ using Peerly.Core.Models.Submissions;
 using Peerly.Core.Persistence.UnitOfWork;
 using static Peerly.Core.Persistence.Schemas.PeerlyCommonScheme;
 
-namespace Peerly.Core.Persistence.Repositories.HomeworkSubmissions;
+namespace Peerly.Core.Persistence.Repositories.SubmittedHomeworks;
 
-internal sealed class HomeworkSubmissionRepository : IHomeworkSubmissionRepository
+internal sealed class SubmittedHomeworkRepository : ISubmittedHomeworkRepository
 {
     private readonly IConnectionContext _connectionContext;
 
-    public HomeworkSubmissionRepository(IConnectionContext connectionContext)
+    public SubmittedHomeworkRepository(IConnectionContext connectionContext)
     {
         _connectionContext = connectionContext;
     }
 
-    public async Task<HomeworkSubmissionId> AddAsync(HomeworkSubmissionAddItem item, CancellationToken cancellationToken)
+    public async Task<SubmittedHomeworkId> AddAsync(SubmittedHomeworkAddItem item, CancellationToken cancellationToken)
     {
         var queryParams = new
         {
@@ -30,17 +30,17 @@ internal sealed class HomeworkSubmissionRepository : IHomeworkSubmissionReposito
 
         const string Query =
             $"""
-             insert into {HomeworkSubmissionTable.TableName} (
-                         {HomeworkSubmissionTable.HomeworkId},
-                         {HomeworkSubmissionTable.StudentId},
-                         {HomeworkSubmissionTable.Comment},
-                         {HomeworkSubmissionTable.CreationTime})
+             insert into {SubmittedHomeworkTable.TableName} (
+                         {SubmittedHomeworkTable.HomeworkId},
+                         {SubmittedHomeworkTable.StudentId},
+                         {SubmittedHomeworkTable.Comment},
+                         {SubmittedHomeworkTable.CreationTime})
                   values (
                          @{nameof(queryParams.HomeworkId)},
                          @{nameof(queryParams.StudentId)},
                          @{nameof(queryParams.Comment)},
                          @{nameof(queryParams.CreationTime)})
-               returning {HomeworkSubmissionTable.Id};
+               returning {SubmittedHomeworkTable.Id};
              """;
 
         var command = new CommandDefinition(
@@ -48,8 +48,8 @@ internal sealed class HomeworkSubmissionRepository : IHomeworkSubmissionReposito
             queryParams,
             _connectionContext.Transaction,
             cancellationToken: cancellationToken);
-        var homeworkSubmissionId = await _connectionContext.Connection.QuerySingleAsync<long>(command);
+        var submittedHomeworkId = await _connectionContext.Connection.QuerySingleAsync<long>(command);
 
-        return new HomeworkSubmissionId(homeworkSubmissionId);
+        return new SubmittedHomeworkId(submittedHomeworkId);
     }
 }

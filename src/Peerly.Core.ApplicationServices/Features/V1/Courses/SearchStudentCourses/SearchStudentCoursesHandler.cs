@@ -25,7 +25,7 @@ internal sealed class SearchStudentCoursesHandler : IQueryHandler<SearchStudentC
 
     public async Task<SearchStudentCoursesQueryResponse> ExecuteAsync(SearchStudentCoursesQuery query, CancellationToken cancellationToken)
     {
-        var unitOfWork = await _unitOfWorkFactory.CreateReadOnlyAsync(cancellationToken);
+        await using var unitOfWork = await _unitOfWorkFactory.CreateReadOnlyAsync(cancellationToken);
 
         var groups = await GetGroupsAsync(query.StudentId, unitOfWork, cancellationToken);
         if (groups.Count == 0) { return new SearchStudentCoursesQueryResponse { CourseInfos = [] }; }

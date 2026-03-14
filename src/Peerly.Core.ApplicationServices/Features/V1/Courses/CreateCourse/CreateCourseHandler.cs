@@ -21,7 +21,7 @@ internal sealed class CreateCourseHandler : ICommandHandler<CreateCourseCommand,
 
     public async Task<CommandResponse<Success>> ExecuteAsync(CreateCourseCommand command, CancellationToken cancellationToken)
     {
-        var unitOfWork = await _unitOfWorkFactory.CreateAsync(cancellationToken);
+        await using var unitOfWork = await _unitOfWorkFactory.CreateAsync(cancellationToken);
 
         var courseAddItem = _mapper.ToCourseAddItem(command);
         var courseId = await unitOfWork.CourseRepository.AddAsync(courseAddItem, cancellationToken);

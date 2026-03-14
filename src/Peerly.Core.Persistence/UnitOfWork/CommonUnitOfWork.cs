@@ -12,8 +12,10 @@ internal sealed class CommonUnitOfWork : UnitOfWork, ICommonUnitOfWork, ICommonR
     private readonly Lazy<IGroupRepository> _groupRepository;
     private readonly Lazy<IGroupStudentRepository> _groupStudentRepository;
     private readonly Lazy<ICourseTeacherRepository> _courseTeacherRepository;
-    private readonly Lazy<IHomeworkSubmissionRepository> _homeworkSubmissionRepository;
+    private readonly Lazy<ISubmittedHomeworkRepository> _submittedHomeworkRepository;
     private readonly Lazy<IFileRepository> _fileRepository;
+    private readonly Lazy<IHomeworkFileRepository> _homeworkFileRepository;
+    private readonly Lazy<ISubmittedHomeworkFileRepository> _submittedHomeworkFileRepository;
 
     public CommonUnitOfWork(
         DbConnection connection,
@@ -22,16 +24,20 @@ internal sealed class CommonUnitOfWork : UnitOfWork, ICommonUnitOfWork, ICommonR
         Func<IConnectionContext, IGroupRepository> groupRepositoryFactory,
         Func<IConnectionContext, IGroupStudentRepository> groupStudentRepositoryFactory,
         Func<IConnectionContext, ICourseTeacherRepository> courseTeacherRepositoryFactory,
-        Func<IConnectionContext, IHomeworkSubmissionRepository> homeworkSubmissionRepositoryFactory,
-        Func<IConnectionContext, IFileRepository> fileRepositoryFactory) : base(connection)
+        Func<IConnectionContext, ISubmittedHomeworkRepository> submittedHomeworkRepositoryFactory,
+        Func<IConnectionContext, IFileRepository> fileRepositoryFactory,
+        Func<IConnectionContext, IHomeworkFileRepository> homeworkFileRepositoryFactory,
+        Func<IConnectionContext, ISubmittedHomeworkFileRepository> submittedHomeworkFileRepositoryFactory) : base(connection)
     {
         _courseRepository = new Lazy<ICourseRepository>(() => courseRepositoryFactory(this));
         _homeworkRepository = new Lazy<IHomeworkRepository>(() => homeworkRepositoryFactory(this));
         _groupRepository = new Lazy<IGroupRepository>(() => groupRepositoryFactory(this));
         _groupStudentRepository = new Lazy<IGroupStudentRepository>(() => groupStudentRepositoryFactory(this));
         _courseTeacherRepository = new Lazy<ICourseTeacherRepository>(() => courseTeacherRepositoryFactory(this));
-        _homeworkSubmissionRepository = new Lazy<IHomeworkSubmissionRepository>(() => homeworkSubmissionRepositoryFactory(this));
+        _submittedHomeworkRepository = new Lazy<ISubmittedHomeworkRepository>(() => submittedHomeworkRepositoryFactory(this));
         _fileRepository = new Lazy<IFileRepository>(() => fileRepositoryFactory(this));
+        _homeworkFileRepository = new Lazy<IHomeworkFileRepository>(() => homeworkFileRepositoryFactory(this));
+        _submittedHomeworkFileRepository = new Lazy<ISubmittedHomeworkFileRepository>(() => submittedHomeworkFileRepositoryFactory(this));
     }
 
     public ICourseRepository CourseRepository => _courseRepository.Value;
@@ -39,14 +45,18 @@ internal sealed class CommonUnitOfWork : UnitOfWork, ICommonUnitOfWork, ICommonR
     public IGroupRepository GroupRepository => _groupRepository.Value;
     public IGroupStudentRepository GroupStudentRepository => _groupStudentRepository.Value;
     public ICourseTeacherRepository CourseTeacherRepository => _courseTeacherRepository.Value;
-    public IHomeworkSubmissionRepository HomeworkSubmissionRepository => _homeworkSubmissionRepository.Value;
+    public ISubmittedHomeworkRepository SubmittedHomeworkRepository => _submittedHomeworkRepository.Value;
     public IFileRepository FileRepository => _fileRepository.Value;
+    public IHomeworkFileRepository HomeworkFileRepository => _homeworkFileRepository.Value;
+    public ISubmittedHomeworkFileRepository SubmittedHomeworkFileRepository => _submittedHomeworkFileRepository.Value;
 
     public IReadOnlyCourseRepository ReadOnlyCourseRepository => _courseRepository.Value;
     public IReadOnlyHomeworkRepository ReadOnlyHomeworkRepository => _homeworkRepository.Value;
     public IReadOnlyGroupRepository ReadOnlyGroupRepository => _groupRepository.Value;
     public IReadOnlyGroupStudentRepository ReadOnlyGroupStudentRepository => _groupStudentRepository.Value;
     public IReadOnlyCourseTeacherRepository ReadOnlyCourseTeacherRepository => _courseTeacherRepository.Value;
-    public IReadOnlyHomeworkSubmissionRepository ReadOnlyHomeworkSubmissionRepository => _homeworkSubmissionRepository.Value;
+    public IReadOnlySubmittedHomeworkRepository ReadOnlySubmittedHomeworkRepository => _submittedHomeworkRepository.Value;
     public IReadOnlyFileRepository ReadOnlyFileRepository => _fileRepository.Value;
+    public IReadOnlyHomeworkFileRepository ReadOnlyHomeworkFileRepository => _homeworkFileRepository.Value;
+    public IReadOnlySubmittedHomeworkFileRepository ReadOnlySubmittedHomeworkFileRepository => _submittedHomeworkFileRepository.Value;
 }

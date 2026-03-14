@@ -21,7 +21,7 @@ internal sealed class GetTeacherCourseHandler : IQueryHandler<GetTeacherCourseQu
 
     public async Task<GetTeacherCourseQueryResponse> ExecuteAsync(GetTeacherCourseQuery query, CancellationToken cancellationToken)
     {
-        var unitOfWork = await _commonUnitOfWorkFactory.CreateReadOnlyAsync(cancellationToken);
+        await using var unitOfWork = await _commonUnitOfWorkFactory.CreateReadOnlyAsync(cancellationToken);
 
         var courseTeacherExistsItem = query.ToCourseTeacherExistsItem();
         var isCourseTeacherExists = await unitOfWork.ReadOnlyCourseTeacherRepository.ExistsAsync(courseTeacherExistsItem, cancellationToken);
