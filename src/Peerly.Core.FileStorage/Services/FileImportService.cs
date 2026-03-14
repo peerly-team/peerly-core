@@ -26,4 +26,9 @@ internal sealed class FileImportService : IFileImportService
             Url = url
         };
     }
+
+    public Task<Uri> GenerateDownloadUrl(StorageId storageId, string fileName)
+    {
+        return _storage.GenerateDownloadUrlAsync(storageId, fileName);
+    }
 }

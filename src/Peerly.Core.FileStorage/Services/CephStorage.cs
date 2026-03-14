@@ -38,4 +38,24 @@ internal sealed class CephStorage : IStorage
 
         return new Uri(stringUri);
     }
+
+    public async Task<Uri> GenerateDownloadUrlAsync(StorageId storageId, string originalObjectName)
+    {
+        using var client = _amazonClientFactory.Create();
+        var stringUri = await client.GetPreSignedURLAsync(
+            new GetPreSignedUrlRequest
+            {
+                Expires = DateTime.Now.Add(_options.ExpirationTime),
+                BucketName = _options.BucketName,
+                Key = storageId.ToString(),
+                Protocol = Protocol.HTTPS,
+                Verb = HttpVerb.GET,
+                ResponseHeaderOverrides =
+                {
+                    ContentDisposition = $"attachment; filename={originalObjectName}"
+                }
+            });
+
+        return new Uri(stringUri);
+    }
 }

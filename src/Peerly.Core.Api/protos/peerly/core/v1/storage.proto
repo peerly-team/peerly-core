@@ -18,8 +18,7 @@ message V1GenerateUploadUrlResponse {
 }
 
 message V1GenerateDownloadUrlRequest {
-  string file_id = 1;
-  int64 user_id = 2;
+  int64 file_id = 1;
 }
 
 message V1GenerateDownloadUrlResponse {
