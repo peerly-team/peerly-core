@@ -57,7 +57,7 @@ internal static class HomeworkControllerMapper
         {
             HomeworkId = new HomeworkId(request.HomeworkId),
             TeacherId = new TeacherId(request.TeacherId),
-            HomeworkStatus = request.HomeworkStatus.ToModel(),
+            HomeworkStatus = request.HomeworkStatus.ToModel()
         };
     }
 

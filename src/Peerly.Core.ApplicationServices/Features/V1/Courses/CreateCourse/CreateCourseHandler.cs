@@ -1,6 +1,5 @@
 using System.Threading;
 using System.Threading.Tasks;
-using OneOf.Types;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourse.Abstractions;
@@ -8,7 +7,7 @@ using Peerly.Core.ApplicationServices.Models.Common;
 
 namespace Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourse;
 
-internal sealed class CreateCourseHandler : ICommandHandler<CreateCourseCommand, Success>
+internal sealed class CreateCourseHandler : ICommandHandler<CreateCourseCommand, CreateCourseCommandResponse>
 {
     private readonly ICommonUnitOfWorkFactory _unitOfWorkFactory;
     private readonly ICreateCourseHandlerMapper _mapper;
@@ -19,7 +18,7 @@ internal sealed class CreateCourseHandler : ICommandHandler<CreateCourseCommand,
         _mapper = mapper;
     }
 
-    public async Task<CommandResponse<Success>> ExecuteAsync(CreateCourseCommand command, CancellationToken cancellationToken)
+    public async Task<CommandResponse<CreateCourseCommandResponse>> ExecuteAsync(CreateCourseCommand command, CancellationToken cancellationToken)
     {
         await using var unitOfWork = await _unitOfWorkFactory.CreateAsync(cancellationToken);
 
@@ -29,6 +28,9 @@ internal sealed class CreateCourseHandler : ICommandHandler<CreateCourseCommand,
         var courseTeacherAddItem = _mapper.ToCourseTeacherAddItem(command, courseId);
         _ = await unitOfWork.CourseTeacherRepository.AddAsync(courseTeacherAddItem, cancellationToken);
 
-        return new Success();
+        return new CreateCourseCommandResponse
+        {
+            CourseId = courseId
+        };
     }
 }

@@ -29,8 +29,7 @@ internal static class CourseMappingMapper
         };
     }
 
-    public static Proto.V1GetTeacherCourseResponse ToV1GetTeacherCourseResponse(
-        this GetTeacherCourseQueryResponse queryResponse)
+    public static Proto.V1GetTeacherCourseResponse ToV1GetTeacherCourseResponse(this GetTeacherCourseQueryResponse queryResponse)
     {
         return new Proto.V1GetTeacherCourseResponse
         {
@@ -47,8 +46,7 @@ internal static class CourseMappingMapper
         };
     }
 
-    public static Proto.V1GetStudentCourseResponse ToV1GetStudentCourseResponse(
-        this GetStudentCourseQueryResponse queryResponse)
+    public static Proto.V1GetStudentCourseResponse ToV1GetStudentCourseResponse(this GetStudentCourseQueryResponse queryResponse)
     {
         return new Proto.V1GetStudentCourseResponse
         {
@@ -66,10 +64,16 @@ internal static class CourseMappingMapper
         };
     }
 
-    public static Proto.V1CreateCourseResponse ToV1CreateCourseResponse(this CommandResponse<Success> commandResponse)
+    public static Proto.V1CreateCourseResponse ToV1CreateCourseResponse(this CommandResponse<CreateCourseCommandResponse> commandResponse)
     {
         return commandResponse.Match(
-            _ => new Proto.V1CreateCourseResponse { SuccessResponse = new Proto.V1CreateCourseResponse.Types.Success() },
+            success => new Proto.V1CreateCourseResponse
+            {
+                SuccessResponse = new Proto.V1CreateCourseResponse.Types.Success
+                {
+                    CourseId = (long)success.CourseId
+                }
+            },
             validationError => new Proto.V1CreateCourseResponse
             {
                 ValidationError = validationError.ToProto<CreateCourseCommand, Proto.V1CreateCourseRequest>()
@@ -129,8 +133,7 @@ internal static class CourseMappingMapper
         };
     }
 
-    public static Proto.V1SearchCoursesResponse ToV1SearchCoursesResponse(
-        this SearchCoursesQueryResponse queryResponse)
+    public static Proto.V1SearchCoursesResponse ToV1SearchCoursesResponse(this SearchCoursesQueryResponse queryResponse)
     {
         return new Proto.V1SearchCoursesResponse
         {

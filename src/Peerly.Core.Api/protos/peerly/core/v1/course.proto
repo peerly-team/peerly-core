@@ -50,7 +50,9 @@ message V1CreateCourseResponse {
     OtherError other_error = 3;
   }
 
-  message Success {}
+  message Success {
+    int64 course_id = 1;
+  }
 }
 
 message V1SearchCoursesRequest {
