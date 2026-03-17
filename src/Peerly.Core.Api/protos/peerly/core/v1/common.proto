@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package peerly.core.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option csharp_namespace = "Peerly.Core.V1.Proto";
+
+message ValidationError {
+  map<string, ErrorMessagesCollection> errors = 1;
+  map<string, string> extensions = 2;
+  google.protobuf.StringValue error_detail = 3;
+
+  message ErrorMessagesCollection {
+    repeated string error_message = 1;
+  }
+}
+
+message OtherError {
+  ErrorType type = 1;
+  google.protobuf.StringValue message = 2;
+
+  enum ErrorType {
+    ERROR_TYPE_UNSPECIFIED = 0;
+    ERROR_TYPE_PERMISSION_DENIED = 1;
+    ERROR_TYPE_NOT_FOUND = 2;
+    ERROR_TYPE_CONFLICT = 3;
+  }
+}
+
+message PaginationInfo {
+  int32 page_size = 1;
+  int32 offset = 2;
+}
+
+enum CourseStatus {
+  COURSE_STATUS_UNKNOWN = 0;
+  COURSE_STATUS_DRAFT = 1;
+  COURSE_STATUS_IN_PROGRESS = 2;
+  COURSE_STATUS_FINISHED = 3;
+  COURSE_STATUS_CANCELED = 4;
+  COURSE_STATUS_DELETED = 5;
+}
+
+message SearchCoursesFilter {
+  repeated CourseStatus course_statuses = 1;
+}
+
+message CourseInfo {
+  int64 id = 1;
+  string name = 2;
+  google.protobuf.StringValue description = 3;
+  CourseStatus status = 4;
+  int64 student_count = 5;
+  int64 homework_count = 6;
+}
+
+enum HomeworkStatus {
+  HOMEWORK_STATUS_UNKNOWN = 0;
+  HOMEWORK_STATUS_DRAFT = 1;
+  HOMEWORK_STATUS_PUBLISHED = 2;
+  HOMEWORK_STATUS_REVIEWING = 3;
+  HOMEWORK_STATUS_CONFIRMATION = 4;
+  HOMEWORK_STATUS_FINISHED = 5;
+}
+
+message SearchCourseHomeworksFilter {
+  repeated HomeworkStatus homework_statuses = 1;
+}
+
+message HomeworkInfo {
+  int64 id = 1;
+  string name = 2;
+  HomeworkStatus status = 3;
+  google.protobuf.StringValue description = 4;
+  google.protobuf.StringValue checklist = 5;
+  google.protobuf.Timestamp deadline = 6;
+  google.protobuf.Timestamp review_deadline = 7;
+  int32 amount_of_reviewers = 8;
+}

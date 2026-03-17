@@ -1,0 +1,116 @@
+syntax = "proto3";
+
+package peerly.core.v1;
+
+import "peerly/core/v1/common.proto";
+import "google/protobuf/wrappers.proto";
+
+option csharp_namespace = "Peerly.Core.V1.Proto";
+
+// todo: добавить сортировку в Search ручки
+service CourseService {
+  rpc V1GetTeacherCourse(V1GetTeacherCourseRequest) returns (V1GetTeacherCourseResponse);
+  rpc V1GetStudentCourse(V1GetStudentCourseRequest) returns (V1GetStudentCourseResponse);
+  rpc V1CreateCourse(V1CreateCourseRequest) returns (V1CreateCourseResponse);
+  rpc V1SearchCourses(V1SearchCoursesRequest) returns (V1SearchCoursesResponse);
+  rpc V1SearchStudentCourses(V1SearchStudentCoursesRequest) returns (V1SearchStudentCoursesResponse);
+  rpc V1SearchTeacherCourses(V1SearchTeacherCoursesRequest) returns (V1SearchTeacherCoursesResponse);
+  rpc V1UpdateCourse(V1UpdateCourseRequest) returns (V1UpdateCourseResponse);
+  rpc V1DeleteCourse(V1DeleteCourseRequest) returns (V1DeleteCourseResponse);
+}
+
+message V1GetTeacherCourseRequest {
+  int64 course_id = 1;
+  int64 teacher_id = 2;
+}
+
+message V1GetTeacherCourseResponse {
+  CourseInfo course_info = 1;
+}
+
+message V1GetStudentCourseRequest {
+  int64 course_id = 1;
+  int64 student_id = 2;
+}
+
+message V1GetStudentCourseResponse {
+  CourseInfo course_info = 1;
+}
+
+message V1CreateCourseRequest {
+  int64 teacher_id = 1;
+  string name = 2;
+  google.protobuf.StringValue description = 3;
+}
+
+message V1CreateCourseResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}
+
+message V1SearchCoursesRequest {
+  SearchCoursesFilter filter = 1;
+  PaginationInfo pagination_info = 2;
+}
+
+message V1SearchCoursesResponse {
+  repeated CourseInfo course_infos = 1;
+}
+
+message V1SearchStudentCoursesRequest {
+  int64 student_id = 1;
+  SearchCoursesFilter filter = 2;
+  PaginationInfo pagination_info = 3;
+}
+
+message V1SearchStudentCoursesResponse {
+  repeated CourseInfo course_infos = 1;
+}
+
+message V1SearchTeacherCoursesRequest {
+  int64 teacher_id = 1;
+  SearchCoursesFilter filter = 2;
+  PaginationInfo pagination_info = 3;
+}
+
+message V1SearchTeacherCoursesResponse {
+  repeated CourseInfo course_infos = 1;
+}
+
+message V1UpdateCourseRequest {
+  int64 course_id = 1;
+  int64 teacher_id = 2;
+  string name = 3;
+  google.protobuf.StringValue description = 4;
+  CourseStatus status = 5;
+}
+
+message V1UpdateCourseResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}
+
+message V1DeleteCourseRequest {
+  int64 course_id = 1;
+  int64 teacher_id = 2;
+}
+
+message V1DeleteCourseResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}

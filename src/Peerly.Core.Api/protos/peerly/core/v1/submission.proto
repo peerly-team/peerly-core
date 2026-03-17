@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package peerly.core.v1;
+
+import "peerly/core/v1/common.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "Peerly.Core.V1.Proto";
+
+// todo: добавить сортировку в Search ручки
+service SubmissionService {
+  rpc V1CreateSubmittedHomework(V1CreateSubmittedHomeworkRequest) returns (V1CreateSubmittedHomeworkResponse);
+  rpc V1CreateSubmittedHomeworkFile(V1CreateSubmittedHomeworkFileRequest) returns (V1CreateSubmittedHomeworkFileResponse);
+
+  // todo: реализовать
+  //rpc V1UpdateHomeworkSubmission(V1UpdateHomeworkSubmissionRequest) returns (V1UpdateHomeworkSubmissionResponse);
+  //rpc V1CreateHomeworkSubmissionAttachment(V1CreateHomeworkSubmissionAttachmentRequest) returns (V1CreateHomeworkSubmissionAttachmentResponse);
+}
+
+message V1CreateSubmittedHomeworkRequest {
+  int64 homework_id = 1;
+  int64 student_id = 2;
+  string comment = 3;
+}
+
+message V1CreateSubmittedHomeworkResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {
+    int64 submitted_homework_id = 1;
+  }
+}
+
+message V1CreateSubmittedHomeworkFileRequest {
+  int64 submitted_homework_id = 1;
+  string storage_id = 2;
+  string file_name = 3;
+  int32 file_size = 4;
+  int64 student_id = 5;
+}
+
+message V1CreateSubmittedHomeworkFileResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {
+    int64 file_id = 1;
+  }
+}

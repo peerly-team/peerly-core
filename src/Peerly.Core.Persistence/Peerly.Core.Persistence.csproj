@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <!-- Third-party packages -->
+    <PackageReference Include="Dapper"/>
+    <PackageReference Include="Microsoft.Extensions.Options"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder"/>
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions"/>
+    <PackageReference Include="Npgsql"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Peerly.Core.Tools\Peerly.Core.Tools.csproj" />
+    <ProjectReference Include="..\Peerly.Core\Peerly.Core.csproj" />
+  </ItemGroup>
+</Project>
