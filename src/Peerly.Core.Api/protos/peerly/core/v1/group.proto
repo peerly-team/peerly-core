@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package peerly.core.v1;
+
+import "peerly/core/v1/common.proto";
+import "google/protobuf/wrappers.proto";
+
+option csharp_namespace = "Peerly.Core.V1.Proto";
+
+service GroupService {
+  rpc V1CreateGroup(V1CreateGroupRequest) returns (V1CreateGroupResponse);
+}
+
+message V1CreateGroupRequest {
+  int64 course_id = 1;
+  string name = 2;
+  int64 teacher_id = 3;
+}
+
+message V1CreateGroupResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {
+    int64 group_id = 1;
+  }
+}

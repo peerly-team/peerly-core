@@ -1,7 +1,7 @@
 using System;
 using Google.Protobuf.WellKnownTypes;
 using OneOf.Types;
-using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomework;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateCourseHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.SearchStudentCourseHomeworks;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.Shared.SearchCourseHomeworks;
@@ -17,12 +17,11 @@ namespace Peerly.Core.Api.Controllers.Homeworks;
 
 internal static class HomeworkControllerMapper
 {
-    public static CreateHomeworkCommand ToCreateHomeworkCommand(this Proto.V1CreateHomeworkRequest request)
+    public static CreateCourseHomeworkCommand ToCreateCourseHomeworkCommand(this Proto.V1CreateCourseHomeworkRequest request)
     {
-        return new CreateHomeworkCommand
+        return new CreateCourseHomeworkCommand
         {
             CourseId = new CourseId(request.CourseId),
-            GroupId = request.GroupId is not null ? new GroupId(request.GroupId.Value) : null,
             TeacherId = new TeacherId(request.TeacherId),
             Name = request.Name,
             AmountOfReviewers = request.AmountOfReviewers,
@@ -33,22 +32,22 @@ internal static class HomeworkControllerMapper
         };
     }
 
-    public static Proto.V1CreateHomeworkResponse ToV1CreateHomeworkResponse(
-        this CommandResponse<CreateHomeworkCommandResponse> commandResponse)
+    public static Proto.V1CreateCourseHomeworkResponse ToV1CreateCourseHomeworkResponse(
+        this CommandResponse<CreateCourseHomeworkCommandResponse> commandResponse)
     {
         return commandResponse.Match(
-            success => new Proto.V1CreateHomeworkResponse
+            success => new Proto.V1CreateCourseHomeworkResponse
             {
-                SuccessResponse = new Proto.V1CreateHomeworkResponse.Types.Success
+                SuccessResponse = new Proto.V1CreateCourseHomeworkResponse.Types.Success
                 {
                     HomeworkId = (long)success.HomeworkId
                 }
             },
-            validationError => new Proto.V1CreateHomeworkResponse
+            validationError => new Proto.V1CreateCourseHomeworkResponse
             {
-                ValidationError = validationError.ToProto<CreateHomeworkCommand, Proto.V1CreateHomeworkRequest>()
+                ValidationError = validationError.ToProto<CreateCourseHomeworkCommand, Proto.V1CreateCourseHomeworkRequest>()
             },
-            otherError => new Proto.V1CreateHomeworkResponse { OtherError = otherError.ToProto() });
+            otherError => new Proto.V1CreateCourseHomeworkResponse { OtherError = otherError.ToProto() });
     }
 
     public static UpdateHomeworkStatusCommand ToUpdateHomeworkStatusCommand(this Proto.V1UpdateHomeworkStatusRequest request)

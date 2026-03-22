@@ -6,7 +6,7 @@ namespace Peerly.Core.Models.Homeworks;
 public sealed record HomeworkAddItem
 {
     public required CourseId CourseId { get; init; }
-    public required GroupId? GroupId { get; init; }
+    public GroupId? GroupId { get; init; }
     public required TeacherId TeacherId { get; init; }
     public required string Name { get; init; }
     public required HomeworkStatus Status { get; init; }

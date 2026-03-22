@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Peerly.Core.Api.Controllers.Courses;
+using Peerly.Core.Api.Controllers.Groups;
 using Peerly.Core.Api.Controllers.Homeworks;
 using Peerly.Core.Api.Controllers.Storage;
 using Peerly.Core.Api.Controllers.Submissions;
@@ -75,6 +76,7 @@ public static class Program
         app.MapGrpcService<CourseController>();
         app.MapGrpcService<HomeworkController>();
         app.MapGrpcService<SubmissionController>();
+        app.MapGrpcService<GroupController>();
 
         app.MapGrpcReflectionService();
 
