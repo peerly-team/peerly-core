@@ -10,7 +10,7 @@ option csharp_namespace = "Peerly.Core.V1.Proto";
 
 // todo: добавить сортировку в Search ручки
 service HomeworkService {
-  rpc V1CreateHomework(V1CreateHomeworkRequest) returns (V1CreateHomeworkResponse);
+  rpc V1CreateCourseHomework(V1CreateCourseHomeworkRequest) returns (V1CreateCourseHomeworkResponse);
   rpc V1UpdateHomeworkStatus(V1UpdateHomeworkStatusRequest) returns (V1UpdateHomeworkStatusResponse);
   rpc V1CreateHomeworkFile(V1CreateHomeworkFileRequest) returns (V1CreateHomeworkFileResponse);
 
@@ -19,19 +19,18 @@ service HomeworkService {
   rpc V1SearchTeacherCoursesHomeworks(V1SearchTeacherCoursesHomeworksRequest) returns (V1SearchTeacherCoursesHomeworksResponse);
 }
 
-message V1CreateHomeworkRequest {
+message V1CreateCourseHomeworkRequest {
   int64 course_id = 1;
-  google.protobuf.Int64Value group_id = 2;
-  int64 teacher_id = 3;
-  string name = 4;
-  int32 amount_of_reviewers = 5;
-  google.protobuf.StringValue description = 6;
-  string checklist = 7;
-  google.protobuf.Timestamp deadline = 8;
-  google.protobuf.Timestamp review_deadline = 9;
+  int64 teacher_id = 2;
+  string name = 3;
+  int32 amount_of_reviewers = 4;
+  google.protobuf.StringValue description = 5;
+  string checklist = 6;
+  google.protobuf.Timestamp deadline = 7;
+  google.protobuf.Timestamp review_deadline = 8;
 }
 
-message V1CreateHomeworkResponse {
+message V1CreateCourseHomeworkResponse {
   oneof response {
     Success success_response = 1;
     ValidationError validation_error = 2;

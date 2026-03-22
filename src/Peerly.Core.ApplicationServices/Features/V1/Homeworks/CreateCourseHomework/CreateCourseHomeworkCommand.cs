@@ -2,12 +2,11 @@ using System;
 using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.Identifiers;
 
-namespace Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomework;
+namespace Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateCourseHomework;
 
-public sealed record CreateHomeworkCommand : ICommand<CreateHomeworkCommandResponse>
+public sealed record CreateCourseHomeworkCommand : ICommand<CreateCourseHomeworkCommandResponse>
 {
     public required CourseId CourseId { get; init; }
-    public required GroupId? GroupId { get; init; }
     public required TeacherId TeacherId { get; init; }
     public required string Name { get; init; }
     public required int AmountOfReviewers { get; init; }

@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Peerly.Core.Abstractions.Repositories;
+using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Groups;
 using Peerly.Core.Persistence.UnitOfWork;
 using Peerly.Core.Tools;
@@ -49,5 +50,37 @@ internal sealed class GroupRepository : IGroupRepository
             cancellationToken: cancellationToken);
 
         return [.. await _connectionContext.Connection.QueryAsync<Group>(command)];
+    }
+
+    public async Task<GroupId> AddAsync(GroupAddItem item, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            CourseId = (long)item.CourseId,
+            item.Name,
+            item.CreationTime
+        };
+
+        const string Query =
+            $"""
+             insert into {GroupTable.TableName} (
+                         {GroupTable.CourseId},
+                         {GroupTable.Name},
+                         {GroupTable.CreationTime})
+                  values (
+                         @{nameof(queryParams.CourseId)},
+                         @{nameof(queryParams.Name)},
+                         @{nameof(queryParams.CreationTime)})
+               returning {GroupTable.Id};
+             """;
+
+        var command = new CommandDefinition(
+            Query,
+            queryParams,
+            _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var groupId = await _connectionContext.Connection.QuerySingleAsync<long>(command);
+
+        return new GroupId(groupId);
     }
 }
