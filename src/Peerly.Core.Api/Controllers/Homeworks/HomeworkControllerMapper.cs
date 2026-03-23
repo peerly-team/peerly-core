@@ -2,6 +2,7 @@ using System;
 using Google.Protobuf.WellKnownTypes;
 using OneOf.Types;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateCourseHomework;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateGroupHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.SearchStudentCourseHomeworks;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.Shared.SearchCourseHomeworks;
@@ -48,6 +49,39 @@ internal static class HomeworkControllerMapper
                 ValidationError = validationError.ToProto<CreateCourseHomeworkCommand, Proto.V1CreateCourseHomeworkRequest>()
             },
             otherError => new Proto.V1CreateCourseHomeworkResponse { OtherError = otherError.ToProto() });
+    }
+
+    public static CreateGroupHomeworkCommand ToCreateGroupHomeworkCommand(this Proto.V1CreateGroupHomeworkRequest request)
+    {
+        return new CreateGroupHomeworkCommand
+        {
+            GroupId = new GroupId(request.GroupId),
+            TeacherId = new TeacherId(request.TeacherId),
+            Name = request.Name,
+            AmountOfReviewers = request.AmountOfReviewers,
+            Description = request.Description,
+            Checklist = request.Checklist,
+            Deadline = request.Deadline.ToDateTimeOffset(),
+            ReviewDeadline = request.ReviewDeadline.ToDateTimeOffset()
+        };
+    }
+
+    public static Proto.V1CreateGroupHomeworkResponse ToV1CreateGroupHomeworkResponse(
+        this CommandResponse<CreateGroupHomeworkCommandResponse> commandResponse)
+    {
+        return commandResponse.Match(
+            success => new Proto.V1CreateGroupHomeworkResponse
+            {
+                SuccessResponse = new Proto.V1CreateGroupHomeworkResponse.Types.Success
+                {
+                    HomeworkId = (long)success.HomeworkId
+                }
+            },
+            validationError => new Proto.V1CreateGroupHomeworkResponse
+            {
+                ValidationError = validationError.ToProto<CreateGroupHomeworkCommand, Proto.V1CreateGroupHomeworkRequest>()
+            },
+            otherError => new Proto.V1CreateGroupHomeworkResponse { OtherError = otherError.ToProto() });
     }
 
     public static UpdateHomeworkStatusCommand ToUpdateHomeworkStatusCommand(this Proto.V1UpdateHomeworkStatusRequest request)
