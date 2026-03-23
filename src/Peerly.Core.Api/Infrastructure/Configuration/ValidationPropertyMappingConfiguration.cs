@@ -3,6 +3,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Courses.DeleteCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.UpdateCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Groups.CreateGroup;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateCourseHomework;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateGroupHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.UpdateHomeworkStatus;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomework;
@@ -36,6 +37,10 @@ public static class ValidationPropertyMappingConfiguration
 
         ValidationPropertyMapping
             .AddMapping<CreateCourseHomeworkCommand, V1CreateCourseHomeworkRequest>()
+            .Build();
+
+        ValidationPropertyMapping
+            .AddMapping<CreateGroupHomeworkCommand, V1CreateGroupHomeworkRequest>()
             .Build();
 
         ValidationPropertyMapping

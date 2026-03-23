@@ -11,6 +11,7 @@ option csharp_namespace = "Peerly.Core.V1.Proto";
 // todo: добавить сортировку в Search ручки
 service HomeworkService {
   rpc V1CreateCourseHomework(V1CreateCourseHomeworkRequest) returns (V1CreateCourseHomeworkResponse);
+  rpc V1CreateGroupHomework(V1CreateGroupHomeworkRequest) returns (V1CreateGroupHomeworkResponse);
   rpc V1UpdateHomeworkStatus(V1UpdateHomeworkStatusRequest) returns (V1UpdateHomeworkStatusResponse);
   rpc V1CreateHomeworkFile(V1CreateHomeworkFileRequest) returns (V1CreateHomeworkFileResponse);
 
@@ -31,6 +32,29 @@ message V1CreateCourseHomeworkRequest {
 }
 
 message V1CreateCourseHomeworkResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {
+    int64 homework_id = 1;
+  }
+}
+
+message V1CreateGroupHomeworkRequest {
+  int64 group_id = 1;
+  int64 teacher_id = 2;
+  string name = 3;
+  int32 amount_of_reviewers = 4;
+  google.protobuf.StringValue description = 5;
+  string checklist = 6;
+  google.protobuf.Timestamp deadline = 7;
+  google.protobuf.Timestamp review_deadline = 8;
+}
+
+message V1CreateGroupHomeworkResponse {
   oneof response {
     Success success_response = 1;
     ValidationError validation_error = 2;
