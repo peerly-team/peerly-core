@@ -20,6 +20,35 @@ internal sealed class GroupStudentRepository : IGroupStudentRepository
         _connectionContext = connectionContext;
     }
 
+    public async Task AddAsync(GroupStudentAddItem item, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            GroupId = (long)item.GroupId,
+            StudentId = (long)item.StudentId,
+            item.CreationTime
+        };
+
+        const string Query =
+            $"""
+             insert into {GroupStudentTable.TableName} (
+                         {GroupStudentTable.GroupId},
+                         {GroupStudentTable.StudentId},
+                         {GroupStudentTable.CreationTime})
+                  values (
+                         @{nameof(queryParams.GroupId)},
+                         @{nameof(queryParams.StudentId)},
+                         @{nameof(queryParams.CreationTime)});
+             """;
+
+        var command = new CommandDefinition(
+            Query,
+            queryParams,
+            _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        await _connectionContext.Connection.ExecuteAsync(command);
+    }
+
     public async Task<IReadOnlyCollection<GroupStudent>> ListAsync(GroupStudentFilter filter, CancellationToken cancellationToken)
     {
         var queryParams = new
