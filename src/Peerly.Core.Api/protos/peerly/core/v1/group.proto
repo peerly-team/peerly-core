@@ -9,6 +9,7 @@ option csharp_namespace = "Peerly.Core.V1.Proto";
 
 service GroupService {
   rpc V1CreateGroup(V1CreateGroupRequest) returns (V1CreateGroupResponse);
+  rpc V1AddGroupParticipant(V1AddGroupParticipantRequest) returns (V1AddGroupParticipantResponse);
 }
 
 message V1CreateGroupRequest {
@@ -27,4 +28,20 @@ message V1CreateGroupResponse {
   message Success {
     int64 group_id = 1;
   }
+}
+
+message V1AddGroupParticipantRequest {
+  int64 group_id = 1;
+  int64 student_id = 2;
+  int64 teacher_id = 3;
+}
+
+message V1AddGroupParticipantResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
 }
