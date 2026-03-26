@@ -13,6 +13,7 @@ using Peerly.Core.Persistence.Repositories.GroupStudents;
 using Peerly.Core.Persistence.Repositories.HomeworkFiles;
 using Peerly.Core.Persistence.Repositories.Homeworks;
 using Peerly.Core.Persistence.Repositories.SubmittedHomeworkFiles;
+using Peerly.Core.Persistence.Repositories.HomeworkDistributions;
 using Peerly.Core.Persistence.Repositories.SubmittedHomeworks;
 using Peerly.Core.Tools.Abstractions;
 
@@ -38,6 +39,7 @@ public class UnitOfWorkInstaller : IInstaller
         services.AddRepositoryFactory<IFileRepository, FileRepository>();
         services.AddRepositoryFactory<IHomeworkFileRepository, HomeworkFileRepository>();
         services.AddRepositoryFactory<ISubmittedHomeworkFileRepository, SubmittedHomeworkFileRepository>();
+        services.AddRepositoryFactory<IHomeworkDistributionRepository, HomeworkDistributionRepository>();
 
         services.AddSingleton<NpgsqlDataSource>(sp =>
         {

@@ -13,6 +13,7 @@ public interface ICommonUnitOfWork : IUnitOfWork
     IFileRepository FileRepository { get; }
     IHomeworkFileRepository HomeworkFileRepository { get; }
     ISubmittedHomeworkFileRepository SubmittedHomeworkFileRepository { get; }
+    IHomeworkDistributionRepository HomeworkDistributionRepository { get; }
 }
 
 public interface ICommonReadOnlyUnitOfWork : IUnitOfWork
@@ -26,4 +27,5 @@ public interface ICommonReadOnlyUnitOfWork : IUnitOfWork
     IReadOnlyFileRepository ReadOnlyFileRepository { get; }
     IReadOnlyHomeworkFileRepository ReadOnlyHomeworkFileRepository { get; }
     IReadOnlySubmittedHomeworkFileRepository ReadOnlySubmittedHomeworkFileRepository { get; }
+    IReadOnlyHomeworkDistributionRepository ReadOnlyHomeworkDistributionRepository { get; }
 }
