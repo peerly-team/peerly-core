@@ -7,12 +7,14 @@ using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.Persistence.Extensions;
 using Peerly.Core.Persistence.Repositories.Courses;
 using Peerly.Core.Persistence.Repositories.CourseTeachers;
+using Peerly.Core.Persistence.Repositories.DistributionReviewers;
 using Peerly.Core.Persistence.Repositories.Files;
 using Peerly.Core.Persistence.Repositories.Groups;
 using Peerly.Core.Persistence.Repositories.GroupStudents;
 using Peerly.Core.Persistence.Repositories.HomeworkFiles;
 using Peerly.Core.Persistence.Repositories.Homeworks;
 using Peerly.Core.Persistence.Repositories.SubmittedHomeworkFiles;
+using Peerly.Core.Persistence.Repositories.HomeworkDistributions;
 using Peerly.Core.Persistence.Repositories.SubmittedHomeworks;
 using Peerly.Core.Tools.Abstractions;
 
@@ -30,6 +32,7 @@ public class UnitOfWorkInstaller : IInstaller
             .BindConfiguration(ConnectionFactoryOptions.SectionName);
 
         services.AddRepositoryFactory<ICourseRepository, CourseRepository>();
+        services.AddRepositoryFactory<IDistributionReviewerRepository, DistributionReviewerRepository>();
         services.AddRepositoryFactory<IHomeworkRepository, HomeworkRepository>();
         services.AddRepositoryFactory<IGroupRepository, GroupRepository>();
         services.AddRepositoryFactory<IGroupStudentRepository, GroupStudentRepository>();
@@ -38,6 +41,7 @@ public class UnitOfWorkInstaller : IInstaller
         services.AddRepositoryFactory<IFileRepository, FileRepository>();
         services.AddRepositoryFactory<IHomeworkFileRepository, HomeworkFileRepository>();
         services.AddRepositoryFactory<ISubmittedHomeworkFileRepository, SubmittedHomeworkFileRepository>();
+        services.AddRepositoryFactory<IHomeworkDistributionRepository, HomeworkDistributionRepository>();
 
         services.AddSingleton<NpgsqlDataSource>(sp =>
         {

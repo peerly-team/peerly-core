@@ -23,6 +23,40 @@ internal sealed class HomeworkRepository : IHomeworkRepository
         _connectionContext = connectionContext;
     }
 
+    public async Task<Homework?> GetAsync(HomeworkId homeworkId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            HomeworkId = (long)homeworkId
+        };
+
+        const string Query =
+            $"""
+             select {HomeworkTable.Id},
+                    {HomeworkTable.CourseId},
+                    {HomeworkTable.GroupId},
+                    {HomeworkTable.TeacherId},
+                    {HomeworkTable.Name},
+                    {HomeworkTable.Status},
+                    {HomeworkTable.AmountOfReviewers},
+                    {HomeworkTable.Description},
+                    {HomeworkTable.Checklist},
+                    {HomeworkTable.Deadline},
+                    {HomeworkTable.ReviewDeadline}
+               from {HomeworkTable.TableName}
+              where {HomeworkTable.Id} = @{nameof(queryParams.HomeworkId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var homeworkDb = await _connectionContext.Connection.QuerySingleOrDefaultAsync<HomeworkDb>(command);
+
+        return homeworkDb?.ToHomework();
+    }
+
     public async Task<int> GetHomeworkCountAsync(CourseId courseId, CancellationToken cancellationToken)
     {
         var queryParams = new

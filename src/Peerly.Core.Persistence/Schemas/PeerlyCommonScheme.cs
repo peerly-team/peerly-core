@@ -136,7 +136,7 @@ internal static class PeerlyCommonScheme
         public const string TableName = "homework_distributions";
 
         public const string HomeworkId = "homework_id";
-        public const string DistributeIn = "distribute_in";
+        public const string DistributionTime = "distribution_time";
         public const string CreationTime = "creation_time";
         public const string ProcessStatus = "process_status";
         public const string FailCount = "fail_count";
@@ -149,7 +149,7 @@ internal static class PeerlyCommonScheme
     {
         public const string TableName = "distribution_reviewers";
 
-        public const string HomeworkId = "homework_id";
+        public const string SubmittedHomeworkId = "submitted_homework_id";
         public const string StudentId = "student_id";
     }
 

@@ -19,6 +19,7 @@ public interface IHomeworkRepository : IReadOnlyHomeworkRepository
 
 public interface IReadOnlyHomeworkRepository
 {
+    Task<Homework?> GetAsync(HomeworkId homeworkId, CancellationToken cancellationToken);
     Task<int> GetHomeworkCountAsync(CourseId courseId, CancellationToken cancellationToken);
     Task<IReadOnlyCollection<Homework>> ListAsync(HomeworkFilter filter, CancellationToken cancellationToken);
 }
