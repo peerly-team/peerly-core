@@ -26,6 +26,8 @@
     <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.2" />
     <PackageVersion Include="Npgsql" Version="10.0.1" />
     <PackageVersion Include="OneOf" Version="3.0.271" />
+    <PackageVersion Include="Quartz" Version="3.16.1" />
+    <PackageVersion Include="Quartz.Extensions.Hosting" Version="3.16.1" />
     <PackageVersion Include="Scrutor" Version="6.1.0" />
   </ItemGroup>
 </Project>

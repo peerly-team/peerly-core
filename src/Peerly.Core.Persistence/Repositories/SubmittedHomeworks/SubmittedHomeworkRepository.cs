@@ -1,10 +1,14 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Peerly.Core.Abstractions.Repositories;
 using Peerly.Core.Identifiers;
+using Peerly.Core.Models.Homeworks;
 using Peerly.Core.Models.Submissions;
+using Peerly.Core.Persistence.Repositories.SubmittedHomeworks.Models;
 using Peerly.Core.Persistence.UnitOfWork;
+using Peerly.Core.Tools;
 using static Peerly.Core.Persistence.Schemas.PeerlyCommonScheme;
 
 namespace Peerly.Core.Persistence.Repositories.SubmittedHomeworks;
@@ -51,5 +55,33 @@ internal sealed class SubmittedHomeworkRepository : ISubmittedHomeworkRepository
         var submittedHomeworkId = await _connectionContext.Connection.QuerySingleAsync<long>(command);
 
         return new SubmittedHomeworkId(submittedHomeworkId);
+    }
+
+    public async Task<IReadOnlyCollection<SubmittedHomeworkStudent>> ListSubmittedHomeworkStudentAsync(
+        SubmittedHomeworkFilter filter,
+        CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            HomeworkIds = filter.HomeworkIds.ToArrayBy(homeworkId => (long)homeworkId)
+        };
+
+        const string Query =
+            $"""
+             select {SubmittedHomeworkTable.Id},
+                    {SubmittedHomeworkTable.StudentId}
+               from {SubmittedHomeworkTable.TableName}
+              where cardinality(@{nameof(queryParams.HomeworkIds)}) = 0
+                 or {SubmittedHomeworkTable.HomeworkId} = any(@{nameof(queryParams.HomeworkIds)});
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var submittedHomeworkStudentDbs = await _connectionContext.Connection.QueryAsync<SubmittedHomeworkStudentDb>(command);
+
+        return submittedHomeworkStudentDbs.ToArrayBy(dbItem => dbItem.ToSubmittedHomeworkStudent());
     }
 }
