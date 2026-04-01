@@ -12,6 +12,7 @@ option csharp_namespace = "Peerly.Core.V1.Proto";
 service SubmissionService {
   rpc V1CreateSubmittedHomework(V1CreateSubmittedHomeworkRequest) returns (V1CreateSubmittedHomeworkResponse);
   rpc V1CreateSubmittedHomeworkFile(V1CreateSubmittedHomeworkFileRequest) returns (V1CreateSubmittedHomeworkFileResponse);
+  rpc V1CreateSubmittedReview(V1CreateSubmittedReviewRequest) returns (V1CreateSubmittedReviewResponse);
 
   // todo: реализовать
   //rpc V1UpdateHomeworkSubmission(V1UpdateHomeworkSubmissionRequest) returns (V1UpdateHomeworkSubmissionResponse);
@@ -53,5 +54,24 @@ message V1CreateSubmittedHomeworkFileResponse {
 
   message Success {
     int64 file_id = 1;
+  }
+}
+
+message V1CreateSubmittedReviewRequest {
+  int64 submitted_homework_id = 1;
+  int64 student_id = 2;
+  int32 mark = 3;
+  string comment = 4;
+}
+
+message V1CreateSubmittedReviewResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {
+    int64 submitted_review_id = 1;
   }
 }

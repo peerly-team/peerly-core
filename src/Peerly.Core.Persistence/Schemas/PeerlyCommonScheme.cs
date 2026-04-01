@@ -153,12 +153,12 @@ internal static class PeerlyCommonScheme
         public const string StudentId = "student_id";
     }
 
-    public static class ReviewSubmissionTable
+    public static class SubmittedReviewTable
     {
-        public const string TableName = "review_submissions";
+        public const string TableName = "submitted_reviews";
 
         public const string Id = "id";
-        public const string HomeworkId = "homework_id";
+        public const string SubmittedHomeworkId = "submitted_homework_id";
         public const string StudentId = "student_id";
         public const string Mark = "mark";
         public const string Comment = "comment";
