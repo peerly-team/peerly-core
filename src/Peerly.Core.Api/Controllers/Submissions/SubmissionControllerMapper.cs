@@ -1,6 +1,7 @@
 using System;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomeworkFile;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedReview;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
 using Proto = Peerly.Core.V1;
@@ -66,5 +67,34 @@ internal static class SubmissionControllerMapper
                 ValidationError = validationError.ToProto<CreateSubmittedHomeworkFileCommand, Proto.V1CreateSubmittedHomeworkFileRequest>()
             },
             otherError => new Proto.V1CreateSubmittedHomeworkFileResponse { OtherError = otherError.ToProto() });
+    }
+
+    public static CreateSubmittedReviewCommand ToCreateSubmittedReviewCommand(this Proto.V1CreateSubmittedReviewRequest request)
+    {
+        return new CreateSubmittedReviewCommand
+        {
+            SubmittedHomeworkId = new SubmittedHomeworkId(request.SubmittedHomeworkId),
+            StudentId = new StudentId(request.StudentId),
+            Mark = request.Mark,
+            Comment = request.Comment
+        };
+    }
+
+    public static Proto.V1CreateSubmittedReviewResponse ToV1CreateSubmittedReviewResponse(
+        this CommandResponse<CreateSubmittedReviewCommandResponse> commandResponse)
+    {
+        return commandResponse.Match(
+            success => new Proto.V1CreateSubmittedReviewResponse
+            {
+                SuccessResponse = new Proto.V1CreateSubmittedReviewResponse.Types.Success
+                {
+                    SubmittedReviewId = (long)success.SubmittedReviewId
+                }
+            },
+            validationError => new Proto.V1CreateSubmittedReviewResponse
+            {
+                ValidationError = validationError.ToProto<CreateSubmittedReviewCommand, Proto.V1CreateSubmittedReviewRequest>()
+            },
+            otherError => new Proto.V1CreateSubmittedReviewResponse { OtherError = otherError.ToProto() });
     }
 }

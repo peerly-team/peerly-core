@@ -18,6 +18,7 @@ internal sealed class CommonUnitOfWork : UnitOfWork, ICommonUnitOfWork, ICommonR
     private readonly Lazy<IHomeworkFileRepository> _homeworkFileRepository;
     private readonly Lazy<ISubmittedHomeworkFileRepository> _submittedHomeworkFileRepository;
     private readonly Lazy<IHomeworkDistributionRepository> _homeworkDistributionRepository;
+    private readonly Lazy<ISubmittedReviewRepository> _submittedReviewRepository;
 
     public CommonUnitOfWork(
         DbConnection connection,
@@ -31,7 +32,8 @@ internal sealed class CommonUnitOfWork : UnitOfWork, ICommonUnitOfWork, ICommonR
         Func<IConnectionContext, IFileRepository> fileRepositoryFactory,
         Func<IConnectionContext, IHomeworkFileRepository> homeworkFileRepositoryFactory,
         Func<IConnectionContext, ISubmittedHomeworkFileRepository> submittedHomeworkFileRepositoryFactory,
-        Func<IConnectionContext, IHomeworkDistributionRepository> homeworkDistributionRepositoryFactory) : base(connection)
+        Func<IConnectionContext, IHomeworkDistributionRepository> homeworkDistributionRepositoryFactory,
+        Func<IConnectionContext, ISubmittedReviewRepository> submittedReviewRepositoryFactory) : base(connection)
     {
         _courseRepository = new Lazy<ICourseRepository>(() => courseRepositoryFactory(this));
         _distributionReviewerRepository = new Lazy<IDistributionReviewerRepository>(() => distributionReviewerRepositoryFactory(this));
@@ -44,6 +46,7 @@ internal sealed class CommonUnitOfWork : UnitOfWork, ICommonUnitOfWork, ICommonR
         _homeworkFileRepository = new Lazy<IHomeworkFileRepository>(() => homeworkFileRepositoryFactory(this));
         _submittedHomeworkFileRepository = new Lazy<ISubmittedHomeworkFileRepository>(() => submittedHomeworkFileRepositoryFactory(this));
         _homeworkDistributionRepository = new Lazy<IHomeworkDistributionRepository>(() => homeworkDistributionRepositoryFactory(this));
+        _submittedReviewRepository = new Lazy<ISubmittedReviewRepository>(() => submittedReviewRepositoryFactory(this));
     }
 
     public ICourseRepository CourseRepository => _courseRepository.Value;
@@ -57,6 +60,7 @@ internal sealed class CommonUnitOfWork : UnitOfWork, ICommonUnitOfWork, ICommonR
     public IHomeworkFileRepository HomeworkFileRepository => _homeworkFileRepository.Value;
     public ISubmittedHomeworkFileRepository SubmittedHomeworkFileRepository => _submittedHomeworkFileRepository.Value;
     public IHomeworkDistributionRepository HomeworkDistributionRepository => _homeworkDistributionRepository.Value;
+    public ISubmittedReviewRepository SubmittedReviewRepository => _submittedReviewRepository.Value;
 
     public IReadOnlyCourseRepository ReadOnlyCourseRepository => _courseRepository.Value;
     public IReadOnlyDistributionReviewerRepository ReadOnlyDistributionReviewerRepository => _distributionReviewerRepository.Value;
@@ -69,4 +73,5 @@ internal sealed class CommonUnitOfWork : UnitOfWork, ICommonUnitOfWork, ICommonR
     public IReadOnlyHomeworkFileRepository ReadOnlyHomeworkFileRepository => _homeworkFileRepository.Value;
     public IReadOnlySubmittedHomeworkFileRepository ReadOnlySubmittedHomeworkFileRepository => _submittedHomeworkFileRepository.Value;
     public IReadOnlyHomeworkDistributionRepository ReadOnlyHomeworkDistributionRepository => _homeworkDistributionRepository.Value;
+    public IReadOnlySubmittedReviewRepository ReadOnlySubmittedReviewRepository => _submittedReviewRepository.Value;
 }

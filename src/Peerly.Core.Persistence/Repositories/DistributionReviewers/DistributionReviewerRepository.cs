@@ -7,6 +7,7 @@ using Peerly.Core.Models.Homeworks;
 using Peerly.Core.Persistence.UnitOfWork;
 using Peerly.Core.Tools;
 using static Peerly.Core.Persistence.Schemas.PeerlyCommonScheme;
+using SubmittedHomeworkStudent = Peerly.Core.Models.Submissions.SubmittedHomeworkStudent;
 
 namespace Peerly.Core.Persistence.Repositories.DistributionReviewers;
 
@@ -49,5 +50,30 @@ internal sealed class DistributionReviewerRepository : IDistributionReviewerRepo
             transaction: _connectionContext.Transaction,
             cancellationToken: cancellationToken);
         await _connectionContext.Connection.ExecuteAsync(command);
+    }
+
+    public async Task<bool> ExistsAsync(SubmittedHomeworkStudent submittedHomeworkStudent, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            SubmittedHomeworkId = (long)submittedHomeworkStudent.SubmittedHomeworkId,
+            StudentId = (long)submittedHomeworkStudent.StudentId
+        };
+
+        const string Query =
+            $"""
+             select exists(
+                 select 1
+                   from {DistributionReviewerTable.TableName}
+                  where {DistributionReviewerTable.SubmittedHomeworkId} = @{nameof(queryParams.SubmittedHomeworkId)}
+                    and {DistributionReviewerTable.StudentId} = @{nameof(queryParams.StudentId)});
+             """;
+
+        var command = new CommandDefinition(
+            Query,
+            queryParams,
+            _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        return await _connectionContext.Connection.QuerySingleAsync<bool>(command);
     }
 }

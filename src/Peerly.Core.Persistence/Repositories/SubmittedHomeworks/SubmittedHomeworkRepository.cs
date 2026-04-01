@@ -10,6 +10,7 @@ using Peerly.Core.Persistence.Repositories.SubmittedHomeworks.Models;
 using Peerly.Core.Persistence.UnitOfWork;
 using Peerly.Core.Tools;
 using static Peerly.Core.Persistence.Schemas.PeerlyCommonScheme;
+using SubmittedHomeworkStudent = Peerly.Core.Models.Homeworks.SubmittedHomeworkStudent;
 
 namespace Peerly.Core.Persistence.Repositories.SubmittedHomeworks;
 
@@ -20,6 +21,29 @@ internal sealed class SubmittedHomeworkRepository : ISubmittedHomeworkRepository
     public SubmittedHomeworkRepository(IConnectionContext connectionContext)
     {
         _connectionContext = connectionContext;
+    }
+
+    public async Task<bool> ExistsAsync(SubmittedHomeworkId submittedHomeworkId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            Id = (long)submittedHomeworkId
+        };
+
+        const string Query =
+            $"""
+             select exists(
+                 select 1
+                   from {SubmittedHomeworkTable.TableName}
+                  where {SubmittedHomeworkTable.Id} = @{nameof(queryParams.Id)});
+             """;
+
+        var command = new CommandDefinition(
+            Query,
+            queryParams,
+            _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        return await _connectionContext.Connection.QuerySingleAsync<bool>(command);
     }
 
     public async Task<SubmittedHomeworkId> AddAsync(SubmittedHomeworkAddItem item, CancellationToken cancellationToken)

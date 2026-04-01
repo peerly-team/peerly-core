@@ -9,6 +9,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.UpdateHomeworkStatus;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomeworkFile;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedReview;
 using Peerly.Core.V1;
 
 namespace Peerly.Core.Api.Infrastructure.Configuration;
@@ -66,6 +67,10 @@ public static class ValidationPropertyMappingConfiguration
 
         ValidationPropertyMapping
             .AddMapping<AddGroupParticipantCommand, V1AddGroupParticipantRequest>()
+            .Build();
+
+        ValidationPropertyMapping
+            .AddMapping<CreateSubmittedReviewCommand, V1CreateSubmittedReviewRequest>()
             .Build();
     }
 }

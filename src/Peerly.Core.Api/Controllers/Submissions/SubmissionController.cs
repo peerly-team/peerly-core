@@ -4,6 +4,7 @@ using Grpc.Core;
 using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomeworkFile;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedReview;
 using Peerly.Core.V1;
 
 namespace Peerly.Core.Api.Controllers.Submissions;
@@ -13,13 +14,16 @@ public sealed class SubmissionController : SubmissionService.SubmissionServiceBa
 {
     private readonly ICommandHandler<CreateSubmittedHomeworkCommand, CreateSubmittedHomeworkCommandResponse> _createSubmittedHomeworkHandler;
     private readonly ICommandHandler<CreateSubmittedHomeworkFileCommand, CreateSubmittedHomeworkFileCommandResponse> _createSubmittedHomeworkFileHandler;
+    private readonly ICommandHandler<CreateSubmittedReviewCommand, CreateSubmittedReviewCommandResponse> _createSubmittedReviewHandler;
 
     public SubmissionController(
         ICommandHandler<CreateSubmittedHomeworkCommand, CreateSubmittedHomeworkCommandResponse> createSubmittedHomeworkHandler,
-        ICommandHandler<CreateSubmittedHomeworkFileCommand, CreateSubmittedHomeworkFileCommandResponse> createSubmittedHomeworkFileHandler)
+        ICommandHandler<CreateSubmittedHomeworkFileCommand, CreateSubmittedHomeworkFileCommandResponse> createSubmittedHomeworkFileHandler,
+        ICommandHandler<CreateSubmittedReviewCommand, CreateSubmittedReviewCommandResponse> createSubmittedReviewHandler)
     {
         _createSubmittedHomeworkHandler = createSubmittedHomeworkHandler;
         _createSubmittedHomeworkFileHandler = createSubmittedHomeworkFileHandler;
+        _createSubmittedReviewHandler = createSubmittedReviewHandler;
     }
 
     public override async Task<V1CreateSubmittedHomeworkResponse> V1CreateSubmittedHomework(
@@ -36,5 +40,14 @@ public sealed class SubmissionController : SubmissionService.SubmissionServiceBa
         var command = request.ToCreateSubmittedHomeworkFileCommand();
         var commandResponse = await _createSubmittedHomeworkFileHandler.ExecuteAsync(command, context.CancellationToken);
         return commandResponse.ToV1CreateSubmittedHomeworkFileResponse();
+    }
+
+    public override async Task<V1CreateSubmittedReviewResponse> V1CreateSubmittedReview(
+        V1CreateSubmittedReviewRequest request,
+        ServerCallContext context)
+    {
+        var command = request.ToCreateSubmittedReviewCommand();
+        var commandResponse = await _createSubmittedReviewHandler.ExecuteAsync(command, context.CancellationToken);
+        return commandResponse.ToV1CreateSubmittedReviewResponse();
     }
 }
