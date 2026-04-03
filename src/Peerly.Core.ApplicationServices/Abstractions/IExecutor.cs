@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Peerly.Core.ApplicationServices.Abstractions.Executors;
+namespace Peerly.Core.ApplicationServices.Abstractions;
 
 internal interface IExecutor<in TRequestItem>
 {

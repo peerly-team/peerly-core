@@ -4,26 +4,26 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Abstractions;
-using Peerly.Core.ApplicationServices.BackgroundServices.HomeworkDistribution.Options;
+using Peerly.Core.ApplicationServices.BackgroundServices.ReviewCompletion.Options;
 using Peerly.Core.Models.BackgroundService;
-using Peerly.Core.Models.BackgroundService.HomeworkDistributions;
+using Peerly.Core.Models.BackgroundService.ReviewCompletions;
 using Quartz;
 
-namespace Peerly.Core.ApplicationServices.BackgroundServices.HomeworkDistribution;
+namespace Peerly.Core.ApplicationServices.BackgroundServices.ReviewCompletion;
 
 [DisallowConcurrentExecution]
-internal sealed class HomeworkDistributionJob : IJob
+internal sealed class ReviewCompletionJob : IJob
 {
     private readonly ICommonUnitOfWorkFactory _commonUnitOfWorkFactory;
-    private readonly IMassExecutor<HomeworkDistributionJobItem> _executor;
-    private readonly ILogger<HomeworkDistributionJob> _logger;
-    private readonly HomeworkDistributionJobOptions _options;
+    private readonly IMassExecutor<ReviewCompletionJobItem> _executor;
+    private readonly ILogger<ReviewCompletionJob> _logger;
+    private readonly ReviewCompletionJobOptions _options;
 
-    public HomeworkDistributionJob(
+    public ReviewCompletionJob(
         ICommonUnitOfWorkFactory commonUnitOfWorkFactory,
-        IMassExecutor<HomeworkDistributionJobItem> executor,
-        ILogger<HomeworkDistributionJob> logger,
-        IOptions<HomeworkDistributionJobOptions> options)
+        IMassExecutor<ReviewCompletionJobItem> executor,
+        ILogger<ReviewCompletionJob> logger,
+        IOptions<ReviewCompletionJobOptions> options)
     {
         _commonUnitOfWorkFactory = commonUnitOfWorkFactory;
         _executor = executor;
@@ -37,8 +37,8 @@ internal sealed class HomeworkDistributionJob : IJob
         {
             await using var unitOfWork = await _commonUnitOfWorkFactory.CreateAsync(context.CancellationToken);
 
-            var filter = GetHomeworkDistributionFilter();
-            var jobItems = await unitOfWork.HomeworkDistributionRepository.TakeAsync(filter, context.CancellationToken);
+            var filter = GetReviewCompletionFilter();
+            var jobItems = await unitOfWork.ReviewCompletionRepository.TakeAsync(filter, context.CancellationToken);
 
             await _executor.RunAsync(jobItems, context.CancellationToken);
         }
@@ -47,14 +47,14 @@ internal sealed class HomeworkDistributionJob : IJob
             _logger.LogError(
                 ex,
                 "{Job} | An unexpected error occurred | Error message: {ErrorMessage}",
-                nameof(HomeworkDistributionJob),
+                nameof(ReviewCompletionJob),
                 ex.Message);
         }
     }
 
-    private HomeworkDistributionFilter GetHomeworkDistributionFilter()
+    private ReviewCompletionFilter GetReviewCompletionFilter()
     {
-        return new HomeworkDistributionFilter
+        return new ReviewCompletionFilter
         {
             ProcessStatuses = [ProcessStatus.Created, ProcessStatus.InProgress, ProcessStatus.Failed],
             MaxFailCount = _options.MaxFailCount,

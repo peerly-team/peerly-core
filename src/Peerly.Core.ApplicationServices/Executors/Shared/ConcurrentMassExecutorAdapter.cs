@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using Peerly.Core.ApplicationServices.Abstractions.Executors;
+using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.ApplicationServices.Executors.Shared.Abstractions;
 
 namespace Peerly.Core.ApplicationServices.Executors.Shared;

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Peerly.Core.ApplicationServices.Abstractions.Executors;
+namespace Peerly.Core.ApplicationServices.Abstractions;
 
 internal interface IMassExecutor<in TRequestItem>
 {
