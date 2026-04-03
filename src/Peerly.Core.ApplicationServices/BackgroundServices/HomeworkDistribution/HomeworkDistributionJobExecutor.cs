@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Peerly.Core.Abstractions.ApplicationServices;
 using Peerly.Core.Abstractions.UnitOfWork;
-using Peerly.Core.ApplicationServices.Abstractions.Executors;
+using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.ApplicationServices.BackgroundServices.HomeworkDistribution.Abstractions;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.BackgroundService;
 using Peerly.Core.Models.BackgroundService.HomeworkDistributions;
+using Peerly.Core.Models.BackgroundService.ReviewCompletions;
 using Peerly.Core.Models.Homeworks;
 
 namespace Peerly.Core.ApplicationServices.BackgroundServices.HomeworkDistribution;
@@ -52,12 +53,12 @@ internal sealed class HomeworkDistributionJobExecutor : IExecutor<HomeworkDistri
 
             if (distributionReviewerAddItems.Count == 0)
             {
-                await UpdateToDoneWithStatus(unitOfWork, homeworkId, HomeworkStatus.Confirmation, cancellationToken);
+                await UpdateToDoneWithStatus(unitOfWork, homework, HomeworkStatus.Confirmation, cancellationToken);
             }
             else
             {
                 await unitOfWork.DistributionReviewerRepository.BatchAddAsync(distributionReviewerAddItems, cancellationToken);
-                await UpdateToDoneWithStatus(unitOfWork, homeworkId, HomeworkStatus.Reviewing, cancellationToken);
+                await UpdateToDoneWithStatus(unitOfWork, homework, HomeworkStatus.Reviewing, cancellationToken);
             }
 
             await operationSet.Complete(cancellationToken);
@@ -163,12 +164,12 @@ internal sealed class HomeworkDistributionJobExecutor : IExecutor<HomeworkDistri
 
     private async Task UpdateToDoneWithStatus(
         ICommonUnitOfWork unitOfWork,
-        HomeworkId homeworkId,
+        Homework homework,
         HomeworkStatus homeworkStatus,
         CancellationToken cancellationToken)
     {
         await unitOfWork.HomeworkDistributionRepository.UpdateAsync(
-            homeworkId,
+            homework.Id,
             builder =>
                 builder
                     .Set(item => item.ProcessStatus, ProcessStatus.Done)
@@ -177,10 +178,24 @@ internal sealed class HomeworkDistributionJobExecutor : IExecutor<HomeworkDistri
             cancellationToken);
 
         await unitOfWork.HomeworkRepository.UpdateAsync(
-            homeworkId,
+            homework.Id,
             builder => builder
                 .Set(item => item.Status, homeworkStatus),
             cancellationToken);
+
+        if (homeworkStatus == HomeworkStatus.Reviewing)
+        {
+            await unitOfWork.ReviewCompletionRepository.AddAsync(
+                new ReviewCompletionAddItem
+                {
+                    HomeworkId = homework.Id,
+                    CompletionTime = homework.ReviewDeadline,
+                    CreationTime = _clock.GetCurrentTime(),
+                    ProcessStatus = ProcessStatus.Created,
+                    FailCount = 0
+                },
+                cancellationToken);
+        }
     }
 
     private Task<bool> UpdateToFailed(

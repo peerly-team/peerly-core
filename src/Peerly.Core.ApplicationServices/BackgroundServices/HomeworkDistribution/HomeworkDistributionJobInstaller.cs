@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
-using Peerly.Core.ApplicationServices.Abstractions.Executors;
+using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.ApplicationServices.BackgroundServices.HomeworkDistribution.Abstractions;
 using Peerly.Core.ApplicationServices.BackgroundServices.HomeworkDistribution.Options;
 using Peerly.Core.ApplicationServices.Executors.Shared;
