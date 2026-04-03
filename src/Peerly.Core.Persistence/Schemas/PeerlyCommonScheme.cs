@@ -145,6 +145,20 @@ internal static class PeerlyCommonScheme
         public const string Error = "error";
     }
 
+    public static class ReviewCompletionTable
+    {
+        public const string TableName = "review_completions";
+
+        public const string HomeworkId = "homework_id";
+        public const string CompletionTime = "completion_time";
+        public const string CreationTime = "creation_time";
+        public const string ProcessStatus = "process_status";
+        public const string FailCount = "fail_count";
+        public const string ProcessTime = "process_time";
+        public const string TakenTime = "taken_time";
+        public const string Error = "error";
+    }
+
     public static class DistributionReviewerTable
     {
         public const string TableName = "distribution_reviewers";
