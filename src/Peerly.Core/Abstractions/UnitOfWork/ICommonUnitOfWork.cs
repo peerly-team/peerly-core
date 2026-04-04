@@ -17,6 +17,7 @@ public interface ICommonUnitOfWork : IUnitOfWork
     IHomeworkDistributionRepository HomeworkDistributionRepository { get; }
     IReviewCompletionRepository ReviewCompletionRepository { get; }
     ISubmittedReviewRepository SubmittedReviewRepository { get; }
+    ISubmittedHomeworkMarkRepository SubmittedHomeworkMarkRepository { get; }
 }
 
 public interface ICommonReadOnlyUnitOfWork : IUnitOfWork
@@ -34,4 +35,5 @@ public interface ICommonReadOnlyUnitOfWork : IUnitOfWork
     IReadOnlyHomeworkDistributionRepository ReadOnlyHomeworkDistributionRepository { get; }
     IReadOnlyReviewCompletionRepository ReadOnlyReviewCompletionRepository { get; }
     IReadOnlySubmittedReviewRepository ReadOnlySubmittedReviewRepository { get; }
+    IReadOnlySubmittedHomeworkMarkRepository ReadOnlySubmittedHomeworkMarkRepository { get; }
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Peerly.Core.Identifiers;
@@ -13,4 +14,8 @@ public interface ISubmittedReviewRepository : IReadOnlySubmittedReviewRepository
 public interface IReadOnlySubmittedReviewRepository
 {
     Task<bool> ExistsAsync(SubmittedHomeworkStudent submittedHomeworkStudent, CancellationToken cancellationToken);
+
+    Task<IReadOnlyCollection<SubmittedHomeworkReviewerMark>> ListSubmittedReviewMarksAsync(
+        HomeworkId homeworkId,
+        CancellationToken cancellationToken);
 }

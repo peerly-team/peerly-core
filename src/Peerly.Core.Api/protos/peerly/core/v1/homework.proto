@@ -13,6 +13,7 @@ service HomeworkService {
   rpc V1CreateCourseHomework(V1CreateCourseHomeworkRequest) returns (V1CreateCourseHomeworkResponse);
   rpc V1CreateGroupHomework(V1CreateGroupHomeworkRequest) returns (V1CreateGroupHomeworkResponse);
   rpc V1UpdateHomeworkStatus(V1UpdateHomeworkStatusRequest) returns (V1UpdateHomeworkStatusResponse);
+  rpc V1ConfirmHomework(V1ConfirmHomeworkRequest) returns (V1ConfirmHomeworkResponse);
   rpc V1CreateHomeworkFile(V1CreateHomeworkFileRequest) returns (V1CreateHomeworkFileResponse);
 
   // todo: закончить реализацию ручек (поправить логику)
@@ -93,6 +94,27 @@ message V1UpdateHomeworkStatusRequest {
 }
 
 message V1UpdateHomeworkStatusResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}
+
+message V1ConfirmHomeworkRequest {
+  int64 homework_id = 1;
+  int64 teacher_id = 2;
+  repeated MarkCorrection mark_corrections = 3;
+
+  message MarkCorrection {
+    int64 submitted_homework_id = 1;
+    int32 teacher_mark = 2;
+  }
+}
+
+message V1ConfirmHomeworkResponse {
   oneof response {
     Success success_response = 1;
     ValidationError validation_error = 2;

@@ -1,10 +1,13 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Peerly.Core.Abstractions.Repositories;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Submissions;
+using Peerly.Core.Persistence.Repositories.SubmittedReviews.Models;
 using Peerly.Core.Persistence.UnitOfWork;
+using Peerly.Core.Tools;
 using static Peerly.Core.Persistence.Schemas.PeerlyCommonScheme;
 
 namespace Peerly.Core.Persistence.Repositories.SubmittedReviews;
@@ -78,5 +81,33 @@ internal sealed class SubmittedReviewRepository : ISubmittedReviewRepository
             _connectionContext.Transaction,
             cancellationToken: cancellationToken);
         return await _connectionContext.Connection.QuerySingleAsync<bool>(command);
+    }
+
+    public async Task<IReadOnlyCollection<SubmittedHomeworkReviewerMark>> ListSubmittedReviewMarksAsync(
+        HomeworkId homeworkId,
+        CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            HomeworkId = (long)homeworkId
+        };
+
+        const string Query =
+            $"""
+             select sr.{SubmittedReviewTable.SubmittedHomeworkId},
+                    sr.{SubmittedReviewTable.Mark}
+               from {SubmittedReviewTable.TableName} sr
+               join {SubmittedHomeworkTable.TableName} sh on sh.{SubmittedHomeworkTable.Id} = sr.{SubmittedReviewTable.SubmittedHomeworkId}
+              where sh.{SubmittedHomeworkTable.HomeworkId} = @{nameof(queryParams.HomeworkId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var results = await _connectionContext.Connection.QueryAsync<SubmittedHomeworkReviewerMarkDb>(command);
+
+        return results.ToArrayBy(db => db.ToSubmittedHomeworkReviewerMark());
     }
 }

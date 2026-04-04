@@ -1,6 +1,8 @@
 using System;
 using Google.Protobuf.WellKnownTypes;
 using OneOf.Types;
+using System.Linq;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ConfirmHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateCourseHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateGroupHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
@@ -104,6 +106,34 @@ internal static class HomeworkControllerMapper
                 ValidationError = validationError.ToProto<UpdateHomeworkStatusCommand, Proto.V1UpdateHomeworkStatusRequest>()
             },
             otherError => new Proto.V1UpdateHomeworkStatusResponse { OtherError = otherError.ToProto() });
+    }
+
+    public static ConfirmHomeworkCommand ToConfirmHomeworkCommand(this Proto.V1ConfirmHomeworkRequest request)
+    {
+        return new ConfirmHomeworkCommand
+        {
+            HomeworkId = new HomeworkId(request.HomeworkId),
+            TeacherId = new TeacherId(request.TeacherId),
+            MarkCorrections = request.MarkCorrections
+                .Select(mc => new MarkCorrection
+                {
+                    SubmittedHomeworkId = new SubmittedHomeworkId(mc.SubmittedHomeworkId),
+                    TeacherMark = mc.TeacherMark
+                })
+                .ToArray()
+        };
+    }
+
+    public static Proto.V1ConfirmHomeworkResponse ToV1ConfirmHomeworkResponse(
+        this CommandResponse<Success> commandResponse)
+    {
+        return commandResponse.Match(
+            _ => new Proto.V1ConfirmHomeworkResponse { SuccessResponse = new Proto.V1ConfirmHomeworkResponse.Types.Success() },
+            validationError => new Proto.V1ConfirmHomeworkResponse
+            {
+                ValidationError = validationError.ToProto<ConfirmHomeworkCommand, Proto.V1ConfirmHomeworkRequest>()
+            },
+            otherError => new Proto.V1ConfirmHomeworkResponse { OtherError = otherError.ToProto() });
     }
 
     public static CreateHomeworkFileCommand ToCreateHomeworkFileCommand(this Proto.V1CreateHomeworkFileRequest request)

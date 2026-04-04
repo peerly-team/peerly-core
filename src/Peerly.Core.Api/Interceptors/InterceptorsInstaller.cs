@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
-using Peerly.Core.Api.Validators;
+using Peerly.Core.Api.Validators.Submissions;
 using Peerly.Core.Tools.Abstractions;
 
 namespace Peerly.Core.Api.Interceptors;

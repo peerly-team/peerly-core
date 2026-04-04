@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -9,6 +10,7 @@ using Peerly.Core.Identifiers;
 using Peerly.Core.Models.BackgroundService;
 using Peerly.Core.Models.BackgroundService.ReviewCompletions;
 using Peerly.Core.Models.Homeworks;
+using Peerly.Core.Models.Submissions;
 
 namespace Peerly.Core.ApplicationServices.BackgroundServices.ReviewCompletion;
 
@@ -39,33 +41,10 @@ internal sealed class ReviewCompletionJobExecutor : IExecutor<ReviewCompletionJo
             if (homework is null)
                 return;
 
-            if (_clock.GetCurrentTime() < homework.ReviewDeadline)
-            {
-                _logger.LogInformation(
-                    "{Job} | HomeworkId: {HomeworkId} | Review deadline has not passed yet, rescheduling",
-                    nameof(ReviewCompletionJobExecutor),
-                    homeworkId);
-
-                await UpdateCompletionTime(unitOfWork, homework, cancellationToken);
-                return;
-            }
-
             await using var operationSet = await unitOfWork.StartOperationSet(cancellationToken);
 
-            await unitOfWork.ReviewCompletionRepository.UpdateAsync(
-                homeworkId,
-                builder =>
-                    builder
-                        .Set(item => item.ProcessStatus, ProcessStatus.Done)
-                        .Set(item => item.ProcessTime, _clock.GetCurrentTime())
-                        .Set(item => item.Error, null),
-                cancellationToken);
-
-            await unitOfWork.HomeworkRepository.UpdateAsync(
-                homeworkId,
-                builder => builder
-                    .Set(item => item.Status, HomeworkStatus.Confirmation),
-                cancellationToken);
+            await AggregateReviewersMarksAsync(unitOfWork, homeworkId, cancellationToken);
+            await CompleteProcessingAsync(unitOfWork, homework, HomeworkStatus.Confirmation, cancellationToken);
 
             await operationSet.Complete(cancellationToken);
         }
@@ -126,10 +105,10 @@ internal sealed class ReviewCompletionJobExecutor : IExecutor<ReviewCompletionJo
             return null;
         }
 
-        if (homework.ReviewDeadline > requestItem.CompletionTime)
+        if (_clock.GetCurrentTime() < homework.ReviewDeadline)
         {
             _logger.LogInformation(
-                "{Job} | HomeworkId: {HomeworkId} | Review deadline postponed, rescheduling completion to {ReviewDeadline}",
+                "{Job} | HomeworkId: {HomeworkId} | Review deadline has not passed yet, rescheduling completion to {ReviewDeadline}",
                 nameof(ReviewCompletionJobExecutor),
                 homeworkId,
                 homework.ReviewDeadline);
@@ -139,6 +118,28 @@ internal sealed class ReviewCompletionJobExecutor : IExecutor<ReviewCompletionJo
         }
 
         return homework;
+    }
+
+    private async Task CompleteProcessingAsync(
+        ICommonUnitOfWork unitOfWork,
+        Homework homework,
+        HomeworkStatus homeworkStatus,
+        CancellationToken cancellationToken)
+    {
+        await unitOfWork.ReviewCompletionRepository.UpdateAsync(
+            homework.Id,
+            builder =>
+                builder
+                    .Set(item => item.ProcessStatus, ProcessStatus.Done)
+                    .Set(item => item.ProcessTime, _clock.GetCurrentTime())
+                    .Set(item => item.Error, null),
+            cancellationToken);
+
+        await unitOfWork.HomeworkRepository.UpdateAsync(
+            homework.Id,
+            builder => builder
+                .Set(item => item.Status, homeworkStatus),
+            cancellationToken);
     }
 
     private static Task<bool> UpdateCompletionTime(
@@ -171,6 +172,32 @@ internal sealed class ReviewCompletionJobExecutor : IExecutor<ReviewCompletionJo
                     .Set(item => item.IncrementFailCount, true)
                     .Set(item => item.ProcessTime, _clock.GetCurrentTime()),
             cancellationToken);
+    }
+
+    private async Task AggregateReviewersMarksAsync(
+        ICommonUnitOfWork unitOfWork,
+        HomeworkId homeworkId,
+        CancellationToken cancellationToken)
+    {
+        var reviewersMarks = await unitOfWork.SubmittedReviewRepository.ListSubmittedReviewMarksAsync(
+            homeworkId,
+            cancellationToken);
+
+        if (reviewersMarks.Count == 0)
+            return;
+
+        var currentTime = _clock.GetCurrentTime();
+        var markAddItems = reviewersMarks
+            .GroupBy(rm => rm.SubmittedHomeworkId)
+            .Select(group => new SubmittedHomeworkMarkAddItem
+            {
+                SubmittedHomeworkId = group.Key,
+                ReviewersMark = (int)Math.Round(group.Average(rm => rm.ReviewerMark)),
+                CreationTime = currentTime
+            })
+            .ToArray();
+
+        await unitOfWork.SubmittedHomeworkMarkRepository.BatchAddAsync(markAddItems, cancellationToken);
     }
 
     private Task<bool> UpdateProcessStatusToCancelled(
