@@ -12,7 +12,7 @@ option csharp_namespace = "Peerly.Core.V1.Proto";
 service HomeworkService {
   rpc V1CreateCourseHomework(V1CreateCourseHomeworkRequest) returns (V1CreateCourseHomeworkResponse);
   rpc V1CreateGroupHomework(V1CreateGroupHomeworkRequest) returns (V1CreateGroupHomeworkResponse);
-  rpc V1UpdateHomeworkStatus(V1UpdateHomeworkStatusRequest) returns (V1UpdateHomeworkStatusResponse);
+  rpc V1PublishHomework(V1PublishHomeworkRequest) returns (V1PublishHomeworkResponse);
   rpc V1ConfirmHomework(V1ConfirmHomeworkRequest) returns (V1ConfirmHomeworkResponse);
   rpc V1CreateHomeworkFile(V1CreateHomeworkFileRequest) returns (V1CreateHomeworkFileResponse);
 
@@ -87,13 +87,12 @@ message V1CreateHomeworkFileResponse {
   }
 }
 
-message V1UpdateHomeworkStatusRequest {
+message V1PublishHomeworkRequest {
   int64 homework_id = 1;
   int64 teacher_id = 2;
-  HomeworkStatus homework_status = 3;
 }
 
-message V1UpdateHomeworkStatusResponse {
+message V1PublishHomeworkResponse {
   oneof response {
     Success success_response = 1;
     ValidationError validation_error = 2;

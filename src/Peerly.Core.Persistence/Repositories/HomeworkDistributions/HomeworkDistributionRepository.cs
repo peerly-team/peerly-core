@@ -23,6 +23,41 @@ internal sealed class HomeworkDistributionRepository : IHomeworkDistributionRepo
         _connectionContext = connectionContext;
     }
 
+    public async Task AddAsync(HomeworkDistributionAddItem item, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            HomeworkId = (long)item.HomeworkId,
+            item.DistributionTime,
+            item.CreationTime,
+            ProcessStatus = item.ProcessStatus.ToString(),
+            item.FailCount
+        };
+
+        const string Query =
+            $"""
+             insert into {HomeworkDistributionTable.TableName}
+                 ({HomeworkDistributionTable.HomeworkId},
+                  {HomeworkDistributionTable.DistributionTime},
+                  {HomeworkDistributionTable.CreationTime},
+                  {HomeworkDistributionTable.ProcessStatus},
+                  {HomeworkDistributionTable.FailCount})
+             values
+                 (@{nameof(queryParams.HomeworkId)},
+                  @{nameof(queryParams.DistributionTime)},
+                  @{nameof(queryParams.CreationTime)},
+                  @{nameof(queryParams.ProcessStatus)},
+                  @{nameof(queryParams.FailCount)});
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        await _connectionContext.Connection.ExecuteAsync(command);
+    }
+
     public async Task<IReadOnlyCollection<HomeworkDistributionJobItem>> TakeAsync(HomeworkDistributionFilter filter, CancellationToken cancellationToken)
     {
         var queryParams = new
@@ -45,6 +80,7 @@ internal sealed class HomeworkDistributionRepository : IHomeworkDistributionRepo
                                  or {HomeworkDistributionTable.TakenTime} is null)
                              and (@{nameof(queryParams.MaxFailCount)} is null
                                  or {HomeworkDistributionTable.FailCount} < @{nameof(queryParams.MaxFailCount)})
+                             and {HomeworkDistributionTable.DistributionTime} <= now()
                              for update skip locked
                              limit @{nameof(queryParams.Limit)})
                 update {HomeworkDistributionTable.TableName} as hd
