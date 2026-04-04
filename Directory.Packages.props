@@ -29,5 +29,6 @@
     <PackageVersion Include="Quartz" Version="3.16.1" />
     <PackageVersion Include="Quartz.Extensions.Hosting" Version="3.16.1" />
     <PackageVersion Include="Scrutor" Version="6.1.0" />
+    <PackageVersion Include="UTF.Unknown" Version="2.6.0" />
   </ItemGroup>
 </Project>

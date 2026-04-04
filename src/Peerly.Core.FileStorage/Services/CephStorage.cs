@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Amazon.S3;
 using Amazon.S3.Model;
@@ -57,5 +59,36 @@ internal sealed class CephStorage : IStorage
             });
 
         return new Uri(stringUri);
+    }
+
+    public async Task<Stream> GetObjectAsync(StorageId storageId, CancellationToken cancellationToken)
+    {
+        using var client = _amazonClientFactory.Create();
+        var response = await client.GetObjectAsync(
+            new GetObjectRequest
+            {
+                BucketName = _options.BucketName,
+                Key = storageId.ToString()
+            },
+            cancellationToken);
+
+        var memoryStream = new MemoryStream();
+        await response.ResponseStream.CopyToAsync(memoryStream, cancellationToken);
+        memoryStream.Position = 0;
+
+        return memoryStream;
+    }
+
+    public async Task PutObjectAsync(StorageId storageId, Stream content, CancellationToken cancellationToken)
+    {
+        using var client = _amazonClientFactory.Create();
+        await client.PutObjectAsync(
+            new PutObjectRequest
+            {
+                BucketName = _options.BucketName,
+                Key = storageId.ToString(),
+                InputStream = content
+            },
+            cancellationToken);
     }
 }

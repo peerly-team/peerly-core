@@ -23,6 +23,32 @@ internal sealed class SubmittedHomeworkRepository : ISubmittedHomeworkRepository
         _connectionContext = connectionContext;
     }
 
+    public async Task<SubmittedHomework?> GetAsync(SubmittedHomeworkId submittedHomeworkId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            Id = (long)submittedHomeworkId
+        };
+
+        const string Query =
+            $"""
+             select {SubmittedHomeworkTable.Id},
+                    {SubmittedHomeworkTable.HomeworkId},
+                    {SubmittedHomeworkTable.StudentId}
+               from {SubmittedHomeworkTable.TableName}
+              where {SubmittedHomeworkTable.Id} = @{nameof(queryParams.Id)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var db = await _connectionContext.Connection.QuerySingleOrDefaultAsync<SubmittedHomeworkDb?>(command);
+
+        return db?.ToSubmittedHomework();
+    }
+
     public async Task<bool> ExistsAsync(SubmittedHomeworkId submittedHomeworkId, CancellationToken cancellationToken)
     {
         var queryParams = new

@@ -6,4 +6,5 @@ public sealed record SubmittedHomeworkFileAddItem
 {
     public required SubmittedHomeworkId SubmittedHomeworkId { get; init; }
     public required FileId FileId { get; init; }
+    public FileId? AnonymizedFileId { get; init; }
 }

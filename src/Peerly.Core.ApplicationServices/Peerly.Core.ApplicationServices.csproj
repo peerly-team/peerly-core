@@ -12,5 +12,6 @@
     <PackageReference Include="Quartz.Extensions.Hosting" />
     <PackageReference Include="Scrutor" />
     <PackageReference Include="OneOf" />
+    <PackageReference Include="UTF.Unknown" />
   </ItemGroup>
 </Project>
