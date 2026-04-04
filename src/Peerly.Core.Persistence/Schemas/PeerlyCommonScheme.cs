@@ -98,6 +98,7 @@ internal static class PeerlyCommonScheme
         public const string Checklist = "checklist";
         public const string Deadline = "deadline";
         public const string ReviewDeadline = "review_deadline";
+        public const string DiscrepancyThreshold = "discrepancy_threshold";
         public const string CreationTime = "creation_time";
         public const string UpdateTime = "update_time";
     }
@@ -187,6 +188,7 @@ internal static class PeerlyCommonScheme
         public const string ReviewersMark = "reviewers_mark";
         public const string TeacherMark = "teacher_mark";
         public const string TeacherId = "teacher_id";
+        public const string HasDiscrepancy = "has_discrepancy";
         public const string CreationTime = "creation_time";
         public const string UpdateTime = "update_time";
     }

@@ -43,7 +43,7 @@ internal sealed class ReviewCompletionJobExecutor : IExecutor<ReviewCompletionJo
 
             await using var operationSet = await unitOfWork.StartOperationSet(cancellationToken);
 
-            await AggregateReviewersMarksAsync(unitOfWork, homeworkId, cancellationToken);
+            await AggregateReviewersMarksAsync(unitOfWork, homework, cancellationToken);
             await CompleteProcessingAsync(unitOfWork, homework, HomeworkStatus.Confirmation, cancellationToken);
 
             await operationSet.Complete(cancellationToken);
@@ -59,7 +59,7 @@ internal sealed class ReviewCompletionJobExecutor : IExecutor<ReviewCompletionJo
                 homeworkId,
                 errorMessage);
 
-            await UpdateToFailed(unitOfWork, homeworkId, errorMessage, cancellationToken);
+            await UpdateToFailedAsync(unitOfWork, homeworkId, errorMessage, cancellationToken);
             return;
         }
 
@@ -87,7 +87,7 @@ internal sealed class ReviewCompletionJobExecutor : IExecutor<ReviewCompletionJo
                 homeworkId,
                 ErrorMessage);
 
-            await UpdateProcessStatusToCancelled(unitOfWork, homeworkId, ErrorMessage, cancellationToken);
+            await UpdateProcessStatusToCancelledAsync(unitOfWork, homeworkId, ErrorMessage, cancellationToken);
             return null;
         }
 
@@ -101,7 +101,7 @@ internal sealed class ReviewCompletionJobExecutor : IExecutor<ReviewCompletionJo
                 homeworkId,
                 errorMessage);
 
-            await UpdateProcessStatusToCancelled(unitOfWork, homeworkId, errorMessage, cancellationToken);
+            await UpdateProcessStatusToCancelledAsync(unitOfWork, homeworkId, errorMessage, cancellationToken);
             return null;
         }
 
@@ -113,7 +113,7 @@ internal sealed class ReviewCompletionJobExecutor : IExecutor<ReviewCompletionJo
                 homeworkId,
                 homework.ReviewDeadline);
 
-            await UpdateCompletionTime(unitOfWork, homework, cancellationToken);
+            await UpdateCompletionTimeAsync(unitOfWork, homework, cancellationToken);
             return null;
         }
 
@@ -142,7 +142,7 @@ internal sealed class ReviewCompletionJobExecutor : IExecutor<ReviewCompletionJo
             cancellationToken);
     }
 
-    private static Task<bool> UpdateCompletionTime(
+    private static Task<bool> UpdateCompletionTimeAsync(
         ICommonUnitOfWork unitOfWork,
         Homework homework,
         CancellationToken cancellationToken)
@@ -157,7 +157,7 @@ internal sealed class ReviewCompletionJobExecutor : IExecutor<ReviewCompletionJo
             cancellationToken);
     }
 
-    private Task<bool> UpdateToFailed(
+    private Task<bool> UpdateToFailedAsync(
         ICommonUnitOfWork unitOfWork,
         HomeworkId homeworkId,
         string errorMessage,
@@ -176,31 +176,34 @@ internal sealed class ReviewCompletionJobExecutor : IExecutor<ReviewCompletionJo
 
     private async Task AggregateReviewersMarksAsync(
         ICommonUnitOfWork unitOfWork,
-        HomeworkId homeworkId,
+        Homework homework,
         CancellationToken cancellationToken)
     {
-        var reviewersMarks = await unitOfWork.SubmittedReviewRepository.ListSubmittedReviewMarksAsync(
-            homeworkId,
-            cancellationToken);
-
+        var reviewersMarks = await unitOfWork.SubmittedReviewRepository.ListSubmittedReviewMarksAsync(homework.Id, cancellationToken);
         if (reviewersMarks.Count == 0)
             return;
 
         var currentTime = _clock.GetCurrentTime();
         var markAddItems = reviewersMarks
             .GroupBy(rm => rm.SubmittedHomeworkId)
-            .Select(group => new SubmittedHomeworkMarkAddItem
-            {
-                SubmittedHomeworkId = group.Key,
-                ReviewersMark = (int)Math.Round(group.Average(rm => rm.ReviewerMark)),
-                CreationTime = currentTime
-            })
+            .Select(
+                group =>
+                {
+                    var marks = group.Select(rm => rm.ReviewerMark).ToArray();
+                    return new SubmittedHomeworkMarkAddItem
+                    {
+                        SubmittedHomeworkId = group.Key,
+                        ReviewersMark = (int)Math.Round(marks.Average()),
+                        HasDiscrepancy = marks.Max() - marks.Min() > homework.DiscrepancyThreshold,
+                        CreationTime = currentTime
+                    };
+                })
             .ToArray();
 
         await unitOfWork.SubmittedHomeworkMarkRepository.BatchAddAsync(markAddItems, cancellationToken);
     }
 
-    private Task<bool> UpdateProcessStatusToCancelled(
+    private Task<bool> UpdateProcessStatusToCancelledAsync(
         ICommonUnitOfWork unitOfWork,
         HomeworkId homeworkId,
         string reason,

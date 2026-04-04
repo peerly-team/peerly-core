@@ -38,6 +38,7 @@ internal sealed class CreateGroupHomeworkHandlerMapper : ICreateGroupHomeworkHan
             Checklist = command.Checklist,
             Deadline = command.Deadline,
             ReviewDeadline = command.ReviewDeadline,
+            DiscrepancyThreshold = command.DiscrepancyThreshold,
             CreationTime = _clock.GetCurrentTime()
         };
     }
