@@ -1,5 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
+using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Submissions;
 
 namespace Peerly.Core.Abstractions.Repositories;
@@ -11,5 +12,5 @@ public interface ISubmittedHomeworkFileRepository : IReadOnlySubmittedHomeworkFi
 
 public interface IReadOnlySubmittedHomeworkFileRepository
 {
-
+    Task<FileId?> GetAnonymizedFileIdAsync(FileId fileId, CancellationToken cancellationToken);
 }

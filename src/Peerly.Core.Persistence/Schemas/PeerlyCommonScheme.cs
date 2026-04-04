@@ -130,6 +130,7 @@ internal static class PeerlyCommonScheme
 
         public const string SubmittedHomeworkId = "submitted_homework_id";
         public const string FileId = "file_id";
+        public const string AnonymizedFileId = "anonymized_file_id";
     }
 
     public static class HomeworkDistributionTable
