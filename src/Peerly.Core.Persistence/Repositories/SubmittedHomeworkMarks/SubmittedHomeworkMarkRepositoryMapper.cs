@@ -13,7 +13,8 @@ internal static class SubmittedHomeworkMarkRepositoryMapper
             SubmittedHomeworkId = new SubmittedHomeworkId(db.SubmittedHomeworkId),
             ReviewersMark = db.ReviewersMark,
             TeacherMark = db.TeacherMark,
-            TeacherId = db.TeacherId is not null ? new TeacherId(db.TeacherId.Value) : null
+            TeacherId = db.TeacherId is not null ? new TeacherId(db.TeacherId.Value) : null,
+            HasDiscrepancy = db.HasDiscrepancy
         };
     }
 }

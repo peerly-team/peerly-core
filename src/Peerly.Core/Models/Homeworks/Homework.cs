@@ -15,5 +15,6 @@ public sealed record Homework
     public required string CheckList { get; init; }
     public required DateTimeOffset Deadline { get; init; }
     public required DateTimeOffset ReviewDeadline { get; init; }
+    public required int DiscrepancyThreshold { get; init; }
     public required string? Description { get; init; }
 }

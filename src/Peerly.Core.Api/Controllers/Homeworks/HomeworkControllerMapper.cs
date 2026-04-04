@@ -31,7 +31,8 @@ internal static class HomeworkControllerMapper
             Description = request.Description,
             Checklist = request.Checklist,
             Deadline = request.Deadline.ToDateTimeOffset(),
-            ReviewDeadline = request.ReviewDeadline.ToDateTimeOffset()
+            ReviewDeadline = request.ReviewDeadline.ToDateTimeOffset(),
+            DiscrepancyThreshold = request.DiscrepancyThreshold
         };
     }
 
@@ -64,7 +65,8 @@ internal static class HomeworkControllerMapper
             Description = request.Description,
             Checklist = request.Checklist,
             Deadline = request.Deadline.ToDateTimeOffset(),
-            ReviewDeadline = request.ReviewDeadline.ToDateTimeOffset()
+            ReviewDeadline = request.ReviewDeadline.ToDateTimeOffset(),
+            DiscrepancyThreshold = request.DiscrepancyThreshold
         };
     }
 

@@ -34,6 +34,7 @@ internal sealed class SubmittedHomeworkMarkRepository : ISubmittedHomeworkMarkRe
         {
             SubmittedHomeworkIds = items.ToArrayBy(item => (long)item.SubmittedHomeworkId),
             ReviewersMarks = items.ToArrayBy(item => item.ReviewersMark),
+            HasDiscrepancies = items.ToArrayBy(item => item.HasDiscrepancy),
             CreationTimes = items.ToArrayBy(item => item.CreationTime)
         };
 
@@ -42,10 +43,12 @@ internal sealed class SubmittedHomeworkMarkRepository : ISubmittedHomeworkMarkRe
              insert into {SubmittedHomeworkMarkTable.TableName} (
                          {SubmittedHomeworkMarkTable.SubmittedHomeworkId},
                          {SubmittedHomeworkMarkTable.ReviewersMark},
+                         {SubmittedHomeworkMarkTable.HasDiscrepancy},
                          {SubmittedHomeworkMarkTable.CreationTime})
              select *
                from unnest(@{nameof(queryParams.SubmittedHomeworkIds)},
                            @{nameof(queryParams.ReviewersMarks)},
+                           @{nameof(queryParams.HasDiscrepancies)},
                            @{nameof(queryParams.CreationTimes)})
              on conflict do nothing;
              """;
@@ -160,7 +163,8 @@ internal sealed class SubmittedHomeworkMarkRepository : ISubmittedHomeworkMarkRe
              select shm.{SubmittedHomeworkMarkTable.SubmittedHomeworkId},
                     shm.{SubmittedHomeworkMarkTable.ReviewersMark},
                     shm.{SubmittedHomeworkMarkTable.TeacherMark},
-                    shm.{SubmittedHomeworkMarkTable.TeacherId}
+                    shm.{SubmittedHomeworkMarkTable.TeacherId},
+                    shm.{SubmittedHomeworkMarkTable.HasDiscrepancy}
                from {SubmittedHomeworkMarkTable.TableName} shm
                join {SubmittedHomeworkTable.TableName} sh
                  on sh.{SubmittedHomeworkTable.Id} = shm.{SubmittedHomeworkMarkTable.SubmittedHomeworkId}

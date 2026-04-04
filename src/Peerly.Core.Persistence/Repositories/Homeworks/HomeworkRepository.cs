@@ -42,7 +42,8 @@ internal sealed class HomeworkRepository : IHomeworkRepository
                     {HomeworkTable.Description},
                     {HomeworkTable.Checklist},
                     {HomeworkTable.Deadline},
-                    {HomeworkTable.ReviewDeadline}
+                    {HomeworkTable.ReviewDeadline},
+                    {HomeworkTable.DiscrepancyThreshold}
                from {HomeworkTable.TableName}
               where {HomeworkTable.Id} = @{nameof(queryParams.HomeworkId)};
              """;
@@ -101,7 +102,8 @@ internal sealed class HomeworkRepository : IHomeworkRepository
                     {HomeworkTable.Description},
                     {HomeworkTable.Checklist},
                     {HomeworkTable.Deadline},
-                    {HomeworkTable.ReviewDeadline}
+                    {HomeworkTable.ReviewDeadline},
+                    {HomeworkTable.DiscrepancyThreshold}
                from {HomeworkTable.TableName}
               where (cardinality(@{nameof(queryParams.CourseIds)}) = 0
                     or {HomeworkTable.CourseId} = any(@{nameof(queryParams.CourseIds)}))
@@ -135,6 +137,7 @@ internal sealed class HomeworkRepository : IHomeworkRepository
             item.Checklist,
             item.Deadline,
             item.ReviewDeadline,
+            item.DiscrepancyThreshold,
             item.CreationTime
         };
 
@@ -151,6 +154,7 @@ internal sealed class HomeworkRepository : IHomeworkRepository
                          {HomeworkTable.Checklist},
                          {HomeworkTable.Deadline},
                          {HomeworkTable.ReviewDeadline},
+                         {HomeworkTable.DiscrepancyThreshold},
                          {HomeworkTable.CreationTime})
                   values (
                          @{nameof(queryParams.CourseId)},
@@ -163,6 +167,7 @@ internal sealed class HomeworkRepository : IHomeworkRepository
                          @{nameof(queryParams.Checklist)},
                          @{nameof(queryParams.Deadline)},
                          @{nameof(queryParams.ReviewDeadline)},
+                         @{nameof(queryParams.DiscrepancyThreshold)},
                          @{nameof(queryParams.CreationTime)})
                returning {HomeworkTable.Id};
              """;

@@ -39,6 +39,7 @@ internal sealed class CreateCourseHomeworkHandler : ICommandHandler<CreateCourse
             Checklist = command.Checklist,
             Deadline = command.Deadline,
             ReviewDeadline = command.ReviewDeadline,
+            DiscrepancyThreshold = command.DiscrepancyThreshold,
             CreationTime = _clock.GetCurrentTime()
         };
         var homeworkId = await unitOfWork.HomeworkRepository.AddAsync(homeworkAddItem, cancellationToken);

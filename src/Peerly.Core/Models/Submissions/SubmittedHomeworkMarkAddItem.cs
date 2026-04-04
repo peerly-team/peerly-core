@@ -7,5 +7,6 @@ public sealed record SubmittedHomeworkMarkAddItem
 {
     public required SubmittedHomeworkId SubmittedHomeworkId { get; init; }
     public required int ReviewersMark { get; init; }
+    public required bool HasDiscrepancy { get; init; }
     public required DateTimeOffset CreationTime { get; init; }
 }

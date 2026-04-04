@@ -14,4 +14,5 @@ public sealed record CreateGroupHomeworkCommand : ICommand<CreateGroupHomeworkCo
     public required string Checklist { get; init; }
     public required DateTimeOffset Deadline { get; init; }
     public required DateTimeOffset ReviewDeadline { get; init; }
+    public required int DiscrepancyThreshold { get; init; }
 }

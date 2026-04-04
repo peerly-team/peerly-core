@@ -30,6 +30,7 @@ message V1CreateCourseHomeworkRequest {
   string checklist = 6;
   google.protobuf.Timestamp deadline = 7;
   google.protobuf.Timestamp review_deadline = 8;
+  int32 discrepancy_threshold = 9;
 }
 
 message V1CreateCourseHomeworkResponse {
@@ -53,6 +54,7 @@ message V1CreateGroupHomeworkRequest {
   string checklist = 6;
   google.protobuf.Timestamp deadline = 7;
   google.protobuf.Timestamp review_deadline = 8;
+  int32 discrepancy_threshold = 9;
 }
 
 message V1CreateGroupHomeworkResponse {

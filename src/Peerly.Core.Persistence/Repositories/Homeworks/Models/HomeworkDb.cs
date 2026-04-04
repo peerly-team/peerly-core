@@ -15,4 +15,5 @@ internal sealed record HomeworkDb
     public required string? Description { get; init; }
     public required DateTimeOffset Deadline { get; init; }
     public required DateTimeOffset ReviewDeadline { get; init; }
+    public required int DiscrepancyThreshold { get; init; }
 }
