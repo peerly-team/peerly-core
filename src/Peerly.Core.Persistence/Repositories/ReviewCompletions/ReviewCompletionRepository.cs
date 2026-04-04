@@ -82,6 +82,7 @@ internal sealed class ReviewCompletionRepository : IReviewCompletionRepository
                                  or {ReviewCompletionTable.TakenTime} is null)
                              and (@{nameof(queryParams.MaxFailCount)} is null
                                  or {ReviewCompletionTable.FailCount} < @{nameof(queryParams.MaxFailCount)})
+                             and {ReviewCompletionTable.CompletionTime} <= now()
                              for update skip locked
                              limit @{nameof(queryParams.Limit)})
                 update {ReviewCompletionTable.TableName} as rc

@@ -6,9 +6,9 @@ using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ConfirmHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateCourseHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateGroupHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PublishHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.SearchStudentCourseHomeworks;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.Shared.SearchCourseHomeworks;
-using Peerly.Core.ApplicationServices.Features.V1.Homeworks.UpdateHomeworkStatus;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Homeworks;
@@ -86,26 +86,25 @@ internal static class HomeworkControllerMapper
             otherError => new Proto.V1CreateGroupHomeworkResponse { OtherError = otherError.ToProto() });
     }
 
-    public static UpdateHomeworkStatusCommand ToUpdateHomeworkStatusCommand(this Proto.V1UpdateHomeworkStatusRequest request)
+    public static PublishHomeworkCommand ToPublishHomeworkCommand(this Proto.V1PublishHomeworkRequest request)
     {
-        return new UpdateHomeworkStatusCommand
+        return new PublishHomeworkCommand
         {
             HomeworkId = new HomeworkId(request.HomeworkId),
-            TeacherId = new TeacherId(request.TeacherId),
-            HomeworkStatus = request.HomeworkStatus.ToModel()
+            TeacherId = new TeacherId(request.TeacherId)
         };
     }
 
-    public static Proto.V1UpdateHomeworkStatusResponse ToV1UpdateHomeworkStatusResponse(
+    public static Proto.V1PublishHomeworkResponse ToV1PublishHomeworkResponse(
         this CommandResponse<Success> commandResponse)
     {
         return commandResponse.Match(
-            _ => new Proto.V1UpdateHomeworkStatusResponse { SuccessResponse = new Proto.V1UpdateHomeworkStatusResponse.Types.Success() },
-            validationError => new Proto.V1UpdateHomeworkStatusResponse
+            _ => new Proto.V1PublishHomeworkResponse { SuccessResponse = new Proto.V1PublishHomeworkResponse.Types.Success() },
+            validationError => new Proto.V1PublishHomeworkResponse
             {
-                ValidationError = validationError.ToProto<UpdateHomeworkStatusCommand, Proto.V1UpdateHomeworkStatusRequest>()
+                ValidationError = validationError.ToProto<PublishHomeworkCommand, Proto.V1PublishHomeworkRequest>()
             },
-            otherError => new Proto.V1UpdateHomeworkStatusResponse { OtherError = otherError.ToProto() });
+            otherError => new Proto.V1PublishHomeworkResponse { OtherError = otherError.ToProto() });
     }
 
     public static ConfirmHomeworkCommand ToConfirmHomeworkCommand(this Proto.V1ConfirmHomeworkRequest request)

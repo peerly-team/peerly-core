@@ -7,8 +7,8 @@ using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ConfirmHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateCourseHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateGroupHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PublishHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.SearchStudentCourseHomeworks;
-using Peerly.Core.ApplicationServices.Features.V1.Homeworks.UpdateHomeworkStatus;
 using Peerly.Core.V1;
 
 namespace Peerly.Core.Api.Controllers.Homeworks;
@@ -19,7 +19,7 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
     private readonly IQueryHandler<SearchStudentCourseHomeworksQuery, SearchStudentCourseHomeworksQueryResponse> _searchStudentCourseHomeworksHandler;
     private readonly ICommandHandler<CreateCourseHomeworkCommand, CreateCourseHomeworkCommandResponse> _createHomeworkHandler;
     private readonly ICommandHandler<CreateGroupHomeworkCommand, CreateGroupHomeworkCommandResponse> _createGroupHomeworkHandler;
-    private readonly ICommandHandler<UpdateHomeworkStatusCommand, Success> _updateHomeworkStatusHandler;
+    private readonly ICommandHandler<PublishHomeworkCommand, Success> _publishHomeworkHandler;
     private readonly ICommandHandler<ConfirmHomeworkCommand, Success> _confirmHomeworkHandler;
     private readonly ICommandHandler<CreateHomeworkFileCommand, CreateHomeworkFileCommandResponse> _createHomeworkAttachmentHandler;
 
@@ -27,14 +27,14 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
         IQueryHandler<SearchStudentCourseHomeworksQuery, SearchStudentCourseHomeworksQueryResponse> searchStudentCourseHomeworksHandler,
         ICommandHandler<CreateCourseHomeworkCommand, CreateCourseHomeworkCommandResponse> createHomeworkHandler,
         ICommandHandler<CreateGroupHomeworkCommand, CreateGroupHomeworkCommandResponse> createGroupHomeworkHandler,
-        ICommandHandler<UpdateHomeworkStatusCommand, Success> updateHomeworkStatusHandler,
+        ICommandHandler<PublishHomeworkCommand, Success> publishHomeworkHandler,
         ICommandHandler<ConfirmHomeworkCommand, Success> confirmHomeworkHandler,
         ICommandHandler<CreateHomeworkFileCommand, CreateHomeworkFileCommandResponse> createHomeworkAttachmentHandler)
     {
         _searchStudentCourseHomeworksHandler = searchStudentCourseHomeworksHandler;
         _createHomeworkHandler = createHomeworkHandler;
         _createGroupHomeworkHandler = createGroupHomeworkHandler;
-        _updateHomeworkStatusHandler = updateHomeworkStatusHandler;
+        _publishHomeworkHandler = publishHomeworkHandler;
         _confirmHomeworkHandler = confirmHomeworkHandler;
         _createHomeworkAttachmentHandler = createHomeworkAttachmentHandler;
     }
@@ -53,11 +53,11 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
         return commandResponse.ToV1CreateGroupHomeworkResponse();
     }
 
-    public override async Task<V1UpdateHomeworkStatusResponse> V1UpdateHomeworkStatus(V1UpdateHomeworkStatusRequest request, ServerCallContext context)
+    public override async Task<V1PublishHomeworkResponse> V1PublishHomework(V1PublishHomeworkRequest request, ServerCallContext context)
     {
-        var command = request.ToUpdateHomeworkStatusCommand();
-        var commandResponse = await _updateHomeworkStatusHandler.ExecuteAsync(command, context.CancellationToken);
-        return commandResponse.ToV1UpdateHomeworkStatusResponse();
+        var command = request.ToPublishHomeworkCommand();
+        var commandResponse = await _publishHomeworkHandler.ExecuteAsync(command, context.CancellationToken);
+        return commandResponse.ToV1PublishHomeworkResponse();
     }
 
     public override async Task<V1ConfirmHomeworkResponse> V1ConfirmHomework(V1ConfirmHomeworkRequest request, ServerCallContext context)
