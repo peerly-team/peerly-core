@@ -1,7 +1,7 @@
 using FluentValidation;
 using Peerly.Core.V1;
 
-namespace Peerly.Core.Api.Validators;
+namespace Peerly.Core.Api.Validators.Submissions;
 
 internal sealed class V1CreateSubmittedReviewRequestValidator : AbstractValidator<V1CreateSubmittedReviewRequest>
 {

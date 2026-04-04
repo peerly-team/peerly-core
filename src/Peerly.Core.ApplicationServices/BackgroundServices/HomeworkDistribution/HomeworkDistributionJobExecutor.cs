@@ -47,19 +47,13 @@ internal sealed class HomeworkDistributionJobExecutor : IExecutor<HomeworkDistri
                 return;
 
             var submittedHomeworks = await GetSubmittedHomeworkStudentsAsync(unitOfWork, homework, cancellationToken);
+            var distributionReviewerAddItems = GetDistributionReviewerAddItems(submittedHomeworks, homework.AmountOfReviewers);
+            var finalHomeworkStatus = distributionReviewerAddItems.Count == 0 ? HomeworkStatus.Confirmation : HomeworkStatus.Reviewing;
+
             await using var operationSet = await unitOfWork.StartOperationSet(cancellationToken);
 
-            var distributionReviewerAddItems = GetDistributionReviewerAddItems(submittedHomeworks, homework.AmountOfReviewers);
-
-            if (distributionReviewerAddItems.Count == 0)
-            {
-                await UpdateToDoneWithStatus(unitOfWork, homework, HomeworkStatus.Confirmation, cancellationToken);
-            }
-            else
-            {
-                await unitOfWork.DistributionReviewerRepository.BatchAddAsync(distributionReviewerAddItems, cancellationToken);
-                await UpdateToDoneWithStatus(unitOfWork, homework, HomeworkStatus.Reviewing, cancellationToken);
-            }
+            await unitOfWork.DistributionReviewerRepository.BatchAddAsync(distributionReviewerAddItems, cancellationToken);
+            await CompleteProcessingAsync(unitOfWork, homework, finalHomeworkStatus, cancellationToken);
 
             await operationSet.Complete(cancellationToken);
         }
@@ -162,7 +156,7 @@ internal sealed class HomeworkDistributionJobExecutor : IExecutor<HomeworkDistri
         return submittedHomeworks;
     }
 
-    private async Task UpdateToDoneWithStatus(
+    private async Task CompleteProcessingAsync(
         ICommonUnitOfWork unitOfWork,
         Homework homework,
         HomeworkStatus homeworkStatus,
