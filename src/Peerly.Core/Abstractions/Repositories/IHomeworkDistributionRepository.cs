@@ -9,6 +9,8 @@ namespace Peerly.Core.Abstractions.Repositories;
 
 public interface IHomeworkDistributionRepository : IReadOnlyHomeworkDistributionRepository
 {
+    Task AddAsync(HomeworkDistributionAddItem item, CancellationToken cancellationToken);
+
     Task<IReadOnlyCollection<HomeworkDistributionJobItem>> TakeAsync(
         HomeworkDistributionFilter filter,
         CancellationToken cancellationToken);
