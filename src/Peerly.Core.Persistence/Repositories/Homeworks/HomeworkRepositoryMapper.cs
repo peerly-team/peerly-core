@@ -21,7 +21,8 @@ internal static class HomeworkRepositoryMapper
             Description = homeworkDb.Description,
             CheckList = homeworkDb.CheckList,
             Deadline = homeworkDb.Deadline,
-            ReviewDeadline = homeworkDb.ReviewDeadline
+            ReviewDeadline = homeworkDb.ReviewDeadline,
+            DiscrepancyThreshold = homeworkDb.DiscrepancyThreshold
         };
     }
 }
