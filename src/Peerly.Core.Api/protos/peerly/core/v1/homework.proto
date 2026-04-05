@@ -12,9 +12,11 @@ option csharp_namespace = "Peerly.Core.V1.Proto";
 service HomeworkService {
   rpc V1CreateCourseHomework(V1CreateCourseHomeworkRequest) returns (V1CreateCourseHomeworkResponse);
   rpc V1CreateGroupHomework(V1CreateGroupHomeworkRequest) returns (V1CreateGroupHomeworkResponse);
+  rpc V1CreateHomeworkFile(V1CreateHomeworkFileRequest) returns (V1CreateHomeworkFileResponse);
+  rpc V1UpdateDraftHomework(V1UpdateDraftHomeworkRequest) returns (V1UpdateDraftHomeworkResponse);
+  rpc V1PostponeHomeworkDeadlines(V1PostponeHomeworkDeadlinesRequest) returns (V1PostponeHomeworkDeadlinesResponse);
   rpc V1PublishHomework(V1PublishHomeworkRequest) returns (V1PublishHomeworkResponse);
   rpc V1ConfirmHomework(V1ConfirmHomeworkRequest) returns (V1ConfirmHomeworkResponse);
-  rpc V1CreateHomeworkFile(V1CreateHomeworkFileRequest) returns (V1CreateHomeworkFileResponse);
 
   // todo: закончить реализацию ручек (поправить логику)
   rpc V1SearchStudentCourseHomeworks(V1SearchStudentCourseHomeworksRequest) returns (V1SearchStudentCourseHomeworksResponse);
@@ -116,6 +118,45 @@ message V1ConfirmHomeworkRequest {
 }
 
 message V1ConfirmHomeworkResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}
+
+message V1UpdateDraftHomeworkRequest {
+  int64 homework_id = 1;
+  int64 teacher_id = 2;
+  string name = 3;
+  int32 amount_of_reviewers = 4;
+  google.protobuf.StringValue description = 5;
+  string checklist = 6;
+  google.protobuf.Timestamp deadline = 7;
+  google.protobuf.Timestamp review_deadline = 8;
+  int32 discrepancy_threshold = 9;
+}
+
+message V1UpdateDraftHomeworkResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}
+
+message V1PostponeHomeworkDeadlinesRequest {
+  int64 homework_id = 1;
+  int64 teacher_id = 2;
+  google.protobuf.Timestamp deadline = 3;
+  google.protobuf.Timestamp review_deadline = 4;
+}
+
+message V1PostponeHomeworkDeadlinesResponse {
   oneof response {
     Success success_response = 1;
     ValidationError validation_error = 2;
