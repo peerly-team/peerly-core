@@ -7,7 +7,9 @@ using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ConfirmHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateCourseHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateGroupHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PostponeHomeworkDeadlines;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PublishHomework;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.UpdateDraftHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedReview;
@@ -76,6 +78,14 @@ public static class ValidationPropertyMappingConfiguration
 
         ValidationPropertyMapping
             .AddMapping<ConfirmHomeworkCommand, V1ConfirmHomeworkRequest>()
+            .Build();
+
+        ValidationPropertyMapping
+            .AddMapping<UpdateDraftHomeworkCommand, V1UpdateDraftHomeworkRequest>()
+            .Build();
+
+        ValidationPropertyMapping
+            .AddMapping<PostponeHomeworkDeadlinesCommand, V1PostponeHomeworkDeadlinesRequest>()
             .Build();
     }
 }
