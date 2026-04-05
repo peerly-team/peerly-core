@@ -1,11 +1,15 @@
 using System;
+using OneOf.Types;
+using Peerly.Core.ApplicationServices.Abstractions;
+using Peerly.Core.Identifiers;
 
-namespace Peerly.Core.Models.Homeworks;
+namespace Peerly.Core.ApplicationServices.Features.V1.Homeworks.UpdateDraftHomework;
 
-public sealed record HomeworkUpdateItem
+public sealed record UpdateDraftHomeworkCommand : ICommand<Success>
 {
+    public required HomeworkId HomeworkId { get; init; }
+    public required TeacherId TeacherId { get; init; }
     public required string Name { get; init; }
-    public required HomeworkStatus Status { get; init; }
     public required int AmountOfReviewers { get; init; }
     public required string? Description { get; init; }
     public required string Checklist { get; init; }

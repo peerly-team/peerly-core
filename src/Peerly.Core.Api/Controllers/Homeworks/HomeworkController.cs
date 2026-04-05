@@ -7,8 +7,10 @@ using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ConfirmHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateCourseHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateGroupHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PostponeHomeworkDeadlines;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PublishHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.SearchStudentCourseHomeworks;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.UpdateDraftHomework;
 using Peerly.Core.V1;
 
 namespace Peerly.Core.Api.Controllers.Homeworks;
@@ -22,6 +24,8 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
     private readonly ICommandHandler<PublishHomeworkCommand, Success> _publishHomeworkHandler;
     private readonly ICommandHandler<ConfirmHomeworkCommand, Success> _confirmHomeworkHandler;
     private readonly ICommandHandler<CreateHomeworkFileCommand, CreateHomeworkFileCommandResponse> _createHomeworkAttachmentHandler;
+    private readonly ICommandHandler<UpdateDraftHomeworkCommand, Success> _updateDraftHomeworkHandler;
+    private readonly ICommandHandler<PostponeHomeworkDeadlinesCommand, Success> _postponeHomeworkDeadlinesHandler;
 
     public HomeworkController(
         IQueryHandler<SearchStudentCourseHomeworksQuery, SearchStudentCourseHomeworksQueryResponse> searchStudentCourseHomeworksHandler,
@@ -29,7 +33,9 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
         ICommandHandler<CreateGroupHomeworkCommand, CreateGroupHomeworkCommandResponse> createGroupHomeworkHandler,
         ICommandHandler<PublishHomeworkCommand, Success> publishHomeworkHandler,
         ICommandHandler<ConfirmHomeworkCommand, Success> confirmHomeworkHandler,
-        ICommandHandler<CreateHomeworkFileCommand, CreateHomeworkFileCommandResponse> createHomeworkAttachmentHandler)
+        ICommandHandler<CreateHomeworkFileCommand, CreateHomeworkFileCommandResponse> createHomeworkAttachmentHandler,
+        ICommandHandler<UpdateDraftHomeworkCommand, Success> updateDraftHomeworkHandler,
+        ICommandHandler<PostponeHomeworkDeadlinesCommand, Success> postponeHomeworkDeadlinesHandler)
     {
         _searchStudentCourseHomeworksHandler = searchStudentCourseHomeworksHandler;
         _createHomeworkHandler = createHomeworkHandler;
@@ -37,6 +43,8 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
         _publishHomeworkHandler = publishHomeworkHandler;
         _confirmHomeworkHandler = confirmHomeworkHandler;
         _createHomeworkAttachmentHandler = createHomeworkAttachmentHandler;
+        _updateDraftHomeworkHandler = updateDraftHomeworkHandler;
+        _postponeHomeworkDeadlinesHandler = postponeHomeworkDeadlinesHandler;
     }
 
     public override async Task<V1CreateCourseHomeworkResponse> V1CreateCourseHomework(V1CreateCourseHomeworkRequest request, ServerCallContext context)
@@ -65,6 +73,20 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
         var command = request.ToConfirmHomeworkCommand();
         var commandResponse = await _confirmHomeworkHandler.ExecuteAsync(command, context.CancellationToken);
         return commandResponse.ToV1ConfirmHomeworkResponse();
+    }
+
+    public override async Task<V1UpdateDraftHomeworkResponse> V1UpdateDraftHomework(V1UpdateDraftHomeworkRequest request, ServerCallContext context)
+    {
+        var command = request.ToUpdateDraftHomeworkCommand();
+        var commandResponse = await _updateDraftHomeworkHandler.ExecuteAsync(command, context.CancellationToken);
+        return commandResponse.ToV1UpdateDraftHomeworkResponse();
+    }
+
+    public override async Task<V1PostponeHomeworkDeadlinesResponse> V1PostponeHomeworkDeadlines(V1PostponeHomeworkDeadlinesRequest request, ServerCallContext context)
+    {
+        var command = request.ToPostponeHomeworkDeadlinesCommand();
+        var commandResponse = await _postponeHomeworkDeadlinesHandler.ExecuteAsync(command, context.CancellationToken);
+        return commandResponse.ToV1PostponeHomeworkDeadlinesResponse();
     }
 
     public override async Task<V1CreateHomeworkFileResponse> V1CreateHomeworkFile(V1CreateHomeworkFileRequest request, ServerCallContext context)

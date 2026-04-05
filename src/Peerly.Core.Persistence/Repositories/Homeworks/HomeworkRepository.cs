@@ -232,6 +232,11 @@ internal sealed class HomeworkRepository : IHomeworkRepository
                     when {configuration.GetFlagParamName(item => item.ReviewDeadline)}
                     then {configuration.GetParamName(item => item.ReviewDeadline)}
                     else {HomeworkTable.ReviewDeadline}
+                    end,
+                    {HomeworkTable.DiscrepancyThreshold} = case
+                    when {configuration.GetFlagParamName(item => item.DiscrepancyThreshold)}
+                    then {configuration.GetParamName(item => item.DiscrepancyThreshold)}
+                    else {HomeworkTable.DiscrepancyThreshold}
                     end
               from (select {HomeworkTable.Id}
                       from {HomeworkTable.TableName}

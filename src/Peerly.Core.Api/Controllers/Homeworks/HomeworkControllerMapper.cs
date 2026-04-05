@@ -6,8 +6,10 @@ using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ConfirmHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateCourseHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateGroupHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PostponeHomeworkDeadlines;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PublishHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.SearchStudentCourseHomeworks;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.UpdateDraftHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.Shared.SearchCourseHomeworks;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
@@ -165,6 +167,57 @@ internal static class HomeworkControllerMapper
                 ValidationError = validationError.ToProto<CreateHomeworkFileCommand, Proto.V1CreateHomeworkFileRequest>()
             },
             otherError => new Proto.V1CreateHomeworkFileResponse { OtherError = otherError.ToProto() });
+    }
+
+    public static UpdateDraftHomeworkCommand ToUpdateDraftHomeworkCommand(this Proto.V1UpdateDraftHomeworkRequest request)
+    {
+        return new UpdateDraftHomeworkCommand
+        {
+            HomeworkId = new HomeworkId(request.HomeworkId),
+            TeacherId = new TeacherId(request.TeacherId),
+            Name = request.Name,
+            AmountOfReviewers = request.AmountOfReviewers,
+            Description = request.Description,
+            Checklist = request.Checklist,
+            Deadline = request.Deadline.ToDateTimeOffset(),
+            ReviewDeadline = request.ReviewDeadline.ToDateTimeOffset(),
+            DiscrepancyThreshold = request.DiscrepancyThreshold
+        };
+    }
+
+    public static Proto.V1UpdateDraftHomeworkResponse ToV1UpdateDraftHomeworkResponse(
+        this CommandResponse<Success> commandResponse)
+    {
+        return commandResponse.Match(
+            _ => new Proto.V1UpdateDraftHomeworkResponse { SuccessResponse = new Proto.V1UpdateDraftHomeworkResponse.Types.Success() },
+            validationError => new Proto.V1UpdateDraftHomeworkResponse
+            {
+                ValidationError = validationError.ToProto<UpdateDraftHomeworkCommand, Proto.V1UpdateDraftHomeworkRequest>()
+            },
+            otherError => new Proto.V1UpdateDraftHomeworkResponse { OtherError = otherError.ToProto() });
+    }
+
+    public static PostponeHomeworkDeadlinesCommand ToPostponeHomeworkDeadlinesCommand(this Proto.V1PostponeHomeworkDeadlinesRequest request)
+    {
+        return new PostponeHomeworkDeadlinesCommand
+        {
+            HomeworkId = new HomeworkId(request.HomeworkId),
+            TeacherId = new TeacherId(request.TeacherId),
+            Deadline = request.Deadline?.ToDateTimeOffset(),
+            ReviewDeadline = request.ReviewDeadline?.ToDateTimeOffset()
+        };
+    }
+
+    public static Proto.V1PostponeHomeworkDeadlinesResponse ToV1PostponeHomeworkDeadlinesResponse(
+        this CommandResponse<Success> commandResponse)
+    {
+        return commandResponse.Match(
+            _ => new Proto.V1PostponeHomeworkDeadlinesResponse { SuccessResponse = new Proto.V1PostponeHomeworkDeadlinesResponse.Types.Success() },
+            validationError => new Proto.V1PostponeHomeworkDeadlinesResponse
+            {
+                ValidationError = validationError.ToProto<PostponeHomeworkDeadlinesCommand, Proto.V1PostponeHomeworkDeadlinesRequest>()
+            },
+            otherError => new Proto.V1PostponeHomeworkDeadlinesResponse { OtherError = otherError.ToProto() });
     }
 
     public static SearchStudentCourseHomeworksQuery ToSearchStudentCoursesQuery(this Proto.V1SearchStudentCourseHomeworksRequest request)
