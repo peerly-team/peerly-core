@@ -3,38 +3,38 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Peerly.Core.Abstractions.Repositories;
-using Peerly.Core.Models.Students;
-using Peerly.Core.Persistence.Repositories.Students.Models;
+using Peerly.Core.Models.Teachers;
+using Peerly.Core.Persistence.Repositories.Teachers.Models;
 using Peerly.Core.Persistence.UnitOfWork;
 using Peerly.Core.Tools;
 using static Peerly.Core.Persistence.Schemas.PeerlyCommonScheme;
 
-namespace Peerly.Core.Persistence.Repositories.Students;
+namespace Peerly.Core.Persistence.Repositories.Teachers;
 
-internal sealed class StudentRepository : IStudentRepository
+internal sealed class TeacherRepository : ITeacherRepository
 {
     private readonly IConnectionContext _connectionContext;
 
-    public StudentRepository(IConnectionContext connectionContext)
+    public TeacherRepository(IConnectionContext connectionContext)
     {
         _connectionContext = connectionContext;
     }
 
-    public async Task<IReadOnlyCollection<Student>> ListAsync(StudentFilter filter, CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<Teacher>> ListAsync(TeacherFilter filter, CancellationToken cancellationToken)
     {
         var queryParams = new
         {
-            StudentIds = filter.StudentIds.ToArrayBy(studentId => (long)studentId)
+            TeacherIds = filter.TeacherIds.ToArrayBy(teacherId => (long)teacherId)
         };
 
         const string Query =
             $"""
-             select {StudentTable.Id},
-                    {StudentTable.Email},
-                    {StudentTable.Name}
-               from {StudentTable.TableName}
-              where cardinality(@{nameof(queryParams.StudentIds)}) = 0
-                 or {StudentTable.Id} = any(@{nameof(queryParams.StudentIds)});
+             select {TeacherTable.Id},
+                    {TeacherTable.Email},
+                    {TeacherTable.Name}
+               from {TeacherTable.TableName}
+              where cardinality(@{nameof(queryParams.TeacherIds)}) = 0
+                 or {TeacherTable.Id} = any(@{nameof(queryParams.TeacherIds)});
              """;
 
         var command = new CommandDefinition(
@@ -42,12 +42,12 @@ internal sealed class StudentRepository : IStudentRepository
             parameters: queryParams,
             transaction: _connectionContext.Transaction,
             cancellationToken: cancellationToken);
-        var results = await _connectionContext.Connection.QueryAsync<StudentDb>(command);
+        var results = await _connectionContext.Connection.QueryAsync<TeacherDb>(command);
 
-        return results.ToArrayBy(db => db.ToStudent());
+        return results.ToArrayBy(db => db.ToTeacher());
     }
 
-    public async Task<bool> AddIfNotExistsAsync(StudentAddItem item, CancellationToken cancellationToken)
+    public async Task<bool> AddIfNotExistsAsync(TeacherAddItem item, CancellationToken cancellationToken)
     {
         var queryParams = new
         {
@@ -59,17 +59,17 @@ internal sealed class StudentRepository : IStudentRepository
 
         const string Query =
             $"""
-             insert into {StudentTable.TableName} (
-                         {StudentTable.Id},
-                         {StudentTable.Email},
-                         {StudentTable.Name},
-                         {StudentTable.CreationTime})
+             insert into {TeacherTable.TableName} (
+                         {TeacherTable.Id},
+                         {TeacherTable.Email},
+                         {TeacherTable.Name},
+                         {TeacherTable.CreationTime})
                   values (
                          @{nameof(queryParams.Id)},
                          @{nameof(queryParams.Email)},
                          @{nameof(queryParams.Name)},
                          @{nameof(queryParams.CreationTime)})
-             on conflict ({StudentTable.Id}) do nothing;
+             on conflict ({TeacherTable.Id}) do nothing;
              """;
 
         var command = new CommandDefinition(
