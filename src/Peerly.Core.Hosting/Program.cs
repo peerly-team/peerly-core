@@ -14,6 +14,7 @@ using Peerly.Core.Api.Extensions;
 using Peerly.Core.Api.Infrastructure.Configuration;
 using Peerly.Core.ApplicationServices.Extensions;
 using Peerly.Core.FileStorage.Extensions;
+using Peerly.Core.Messaging.Extensions;
 using Peerly.Core.Persistence.Extensions;
 
 namespace Peerly.Core.Hosting;
@@ -45,6 +46,9 @@ public static class Program
 
         // FileStorage
         services.ConfigureFileStorage(configuration);
+
+        // Messaging
+        services.ConfigureMessaging(configuration);
 
         // Persistence
         services.ConfigurePersistence(configuration);

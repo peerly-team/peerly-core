@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <!-- Third-party packages -->
+    <PackageReference Include="Confluent.Kafka"/>
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions"/>
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Peerly.Core.Tools\Peerly.Core.Tools.csproj" />
+    <ProjectReference Include="..\Peerly.Core\Peerly.Core.csproj" />
+  </ItemGroup>
+</Project>

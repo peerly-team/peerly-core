@@ -7,6 +7,7 @@ namespace Peerly.Core.Abstractions.Repositories;
 
 public interface IStudentRepository : IReadOnlyStudentRepository
 {
+    Task<bool> AddIfNotExistsAsync(StudentAddItem item, CancellationToken cancellationToken);
 }
 
 public interface IReadOnlyStudentRepository
