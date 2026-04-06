@@ -34,9 +34,39 @@ internal sealed class SubmittedHomeworkRepository : ISubmittedHomeworkRepository
             $"""
              select {SubmittedHomeworkTable.Id},
                     {SubmittedHomeworkTable.HomeworkId},
-                    {SubmittedHomeworkTable.StudentId}
+                    {SubmittedHomeworkTable.StudentId},
+                    {SubmittedHomeworkTable.Comment}
                from {SubmittedHomeworkTable.TableName}
               where {SubmittedHomeworkTable.Id} = @{nameof(queryParams.Id)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var db = await _connectionContext.Connection.QuerySingleOrDefaultAsync<SubmittedHomeworkDb?>(command);
+
+        return db?.ToSubmittedHomework();
+    }
+
+    public async Task<SubmittedHomework?> GetByHomeworkAndStudentAsync(HomeworkId homeworkId, StudentId studentId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            HomeworkId = (long)homeworkId,
+            StudentId = (long)studentId
+        };
+
+        const string Query =
+            $"""
+             select {SubmittedHomeworkTable.Id},
+                    {SubmittedHomeworkTable.HomeworkId},
+                    {SubmittedHomeworkTable.StudentId},
+                    {SubmittedHomeworkTable.Comment}
+               from {SubmittedHomeworkTable.TableName}
+              where {SubmittedHomeworkTable.HomeworkId} = @{nameof(queryParams.HomeworkId)}
+                and {SubmittedHomeworkTable.StudentId} = @{nameof(queryParams.StudentId)};
              """;
 
         var command = new CommandDefinition(

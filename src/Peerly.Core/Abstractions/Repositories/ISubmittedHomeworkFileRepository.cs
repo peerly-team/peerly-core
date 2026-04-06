@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Peerly.Core.Identifiers;
@@ -13,4 +14,5 @@ public interface ISubmittedHomeworkFileRepository : IReadOnlySubmittedHomeworkFi
 public interface IReadOnlySubmittedHomeworkFileRepository
 {
     Task<FileId?> GetAnonymizedFileIdAsync(FileId fileId, CancellationToken cancellationToken);
+    Task<IReadOnlyCollection<SubmittedHomeworkFileItem>> ListAsync(SubmittedHomeworkId submittedHomeworkId, CancellationToken cancellationToken);
 }

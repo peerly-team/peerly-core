@@ -149,6 +149,34 @@ internal sealed class SubmittedHomeworkMarkRepository : ISubmittedHomeworkMarkRe
         return affectedRows == 1;
     }
 
+    public async Task<SubmittedHomeworkMark?> GetAsync(SubmittedHomeworkId submittedHomeworkId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            SubmittedHomeworkId = (long)submittedHomeworkId
+        };
+
+        const string Query =
+            $"""
+             select {SubmittedHomeworkMarkTable.SubmittedHomeworkId},
+                    {SubmittedHomeworkMarkTable.ReviewersMark},
+                    {SubmittedHomeworkMarkTable.TeacherMark},
+                    {SubmittedHomeworkMarkTable.TeacherId},
+                    {SubmittedHomeworkMarkTable.HasDiscrepancy}
+               from {SubmittedHomeworkMarkTable.TableName}
+              where {SubmittedHomeworkMarkTable.SubmittedHomeworkId} = @{nameof(queryParams.SubmittedHomeworkId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var db = await _connectionContext.Connection.QuerySingleOrDefaultAsync<SubmittedHomeworkMarkDb?>(command);
+
+        return db?.ToSubmittedHomeworkMark();
+    }
+
     public async Task<IReadOnlyCollection<SubmittedHomeworkMark>> ListAsync(
         HomeworkId homeworkId,
         CancellationToken cancellationToken)

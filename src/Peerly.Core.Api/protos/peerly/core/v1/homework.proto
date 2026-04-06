@@ -18,6 +18,9 @@ service HomeworkService {
   rpc V1PublishHomework(V1PublishHomeworkRequest) returns (V1PublishHomeworkResponse);
   rpc V1ConfirmHomework(V1ConfirmHomeworkRequest) returns (V1ConfirmHomeworkResponse);
 
+  rpc V1GetTeacherHomework(V1GetTeacherHomeworkRequest) returns (V1GetTeacherHomeworkResponse);
+  rpc V1GetStudentHomework(V1GetStudentHomeworkRequest) returns (V1GetStudentHomeworkResponse);
+
   // todo: закончить реализацию ручек (поправить логику)
   rpc V1SearchStudentCourseHomeworks(V1SearchStudentCourseHomeworksRequest) returns (V1SearchStudentCourseHomeworksResponse);
   rpc V1SearchTeacherCoursesHomeworks(V1SearchTeacherCoursesHomeworksRequest) returns (V1SearchTeacherCoursesHomeworksResponse);
@@ -186,4 +189,22 @@ message V1SearchTeacherCoursesHomeworksRequest {
 
 message V1SearchTeacherCoursesHomeworksResponse {
   repeated HomeworkInfo homework_infos = 1;
+}
+
+message V1GetTeacherHomeworkRequest {
+  int64 homework_id = 1;
+  int64 teacher_id = 2;
+}
+
+message V1GetTeacherHomeworkResponse {
+  HomeworkDetailInfo homework_detail = 1;
+}
+
+message V1GetStudentHomeworkRequest {
+  int64 homework_id = 1;
+  int64 student_id = 2;
+}
+
+message V1GetStudentHomeworkResponse {
+  HomeworkDetailInfo homework_detail = 1;
 }

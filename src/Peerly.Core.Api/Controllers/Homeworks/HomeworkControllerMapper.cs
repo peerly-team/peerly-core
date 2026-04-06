@@ -8,8 +8,13 @@ using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateGroupHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PostponeHomeworkDeadlines;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PublishHomework;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.GetStudentHomework;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.GetTeacherHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.SearchStudentCourseHomeworks;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.SearchTeacherCourseHomeworks;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.Shared.GetHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.UpdateDraftHomework;
+using Peerly.Core.Models.Files;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.Shared.SearchCourseHomeworks;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
@@ -220,6 +225,60 @@ internal static class HomeworkControllerMapper
             otherError => new Proto.V1PostponeHomeworkDeadlinesResponse { OtherError = otherError.ToProto() });
     }
 
+    public static GetTeacherHomeworkQuery ToGetTeacherHomeworkQuery(this Proto.V1GetTeacherHomeworkRequest request)
+    {
+        return new GetTeacherHomeworkQuery
+        {
+            HomeworkId = new HomeworkId(request.HomeworkId),
+            TeacherId = new TeacherId(request.TeacherId)
+        };
+    }
+
+    public static Proto.V1GetTeacherHomeworkResponse ToV1GetTeacherHomeworkResponse(this GetTeacherHomeworkQueryResponse queryResponse)
+    {
+        return new Proto.V1GetTeacherHomeworkResponse
+        {
+            HomeworkDetail = queryResponse.HomeworkDetail.ToProtoDetail()
+        };
+    }
+
+    public static GetStudentHomeworkQuery ToGetStudentHomeworkQuery(this Proto.V1GetStudentHomeworkRequest request)
+    {
+        return new GetStudentHomeworkQuery
+        {
+            HomeworkId = new HomeworkId(request.HomeworkId),
+            StudentId = new StudentId(request.StudentId)
+        };
+    }
+
+    public static Proto.V1GetStudentHomeworkResponse ToV1GetStudentHomeworkResponse(this GetStudentHomeworkQueryResponse queryResponse)
+    {
+        return new Proto.V1GetStudentHomeworkResponse
+        {
+            HomeworkDetail = queryResponse.HomeworkDetail.ToProtoDetail()
+        };
+    }
+
+    public static SearchTeacherCourseHomeworksQuery ToSearchTeacherCourseHomeworksQuery(this Proto.V1SearchTeacherCoursesHomeworksRequest request)
+    {
+        return new SearchTeacherCourseHomeworksQuery
+        {
+            TeacherId = new TeacherId(request.TeacherId),
+            CourseId = new CourseId(request.CourseId),
+            Filter = request.Filter.ToFilter(),
+            PaginationInfo = request.PaginationInfo.ToPaginationInfo()
+        };
+    }
+
+    public static Proto.V1SearchTeacherCoursesHomeworksResponse ToV1SearchTeacherCoursesHomeworksResponse(
+        this SearchTeacherCourseHomeworksQueryResponse queryResponse)
+    {
+        return new Proto.V1SearchTeacherCoursesHomeworksResponse
+        {
+            HomeworkInfos = { queryResponse.Homeworks.ToArrayBy(homework => homework.ToProto()) }
+        };
+    }
+
     public static SearchStudentCourseHomeworksQuery ToSearchStudentCoursesQuery(this Proto.V1SearchStudentCourseHomeworksRequest request)
     {
         return new SearchStudentCourseHomeworksQuery
@@ -295,6 +354,38 @@ internal static class HomeworkControllerMapper
         {
             Offset = paginationInfoProto.Offset,
             PageSize = paginationInfoProto.PageSize
+        };
+    }
+
+    private static Proto.HomeworkDetailInfo ToProtoDetail(this HomeworkDetailResponseItem item)
+    {
+        var homework = item.Homework;
+        var result = new Proto.HomeworkDetailInfo
+        {
+            Id = (long)homework.Id,
+            Name = homework.Name,
+            Status = homework.Status.ToProto(),
+            Description = homework.Description,
+            Checklist = homework.CheckList,
+            Deadline = homework.Deadline.ToTimestamp(),
+            ReviewDeadline = homework.ReviewDeadline.ToTimestamp(),
+            AmountOfReviewers = homework.AmountOfReviewers,
+            DiscrepancyThreshold = homework.DiscrepancyThreshold,
+            GroupId = homework.GroupId.HasValue ? (long)homework.GroupId.Value : null,
+            CourseId = (long)homework.CourseId,
+            Files = { item.Files.ToArrayBy(f => f.ToProtoFileInfo()) }
+        };
+
+        return result;
+    }
+
+    private static Proto.FileInfo ToProtoFileInfo(this File file)
+    {
+        return new Proto.FileInfo
+        {
+            Id = (long)file.Id,
+            Name = file.Name,
+            Size = file.Size
         };
     }
 }

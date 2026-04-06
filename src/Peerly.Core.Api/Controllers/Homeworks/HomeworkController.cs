@@ -9,7 +9,10 @@ using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateGroupHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PostponeHomeworkDeadlines;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PublishHomework;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.GetStudentHomework;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.GetTeacherHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.SearchStudentCourseHomeworks;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.SearchTeacherCourseHomeworks;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.UpdateDraftHomework;
 using Peerly.Core.V1;
 
@@ -19,6 +22,9 @@ namespace Peerly.Core.Api.Controllers.Homeworks;
 public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
 {
     private readonly IQueryHandler<SearchStudentCourseHomeworksQuery, SearchStudentCourseHomeworksQueryResponse> _searchStudentCourseHomeworksHandler;
+    private readonly IQueryHandler<SearchTeacherCourseHomeworksQuery, SearchTeacherCourseHomeworksQueryResponse> _searchTeacherCourseHomeworksHandler;
+    private readonly IQueryHandler<GetTeacherHomeworkQuery, GetTeacherHomeworkQueryResponse> _getTeacherHomeworkHandler;
+    private readonly IQueryHandler<GetStudentHomeworkQuery, GetStudentHomeworkQueryResponse> _getStudentHomeworkHandler;
     private readonly ICommandHandler<CreateCourseHomeworkCommand, CreateCourseHomeworkCommandResponse> _createHomeworkHandler;
     private readonly ICommandHandler<CreateGroupHomeworkCommand, CreateGroupHomeworkCommandResponse> _createGroupHomeworkHandler;
     private readonly ICommandHandler<PublishHomeworkCommand, Success> _publishHomeworkHandler;
@@ -29,6 +35,9 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
 
     public HomeworkController(
         IQueryHandler<SearchStudentCourseHomeworksQuery, SearchStudentCourseHomeworksQueryResponse> searchStudentCourseHomeworksHandler,
+        IQueryHandler<SearchTeacherCourseHomeworksQuery, SearchTeacherCourseHomeworksQueryResponse> searchTeacherCourseHomeworksHandler,
+        IQueryHandler<GetTeacherHomeworkQuery, GetTeacherHomeworkQueryResponse> getTeacherHomeworkHandler,
+        IQueryHandler<GetStudentHomeworkQuery, GetStudentHomeworkQueryResponse> getStudentHomeworkHandler,
         ICommandHandler<CreateCourseHomeworkCommand, CreateCourseHomeworkCommandResponse> createHomeworkHandler,
         ICommandHandler<CreateGroupHomeworkCommand, CreateGroupHomeworkCommandResponse> createGroupHomeworkHandler,
         ICommandHandler<PublishHomeworkCommand, Success> publishHomeworkHandler,
@@ -38,6 +47,9 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
         ICommandHandler<PostponeHomeworkDeadlinesCommand, Success> postponeHomeworkDeadlinesHandler)
     {
         _searchStudentCourseHomeworksHandler = searchStudentCourseHomeworksHandler;
+        _searchTeacherCourseHomeworksHandler = searchTeacherCourseHomeworksHandler;
+        _getTeacherHomeworkHandler = getTeacherHomeworkHandler;
+        _getStudentHomeworkHandler = getStudentHomeworkHandler;
         _createHomeworkHandler = createHomeworkHandler;
         _createGroupHomeworkHandler = createGroupHomeworkHandler;
         _publishHomeworkHandler = publishHomeworkHandler;
@@ -94,6 +106,29 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
         var command = request.ToCreateHomeworkFileCommand();
         var commandResponse = await _createHomeworkAttachmentHandler.ExecuteAsync(command, context.CancellationToken);
         return commandResponse.ToV1CreateHomeworkAttachmentResponse();
+    }
+
+    public override async Task<V1GetTeacherHomeworkResponse> V1GetTeacherHomework(V1GetTeacherHomeworkRequest request, ServerCallContext context)
+    {
+        var query = request.ToGetTeacherHomeworkQuery();
+        var queryResponse = await _getTeacherHomeworkHandler.ExecuteAsync(query, context.CancellationToken);
+        return queryResponse.ToV1GetTeacherHomeworkResponse();
+    }
+
+    public override async Task<V1GetStudentHomeworkResponse> V1GetStudentHomework(V1GetStudentHomeworkRequest request, ServerCallContext context)
+    {
+        var query = request.ToGetStudentHomeworkQuery();
+        var queryResponse = await _getStudentHomeworkHandler.ExecuteAsync(query, context.CancellationToken);
+        return queryResponse.ToV1GetStudentHomeworkResponse();
+    }
+
+    public override async Task<V1SearchTeacherCoursesHomeworksResponse> V1SearchTeacherCoursesHomeworks(
+        V1SearchTeacherCoursesHomeworksRequest request,
+        ServerCallContext context)
+    {
+        var query = request.ToSearchTeacherCourseHomeworksQuery();
+        var queryResponse = await _searchTeacherCourseHomeworksHandler.ExecuteAsync(query, context.CancellationToken);
+        return queryResponse.ToV1SearchTeacherCoursesHomeworksResponse();
     }
 
     // todo: поправить ручку

@@ -13,6 +13,12 @@ service SubmissionService {
   rpc V1CreateSubmittedHomework(V1CreateSubmittedHomeworkRequest) returns (V1CreateSubmittedHomeworkResponse);
   rpc V1CreateSubmittedHomeworkFile(V1CreateSubmittedHomeworkFileRequest) returns (V1CreateSubmittedHomeworkFileResponse);
   rpc V1CreateSubmittedReview(V1CreateSubmittedReviewRequest) returns (V1CreateSubmittedReviewResponse);
+  rpc V1SearchHomeworkSubmissions(V1SearchHomeworkSubmissionsRequest) returns (V1SearchHomeworkSubmissionsResponse);
+  rpc V1GetStudentSubmission(V1GetStudentSubmissionRequest) returns (V1GetStudentSubmissionResponse);
+  rpc V1SearchStudentAssignedReviews(V1SearchStudentAssignedReviewsRequest) returns (V1SearchStudentAssignedReviewsResponse);
+  rpc V1GetSubmissionForReview(V1GetSubmissionForReviewRequest) returns (V1GetSubmissionForReviewResponse);
+  rpc V1GetTeacherSubmissionDetail(V1GetTeacherSubmissionDetailRequest) returns (V1GetTeacherSubmissionDetailResponse);
+  rpc V1GetStudentCourseResults(V1GetStudentCourseResultsRequest) returns (V1GetStudentCourseResultsResponse);
 
   // todo: реализовать
   //rpc V1UpdateHomeworkSubmission(V1UpdateHomeworkSubmissionRequest) returns (V1UpdateHomeworkSubmissionResponse);
@@ -74,4 +80,121 @@ message V1CreateSubmittedReviewResponse {
   message Success {
     int64 submitted_review_id = 1;
   }
+}
+
+message V1SearchHomeworkSubmissionsRequest {
+  int64 homework_id = 1;
+  int64 teacher_id = 2;
+}
+
+message V1SearchHomeworkSubmissionsResponse {
+  repeated SubmissionOverviewInfo submissions = 1;
+}
+
+// V1GetStudentSubmission
+message V1GetStudentSubmissionRequest {
+  int64 homework_id = 1;
+  int64 student_id = 2;
+}
+
+message V1GetStudentSubmissionResponse {
+  SubmissionDetailInfo submission = 1;
+}
+
+message SubmissionDetailInfo {
+  int64 submitted_homework_id = 1;
+  string comment = 2;
+  repeated FileInfo files = 3;
+  repeated ReviewInfo reviews = 4;
+  google.protobuf.Int32Value reviewers_mark = 5;
+  google.protobuf.Int32Value teacher_mark = 6;
+  bool has_discrepancy = 7;
+}
+
+message ReviewInfo {
+  int32 mark = 1;
+  string comment = 2;
+  google.protobuf.Timestamp creation_time = 3;
+}
+
+// V1SearchStudentAssignedReviews
+message V1SearchStudentAssignedReviewsRequest {
+  int64 student_id = 1;
+  int64 homework_id = 2;
+}
+
+message V1SearchStudentAssignedReviewsResponse {
+  repeated AssignedReviewInfo assigned_reviews = 1;
+}
+
+message AssignedReviewInfo {
+  int64 submitted_homework_id = 1;
+  int64 homework_id = 2;
+  string homework_name = 3;
+  bool is_reviewed = 4;
+}
+
+// V1GetSubmissionForReview
+message V1GetSubmissionForReviewRequest {
+  int64 submitted_homework_id = 1;
+  int64 student_id = 2;
+}
+
+message V1GetSubmissionForReviewResponse {
+  SubmissionForReviewInfo submission = 1;
+}
+
+message SubmissionForReviewInfo {
+  int64 submitted_homework_id = 1;
+  string comment = 2;
+  repeated FileInfo anonymized_files = 3;
+  string checklist = 4;
+}
+
+// V1GetTeacherSubmissionDetail
+message V1GetTeacherSubmissionDetailRequest {
+  int64 submitted_homework_id = 1;
+  int64 teacher_id = 2;
+}
+
+message V1GetTeacherSubmissionDetailResponse {
+  TeacherSubmissionDetailInfo submission_detail = 1;
+}
+
+message TeacherSubmissionDetailInfo {
+  int64 submitted_homework_id = 1;
+  int64 student_id = 2;
+  string student_name = 3;
+  string comment = 4;
+  repeated FileInfo files = 5;
+  repeated TeacherReviewInfo reviews = 6;
+  google.protobuf.Int32Value reviewers_mark = 7;
+  google.protobuf.Int32Value teacher_mark = 8;
+  bool has_discrepancy = 9;
+}
+
+message TeacherReviewInfo {
+  int64 reviewer_student_id = 1;
+  string reviewer_name = 2;
+  int32 mark = 3;
+  string comment = 4;
+  google.protobuf.Timestamp creation_time = 5;
+}
+
+// V1GetStudentCourseResults
+message V1GetStudentCourseResultsRequest {
+  int64 student_id = 1;
+  int64 course_id = 2;
+}
+
+message V1GetStudentCourseResultsResponse {
+  repeated StudentHomeworkResult results = 1;
+}
+
+message StudentHomeworkResult {
+  int64 homework_id = 1;
+  string homework_name = 2;
+  HomeworkStatus homework_status = 3;
+  google.protobuf.Int32Value reviewers_mark = 4;
+  google.protobuf.Int32Value teacher_mark = 5;
 }
