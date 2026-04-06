@@ -79,3 +79,46 @@ message HomeworkInfo {
   google.protobuf.Timestamp review_deadline = 7;
   int32 amount_of_reviewers = 8;
 }
+
+message GroupInfo {
+  int64 id = 1;
+  string name = 2;
+  int64 student_count = 3;
+}
+
+message StudentInfo {
+  int64 id = 1;
+  string email = 2;
+  google.protobuf.StringValue name = 3;
+}
+
+message FileInfo {
+  int64 id = 1;
+  string name = 2;
+  int32 size = 3;
+}
+
+message HomeworkDetailInfo {
+  int64 id = 1;
+  string name = 2;
+  HomeworkStatus status = 3;
+  google.protobuf.StringValue description = 4;
+  string checklist = 5;
+  google.protobuf.Timestamp deadline = 6;
+  google.protobuf.Timestamp review_deadline = 7;
+  int32 amount_of_reviewers = 8;
+  int32 discrepancy_threshold = 9;
+  google.protobuf.Int64Value group_id = 10;
+  int64 course_id = 11;
+  repeated FileInfo files = 12;
+}
+
+message SubmissionOverviewInfo {
+  int64 submitted_homework_id = 1;
+  int64 student_id = 2;
+  string student_name = 3;
+  google.protobuf.Int32Value reviewers_mark = 4;
+  google.protobuf.Int32Value teacher_mark = 5;
+  bool has_discrepancy = 6;
+  int32 reviews_received = 7;
+}

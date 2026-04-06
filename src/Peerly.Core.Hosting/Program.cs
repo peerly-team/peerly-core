@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Peerly.Core.Api.Controllers.Courses;
+using Peerly.Core.Api.Controllers.Groups;
 using Peerly.Core.Api.Controllers.Homeworks;
 using Peerly.Core.Api.Controllers.Storage;
 using Peerly.Core.Api.Controllers.Submissions;
@@ -13,6 +14,7 @@ using Peerly.Core.Api.Extensions;
 using Peerly.Core.Api.Infrastructure.Configuration;
 using Peerly.Core.ApplicationServices.Extensions;
 using Peerly.Core.FileStorage.Extensions;
+using Peerly.Core.Messaging.Extensions;
 using Peerly.Core.Persistence.Extensions;
 
 namespace Peerly.Core.Hosting;
@@ -45,6 +47,9 @@ public static class Program
         // FileStorage
         services.ConfigureFileStorage(configuration);
 
+        // Messaging
+        services.ConfigureMessaging(configuration);
+
         // Persistence
         services.ConfigurePersistence(configuration);
     }
@@ -75,6 +80,7 @@ public static class Program
         app.MapGrpcService<CourseController>();
         app.MapGrpcService<HomeworkController>();
         app.MapGrpcService<SubmissionController>();
+        app.MapGrpcService<GroupController>();
 
         app.MapGrpcReflectionService();
 

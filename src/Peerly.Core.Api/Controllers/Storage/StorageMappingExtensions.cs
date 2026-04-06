@@ -28,7 +28,8 @@ internal static class StorageMappingExtensions
     {
         return new GenerateDownloadUrlQuery
         {
-            FileId = new FileId(request.FileId)
+            FileId = new FileId(request.FileId),
+            IsReviewer = request.IsReviewer
         };
     }
 

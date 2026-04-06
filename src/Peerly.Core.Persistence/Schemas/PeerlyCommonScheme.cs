@@ -98,6 +98,7 @@ internal static class PeerlyCommonScheme
         public const string Checklist = "checklist";
         public const string Deadline = "deadline";
         public const string ReviewDeadline = "review_deadline";
+        public const string DiscrepancyThreshold = "discrepancy_threshold";
         public const string CreationTime = "creation_time";
         public const string UpdateTime = "update_time";
     }
@@ -129,6 +130,7 @@ internal static class PeerlyCommonScheme
 
         public const string SubmittedHomeworkId = "submitted_homework_id";
         public const string FileId = "file_id";
+        public const string AnonymizedFileId = "anonymized_file_id";
     }
 
     public static class HomeworkDistributionTable
@@ -136,7 +138,21 @@ internal static class PeerlyCommonScheme
         public const string TableName = "homework_distributions";
 
         public const string HomeworkId = "homework_id";
-        public const string DistributeIn = "distribute_in";
+        public const string DistributionTime = "distribution_time";
+        public const string CreationTime = "creation_time";
+        public const string ProcessStatus = "process_status";
+        public const string FailCount = "fail_count";
+        public const string ProcessTime = "process_time";
+        public const string TakenTime = "taken_time";
+        public const string Error = "error";
+    }
+
+    public static class ReviewCompletionTable
+    {
+        public const string TableName = "review_completions";
+
+        public const string HomeworkId = "homework_id";
+        public const string CompletionTime = "completion_time";
         public const string CreationTime = "creation_time";
         public const string ProcessStatus = "process_status";
         public const string FailCount = "fail_count";
@@ -149,16 +165,16 @@ internal static class PeerlyCommonScheme
     {
         public const string TableName = "distribution_reviewers";
 
-        public const string HomeworkId = "homework_id";
+        public const string SubmittedHomeworkId = "submitted_homework_id";
         public const string StudentId = "student_id";
     }
 
-    public static class ReviewSubmissionTable
+    public static class SubmittedReviewTable
     {
-        public const string TableName = "review_submissions";
+        public const string TableName = "submitted_reviews";
 
         public const string Id = "id";
-        public const string HomeworkId = "homework_id";
+        public const string SubmittedHomeworkId = "submitted_homework_id";
         public const string StudentId = "student_id";
         public const string Mark = "mark";
         public const string Comment = "comment";
@@ -173,6 +189,7 @@ internal static class PeerlyCommonScheme
         public const string ReviewersMark = "reviewers_mark";
         public const string TeacherMark = "teacher_mark";
         public const string TeacherId = "teacher_id";
+        public const string HasDiscrepancy = "has_discrepancy";
         public const string CreationTime = "creation_time";
         public const string UpdateTime = "update_time";
     }

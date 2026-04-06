@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Peerly.Core.Identifiers;
@@ -13,4 +14,5 @@ public interface IFileRepository : IReadOnlyFileRepository
 public interface IReadOnlyFileRepository
 {
     Task<File?> Get(FileId fileId, CancellationToken cancellationToken);
+    Task<IReadOnlyCollection<File>> ListByIdsAsync(IReadOnlyCollection<FileId> fileIds, CancellationToken cancellationToken);
 }

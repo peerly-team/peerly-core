@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package peerly.core.v1;
+
+import "peerly/core/v1/common.proto";
+import "google/protobuf/wrappers.proto";
+
+option csharp_namespace = "Peerly.Core.V1.Proto";
+
+service GroupService {
+  rpc V1CreateGroup(V1CreateGroupRequest) returns (V1CreateGroupResponse);
+  rpc V1AddGroupParticipant(V1AddGroupParticipantRequest) returns (V1AddGroupParticipantResponse);
+  rpc V1SearchCourseGroups(V1SearchCourseGroupsRequest) returns (V1SearchCourseGroupsResponse);
+  rpc V1SearchGroupStudents(V1SearchGroupStudentsRequest) returns (V1SearchGroupStudentsResponse);
+}
+
+message V1CreateGroupRequest {
+  int64 course_id = 1;
+  string name = 2;
+  int64 teacher_id = 3;
+}
+
+message V1CreateGroupResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {
+    int64 group_id = 1;
+  }
+}
+
+message V1AddGroupParticipantRequest {
+  int64 group_id = 1;
+  int64 student_id = 2;
+  int64 teacher_id = 3;
+}
+
+message V1AddGroupParticipantResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}
+
+message V1SearchCourseGroupsRequest {
+  int64 course_id = 1;
+  int64 teacher_id = 2;
+}
+
+message V1SearchCourseGroupsResponse {
+  repeated GroupInfo group_infos = 1;
+}
+
+message V1SearchGroupStudentsRequest {
+  int64 group_id = 1;
+  int64 teacher_id = 2;
+}
+
+message V1SearchGroupStudentsResponse {
+  repeated StudentInfo student_infos = 1;
+}

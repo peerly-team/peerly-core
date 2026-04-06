@@ -23,6 +23,41 @@ internal sealed class HomeworkRepository : IHomeworkRepository
         _connectionContext = connectionContext;
     }
 
+    public async Task<Homework?> GetAsync(HomeworkId homeworkId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            HomeworkId = (long)homeworkId
+        };
+
+        const string Query =
+            $"""
+             select {HomeworkTable.Id},
+                    {HomeworkTable.CourseId},
+                    {HomeworkTable.GroupId},
+                    {HomeworkTable.TeacherId},
+                    {HomeworkTable.Name},
+                    {HomeworkTable.Status},
+                    {HomeworkTable.AmountOfReviewers},
+                    {HomeworkTable.Description},
+                    {HomeworkTable.Checklist},
+                    {HomeworkTable.Deadline},
+                    {HomeworkTable.ReviewDeadline},
+                    {HomeworkTable.DiscrepancyThreshold}
+               from {HomeworkTable.TableName}
+              where {HomeworkTable.Id} = @{nameof(queryParams.HomeworkId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var homeworkDb = await _connectionContext.Connection.QuerySingleOrDefaultAsync<HomeworkDb>(command);
+
+        return homeworkDb?.ToHomework();
+    }
+
     public async Task<int> GetHomeworkCountAsync(CourseId courseId, CancellationToken cancellationToken)
     {
         var queryParams = new
@@ -67,7 +102,8 @@ internal sealed class HomeworkRepository : IHomeworkRepository
                     {HomeworkTable.Description},
                     {HomeworkTable.Checklist},
                     {HomeworkTable.Deadline},
-                    {HomeworkTable.ReviewDeadline}
+                    {HomeworkTable.ReviewDeadline},
+                    {HomeworkTable.DiscrepancyThreshold}
                from {HomeworkTable.TableName}
               where (cardinality(@{nameof(queryParams.CourseIds)}) = 0
                     or {HomeworkTable.CourseId} = any(@{nameof(queryParams.CourseIds)}))
@@ -101,6 +137,7 @@ internal sealed class HomeworkRepository : IHomeworkRepository
             item.Checklist,
             item.Deadline,
             item.ReviewDeadline,
+            item.DiscrepancyThreshold,
             item.CreationTime
         };
 
@@ -117,6 +154,7 @@ internal sealed class HomeworkRepository : IHomeworkRepository
                          {HomeworkTable.Checklist},
                          {HomeworkTable.Deadline},
                          {HomeworkTable.ReviewDeadline},
+                         {HomeworkTable.DiscrepancyThreshold},
                          {HomeworkTable.CreationTime})
                   values (
                          @{nameof(queryParams.CourseId)},
@@ -129,6 +167,7 @@ internal sealed class HomeworkRepository : IHomeworkRepository
                          @{nameof(queryParams.Checklist)},
                          @{nameof(queryParams.Deadline)},
                          @{nameof(queryParams.ReviewDeadline)},
+                         @{nameof(queryParams.DiscrepancyThreshold)},
                          @{nameof(queryParams.CreationTime)})
                returning {HomeworkTable.Id};
              """;
@@ -193,6 +232,11 @@ internal sealed class HomeworkRepository : IHomeworkRepository
                     when {configuration.GetFlagParamName(item => item.ReviewDeadline)}
                     then {configuration.GetParamName(item => item.ReviewDeadline)}
                     else {HomeworkTable.ReviewDeadline}
+                    end,
+                    {HomeworkTable.DiscrepancyThreshold} = case
+                    when {configuration.GetFlagParamName(item => item.DiscrepancyThreshold)}
+                    then {configuration.GetParamName(item => item.DiscrepancyThreshold)}
+                    else {HomeworkTable.DiscrepancyThreshold}
                     end
               from (select {HomeworkTable.Id}
                       from {HomeworkTable.TableName}

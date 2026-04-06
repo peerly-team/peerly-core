@@ -10,28 +10,59 @@ option csharp_namespace = "Peerly.Core.V1.Proto";
 
 // todo: добавить сортировку в Search ручки
 service HomeworkService {
-  rpc V1CreateHomework(V1CreateHomeworkRequest) returns (V1CreateHomeworkResponse);
-  rpc V1UpdateHomeworkStatus(V1UpdateHomeworkStatusRequest) returns (V1UpdateHomeworkStatusResponse);
+  rpc V1CreateCourseHomework(V1CreateCourseHomeworkRequest) returns (V1CreateCourseHomeworkResponse);
+  rpc V1CreateGroupHomework(V1CreateGroupHomeworkRequest) returns (V1CreateGroupHomeworkResponse);
   rpc V1CreateHomeworkFile(V1CreateHomeworkFileRequest) returns (V1CreateHomeworkFileResponse);
+  rpc V1UpdateDraftHomework(V1UpdateDraftHomeworkRequest) returns (V1UpdateDraftHomeworkResponse);
+  rpc V1PostponeHomeworkDeadlines(V1PostponeHomeworkDeadlinesRequest) returns (V1PostponeHomeworkDeadlinesResponse);
+  rpc V1PublishHomework(V1PublishHomeworkRequest) returns (V1PublishHomeworkResponse);
+  rpc V1ConfirmHomework(V1ConfirmHomeworkRequest) returns (V1ConfirmHomeworkResponse);
+
+  rpc V1GetTeacherHomework(V1GetTeacherHomeworkRequest) returns (V1GetTeacherHomeworkResponse);
+  rpc V1GetStudentHomework(V1GetStudentHomeworkRequest) returns (V1GetStudentHomeworkResponse);
 
   // todo: закончить реализацию ручек (поправить логику)
   rpc V1SearchStudentCourseHomeworks(V1SearchStudentCourseHomeworksRequest) returns (V1SearchStudentCourseHomeworksResponse);
   rpc V1SearchTeacherCoursesHomeworks(V1SearchTeacherCoursesHomeworksRequest) returns (V1SearchTeacherCoursesHomeworksResponse);
 }
 
-message V1CreateHomeworkRequest {
+message V1CreateCourseHomeworkRequest {
   int64 course_id = 1;
-  google.protobuf.Int64Value group_id = 2;
-  int64 teacher_id = 3;
-  string name = 4;
-  int32 amount_of_reviewers = 5;
-  google.protobuf.StringValue description = 6;
-  string checklist = 7;
-  google.protobuf.Timestamp deadline = 8;
-  google.protobuf.Timestamp review_deadline = 9;
+  int64 teacher_id = 2;
+  string name = 3;
+  int32 amount_of_reviewers = 4;
+  google.protobuf.StringValue description = 5;
+  string checklist = 6;
+  google.protobuf.Timestamp deadline = 7;
+  google.protobuf.Timestamp review_deadline = 8;
+  int32 discrepancy_threshold = 9;
 }
 
-message V1CreateHomeworkResponse {
+message V1CreateCourseHomeworkResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {
+    int64 homework_id = 1;
+  }
+}
+
+message V1CreateGroupHomeworkRequest {
+  int64 group_id = 1;
+  int64 teacher_id = 2;
+  string name = 3;
+  int32 amount_of_reviewers = 4;
+  google.protobuf.StringValue description = 5;
+  string checklist = 6;
+  google.protobuf.Timestamp deadline = 7;
+  google.protobuf.Timestamp review_deadline = 8;
+  int32 discrepancy_threshold = 9;
+}
+
+message V1CreateGroupHomeworkResponse {
   oneof response {
     Success success_response = 1;
     ValidationError validation_error = 2;
@@ -63,13 +94,72 @@ message V1CreateHomeworkFileResponse {
   }
 }
 
-message V1UpdateHomeworkStatusRequest {
+message V1PublishHomeworkRequest {
   int64 homework_id = 1;
   int64 teacher_id = 2;
-  HomeworkStatus homework_status = 3;
 }
 
-message V1UpdateHomeworkStatusResponse {
+message V1PublishHomeworkResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}
+
+message V1ConfirmHomeworkRequest {
+  int64 homework_id = 1;
+  int64 teacher_id = 2;
+  repeated MarkCorrection mark_corrections = 3;
+
+  message MarkCorrection {
+    int64 submitted_homework_id = 1;
+    int32 teacher_mark = 2;
+  }
+}
+
+message V1ConfirmHomeworkResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}
+
+message V1UpdateDraftHomeworkRequest {
+  int64 homework_id = 1;
+  int64 teacher_id = 2;
+  string name = 3;
+  int32 amount_of_reviewers = 4;
+  google.protobuf.StringValue description = 5;
+  string checklist = 6;
+  google.protobuf.Timestamp deadline = 7;
+  google.protobuf.Timestamp review_deadline = 8;
+  int32 discrepancy_threshold = 9;
+}
+
+message V1UpdateDraftHomeworkResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}
+
+message V1PostponeHomeworkDeadlinesRequest {
+  int64 homework_id = 1;
+  int64 teacher_id = 2;
+  google.protobuf.Timestamp deadline = 3;
+  google.protobuf.Timestamp review_deadline = 4;
+}
+
+message V1PostponeHomeworkDeadlinesResponse {
   oneof response {
     Success success_response = 1;
     ValidationError validation_error = 2;
@@ -99,4 +189,22 @@ message V1SearchTeacherCoursesHomeworksRequest {
 
 message V1SearchTeacherCoursesHomeworksResponse {
   repeated HomeworkInfo homework_infos = 1;
+}
+
+message V1GetTeacherHomeworkRequest {
+  int64 homework_id = 1;
+  int64 teacher_id = 2;
+}
+
+message V1GetTeacherHomeworkResponse {
+  HomeworkDetailInfo homework_detail = 1;
+}
+
+message V1GetStudentHomeworkRequest {
+  int64 homework_id = 1;
+  int64 student_id = 2;
+}
+
+message V1GetStudentHomeworkResponse {
+  HomeworkDetailInfo homework_detail = 1;
 }
