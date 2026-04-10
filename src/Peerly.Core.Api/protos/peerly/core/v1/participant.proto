@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package peerly.core.v1;
+
+import "peerly/core/v1/common.proto";
+
+option csharp_namespace = "Peerly.Core.V1.Proto";
+
+service ParticipantService {
+  rpc V1ListCourseParticipants(V1ListCourseParticipantsRequest) returns (V1ListCourseParticipantsResponse); // todo: реализовать GET api/v1/courses/{course_id}/participants
+  rpc V1ListGroupParticipants(V1ListGroupParticipantsRequest) returns (V1ListGroupParticipantsResponse); // todo: реализовать GET api/v1/groups/{group_id}/participants
+  rpc V1AddGroupParticipant(V1AddGroupParticipantRequest) returns (V1AddGroupParticipantResponse); // todo: реализовать PUT api/v1/groups/{group_id}/participants
+}
+
+message V1AddGroupParticipantRequest {
+  int64 group_id = 1;
+  int64 student_id = 2;
+  int64 teacher_id = 3;
+}
+
+message V1AddGroupParticipantResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}
+
+message V1ListCourseParticipantsRequest {
+  int64 course_id = 1;
+}
+
+message V1ListCourseParticipantsResponse {
+  repeated Participant participants = 1;
+}
+
+message V1ListGroupParticipantsRequest {
+  int64 group_id = 1;
+}
+
+message V1ListGroupParticipantsResponse {
+  repeated Participant participants = 1;
+}
