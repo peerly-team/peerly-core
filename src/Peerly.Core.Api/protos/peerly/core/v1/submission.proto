@@ -3,20 +3,31 @@ syntax = "proto3";
 package peerly.core.v1;
 
 import "peerly/core/v1/common.proto";
-import "google/protobuf/wrappers.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 
 option csharp_namespace = "Peerly.Core.V1.Proto";
 
-// todo: добавить сортировку в Search ручки
 service SubmissionService {
   rpc V1CreateSubmittedHomework(V1CreateSubmittedHomeworkRequest) returns (V1CreateSubmittedHomeworkResponse);
   rpc V1CreateSubmittedHomeworkFile(V1CreateSubmittedHomeworkFileRequest) returns (V1CreateSubmittedHomeworkFileResponse);
-  rpc V1CreateSubmittedReview(V1CreateSubmittedReviewRequest) returns (V1CreateSubmittedReviewResponse);
+  rpc V1UpdateSubmittedHomework(V1UpdateSubmittedHomeworkRequest) returns (V1UpdateSubmittedHomeworkResponse);
+  rpc V1DeleteSubmittedHomework(V1DeleteSubmittedHomeworkRequest) returns (V1DeleteSubmittedHomeworkResponse);
+  rpc V1DeleteSubmittedHomeworkFile(V1DeleteSubmittedHomeworkFileRequest) returns (V1DeleteSubmittedHomeworkFileResponse);
+  rpc V1GetSubmittedHomework(V1GetSubmittedHomeworkRequest) returns (V1GetSubmittedHomeworkResponse);
 
-  // todo: реализовать
-  //rpc V1UpdateHomeworkSubmission(V1UpdateHomeworkSubmissionRequest) returns (V1UpdateHomeworkSubmissionResponse);
-  //rpc V1CreateHomeworkSubmissionAttachment(V1CreateHomeworkSubmissionAttachmentRequest) returns (V1CreateHomeworkSubmissionAttachmentResponse);
+  rpc V1ListAssignedReviews(V1ListAssignedReviewsRequest) returns (V1ListAssignedReviewsResponse);
+  rpc V1GetAssignedReview(V1GetAssignedReviewRequest) returns (V1GetAssignedReviewResponse);
+  rpc V1CreateSubmittedReview(V1CreateSubmittedReviewRequest) returns (V1CreateSubmittedReviewResponse);
+  rpc V1UpdateSubmittedReview(V1UpdateSubmittedReviewRequest) returns (V1UpdateSubmittedReviewResponse);
+  rpc V1DeleteSubmittedReview(V1DeleteSubmittedReviewRequest) returns (V1DeleteSubmittedReviewResponse);
+  rpc V1GetSubmittedReview(V1GetSubmittedReviewRequest) returns (V1GetSubmittedReviewResponse);
+
+  rpc V1ListSubmissionResults(V1ListSubmissionResultsRequest) returns (V1ListSubmissionResultsResponse);
+  rpc V1GetTeacherSubmissionDetail(V1GetTeacherSubmissionDetailRequest) returns (V1GetTeacherSubmissionDetailResponse);
+  rpc V1CorrectSubmissionMark(V1CorrectSubmissionMarkRequest) returns (V1CorrectSubmissionMarkResponse);
+
+  rpc V1ListSubmittedHomeworks(V1ListSubmittedHomeworksRequest) returns (V1ListSubmittedHomeworksResponse);
 }
 
 message V1CreateSubmittedHomeworkRequest {
@@ -57,6 +68,109 @@ message V1CreateSubmittedHomeworkFileResponse {
   }
 }
 
+message V1UpdateSubmittedHomeworkRequest {
+  int64 submitted_homework_id = 1;
+  int64 student_id = 2;
+  string comment = 3;
+}
+
+message V1UpdateSubmittedHomeworkResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}
+
+message V1DeleteSubmittedHomeworkRequest {
+  int64 submitted_homework_id = 1;
+  int64 student_id = 2;
+}
+
+message V1DeleteSubmittedHomeworkResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}
+
+message V1DeleteSubmittedHomeworkFileRequest {
+  int64 submitted_homework_id = 1;
+  int64 file_id = 2;
+  int64 student_id = 3;
+}
+
+message V1DeleteSubmittedHomeworkFileResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}
+
+message V1GetSubmittedHomeworkRequest {
+  int64 submitted_homework_id = 1;
+  int64 student_id = 2;
+}
+
+message V1GetSubmittedHomeworkResponse {
+  SubmissionDetail submission = 1;
+
+  message SubmissionDetail {
+    int64 submitted_homework_id = 1;
+    string comment = 2;
+    repeated File files = 3;
+    repeated Review reviews = 4;
+    google.protobuf.Int32Value final_mark = 5;
+  }
+
+  message Review {
+    int32 mark = 1;
+    string comment = 2;
+    google.protobuf.Timestamp created_at = 3;
+  }
+}
+
+message V1ListAssignedReviewsRequest {
+  int64 homework_id = 1;
+  int64 student_id = 2;
+}
+
+message V1ListAssignedReviewsResponse {
+  repeated AssignedReview assigned_reviews = 1;
+
+  message AssignedReview {
+    int64 submitted_homework_id = 1;
+    string homework_name = 2;
+    bool is_reviewed = 3;
+  }
+}
+
+message V1GetAssignedReviewRequest {
+  int64 submitted_homework_id = 1;
+  int64 student_id = 2;
+}
+
+message V1GetAssignedReviewResponse {
+  SubmissionForReview submission = 1;
+
+  message SubmissionForReview {
+    int64 submitted_homework_id = 1;
+    string comment = 2;
+    // NOTE: если есть персональные данные, то передаем идентификатор анонимизированного файла
+    repeated File files = 3;
+    string checklist = 4;
+  }
+
+}
+
 message V1CreateSubmittedReviewRequest {
   int64 submitted_homework_id = 1;
   int64 student_id = 2;
@@ -73,5 +187,124 @@ message V1CreateSubmittedReviewResponse {
 
   message Success {
     int64 submitted_review_id = 1;
+  }
+}
+
+message V1UpdateSubmittedReviewRequest {
+  int64 submitted_review_id = 1;
+  int64 student_id = 2;
+  int32 mark = 3;
+  string comment = 4;
+}
+
+message V1UpdateSubmittedReviewResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}
+
+message V1DeleteSubmittedReviewRequest {
+  int64 submitted_review_id = 1;
+  int64 student_id = 2;
+}
+
+message V1DeleteSubmittedReviewResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}
+
+message V1GetSubmittedReviewRequest {
+  int64 submitted_review_id = 1;
+  int64 student_id = 2;
+}
+
+message V1GetSubmittedReviewResponse {
+  SubmittedReviewDetail review = 1;
+
+
+  message SubmittedReviewDetail {
+    int64 submitted_review_id = 1;
+    int64 submitted_homework_id = 2;
+    int32 mark = 3;
+    string comment = 4;
+    google.protobuf.Timestamp created_at = 5;
+  }
+}
+
+message V1ListSubmissionResultsRequest {
+  int64 homework_id = 1;
+  int64 teacher_id = 2;
+}
+
+message V1ListSubmissionResultsResponse {
+  repeated SubmissionResult submission_results = 1;
+
+  message SubmissionResult {
+    int64 submitted_homework_id = 1;
+    Student student = 2;
+    repeated TeacherReview reviews = 3;
+    google.protobuf.Int32Value average_mark = 4;
+    google.protobuf.Int32Value final_mark = 5;
+    bool has_discrepancy = 6;
+  }
+}
+
+message V1GetTeacherSubmissionDetailRequest {
+  int64 submitted_homework_id = 1;
+  int64 teacher_id = 2;
+}
+
+message V1GetTeacherSubmissionDetailResponse {
+  TeacherSubmissionDetail submission = 1;
+
+  message TeacherSubmissionDetail {
+    int64 submitted_homework_id = 1;
+    Student student = 2;
+    string comment = 3;
+    repeated File files = 4;
+    repeated TeacherReview reviews = 5;
+    google.protobuf.Int32Value final_mark = 6;
+  }
+}
+
+message V1CorrectSubmissionMarkRequest {
+  int64 submitted_homework_id = 1;
+  int64 teacher_id = 2;
+  int32 teacher_mark = 3;
+}
+
+message V1CorrectSubmissionMarkResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}
+
+message V1ListSubmittedHomeworksRequest {
+  int64 homework_id = 1;
+  int64 teacher_id = 2;
+}
+
+message V1ListSubmittedHomeworksResponse {
+  repeated SubmissionOverview submissions = 1;
+
+  message SubmissionOverview {
+    int64 submitted_homework_id = 1;
+    Student student = 2;
+    google.protobuf.Int32Value final_mark = 3;
+    int32 review_count = 4;
+    bool has_discrepancy = 5;
   }
 }

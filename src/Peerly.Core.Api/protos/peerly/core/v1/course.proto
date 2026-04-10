@@ -7,7 +7,6 @@ import "google/protobuf/wrappers.proto";
 
 option csharp_namespace = "Peerly.Core.V1.Proto";
 
-// todo: добавить сортировку в Search ручки
 service CourseService {
   rpc V1GetTeacherCourse(V1GetTeacherCourseRequest) returns (V1GetTeacherCourseResponse);
   rpc V1GetStudentCourse(V1GetStudentCourseRequest) returns (V1GetStudentCourseResponse);
@@ -84,6 +83,7 @@ message V1SearchTeacherCoursesResponse {
   repeated CourseInfo course_infos = 1;
 }
 
+// todo: вынести обновление статуса в отдельную ручку
 message V1UpdateCourseRequest {
   int64 course_id = 1;
   int64 teacher_id = 2;
