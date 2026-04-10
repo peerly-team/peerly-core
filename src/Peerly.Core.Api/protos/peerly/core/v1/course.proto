@@ -7,7 +7,6 @@ import "google/protobuf/wrappers.proto";
 
 option csharp_namespace = "Peerly.Core.V1.Proto";
 
-// todo: добавить сортировку в Search ручки
 service CourseService {
   rpc V1GetTeacherCourse(V1GetTeacherCourseRequest) returns (V1GetTeacherCourseResponse);
   rpc V1GetStudentCourse(V1GetStudentCourseRequest) returns (V1GetStudentCourseResponse);

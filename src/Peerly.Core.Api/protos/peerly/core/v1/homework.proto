@@ -8,7 +8,6 @@ import "google/protobuf/timestamp.proto";
 
 option csharp_namespace = "Peerly.Core.V1.Proto";
 
-// todo: добавить сортировку в Search ручки
 service HomeworkService {
   rpc V1CreateCourseHomework(V1CreateCourseHomeworkRequest) returns (V1CreateCourseHomeworkResponse);
   rpc V1CreateGroupHomework(V1CreateGroupHomeworkRequest) returns (V1CreateGroupHomeworkResponse);
@@ -17,10 +16,10 @@ service HomeworkService {
   rpc V1PostponeHomeworkDeadlines(V1PostponeHomeworkDeadlinesRequest) returns (V1PostponeHomeworkDeadlinesResponse);
   rpc V1PublishHomework(V1PublishHomeworkRequest) returns (V1PublishHomeworkResponse);
   rpc V1ConfirmHomework(V1ConfirmHomeworkRequest) returns (V1ConfirmHomeworkResponse);
-
-  // todo: закончить реализацию ручек (поправить логику)
-  rpc V1SearchStudentCourseHomeworks(V1SearchStudentCourseHomeworksRequest) returns (V1SearchStudentCourseHomeworksResponse);
-  rpc V1SearchTeacherCoursesHomeworks(V1SearchTeacherCoursesHomeworksRequest) returns (V1SearchTeacherCoursesHomeworksResponse);
+  rpc V1ListTeacherCourseHomeworks(V1ListTeacherCourseHomeworksRequest) returns (V1ListTeacherCourseHomeworksResponse);
+  rpc V1ListStudentCourseHomeworks(V1ListTeacherCourseHomeworksRequest) returns (V1ListTeacherCourseHomeworksResponse);
+  rpc V1SearchTeacherHomeworks(V1SearchTeacherHomeworksRequest) returns (V1SearchTeacherHomeworksResponse);
+  rpc V1SearchStudentHomeworks(V1SearchTeacherHomeworksRequest) returns (V1SearchTeacherHomeworksResponse);
 }
 
 message V1CreateCourseHomeworkRequest {
@@ -166,24 +165,24 @@ message V1PostponeHomeworkDeadlinesResponse {
   message Success {}
 }
 
-message V1SearchStudentCourseHomeworksRequest {
+message V1ListStudentCourseHomeworksRequest {
   int64 student_id = 1;
   int64 course_id = 2;
   SearchCourseHomeworksFilter filter = 3;
   PaginationInfo pagination_info = 4;
 }
 
-message V1SearchStudentCourseHomeworksResponse {
+message V1ListStudentCourseHomeworksResponse {
   repeated HomeworkInfo homework_infos = 1;
 }
 
-message V1SearchTeacherCoursesHomeworksRequest {
+message V1ListTeacherCourseHomeworksRequest {
   int64 teacher_id = 1;
   int64 course_id = 2;
   SearchCourseHomeworksFilter filter = 3;
   PaginationInfo pagination_info = 4;
 }
 
-message V1SearchTeacherCoursesHomeworksResponse {
+message V1ListTeacherCourseHomeworksResponse {
   repeated HomeworkInfo homework_infos = 1;
 }

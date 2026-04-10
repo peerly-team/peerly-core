@@ -12,7 +12,13 @@ option csharp_namespace = "Peerly.Core.V1.Proto";
 service SubmissionService {
   rpc V1CreateSubmittedHomework(V1CreateSubmittedHomeworkRequest) returns (V1CreateSubmittedHomeworkResponse);
   rpc V1CreateSubmittedHomeworkFile(V1CreateSubmittedHomeworkFileRequest) returns (V1CreateSubmittedHomeworkFileResponse);
+  rpc V1GetSubmittedHomework(V1GetSubmittedHomeworkRequest) returns (V1GetSubmittedHomeworkResponse);
+  rpc V1ListSubmittedHomeworks(V1ListSubmittedHomeworksRequest) returns (V1ListSubmittedHomeworksResponse);
   rpc V1CreateSubmittedReview(V1CreateSubmittedReviewRequest) returns (V1CreateSubmittedReviewResponse);
+  rpc V1ListSubmittedHomeworksForReview(V1ListSubmittedHomeworksForReviewRequest) returns (V1ListSubmittedHomeworksForReviewResponse);
+  rpc V1GetSubmittedHomeworkForReview(V1GetSubmittedHomeworkForReviewRequest) returns (V1GetSubmittedHomeworkForReviewResponse);
+  rpc V1ListSubmittedHomeworkForConfirmation(V1ListSubmittedHomeworkForConfirmationRequest) returns (V1ListSubmittedHomeworkForConfirmationResponse);
+
 
   // todo: реализовать
   //rpc V1UpdateHomeworkSubmission(V1UpdateHomeworkSubmissionRequest) returns (V1UpdateHomeworkSubmissionResponse);
