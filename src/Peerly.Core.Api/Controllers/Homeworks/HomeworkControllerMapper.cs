@@ -1,5 +1,4 @@
 using System;
-using Google.Protobuf.WellKnownTypes;
 using OneOf.Types;
 using System.Linq;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ConfirmHomework;
@@ -8,14 +7,10 @@ using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateGroupHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PostponeHomeworkDeadlines;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PublishHomework;
-using Peerly.Core.ApplicationServices.Features.V1.Homeworks.SearchStudentCourseHomeworks;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.UpdateDraftHomework;
-using Peerly.Core.ApplicationServices.Features.V1.Homeworks.Shared.SearchCourseHomeworks;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Homeworks;
-using Peerly.Core.Pagination;
-using Peerly.Core.Tools;
 using Proto = Peerly.Core.V1;
 
 namespace Peerly.Core.Api.Controllers.Homeworks;
@@ -218,83 +213,5 @@ internal static class HomeworkControllerMapper
                 ValidationError = validationError.ToProto<PostponeHomeworkDeadlinesCommand, Proto.V1PostponeHomeworkDeadlinesRequest>()
             },
             otherError => new Proto.V1PostponeHomeworkDeadlinesResponse { OtherError = otherError.ToProto() });
-    }
-
-    public static SearchStudentCourseHomeworksQuery ToSearchStudentCoursesQuery(this Proto.V1SearchStudentCourseHomeworksRequest request)
-    {
-        return new SearchStudentCourseHomeworksQuery
-        {
-            StudentId = new StudentId(request.StudentId),
-            CourseId = new CourseId(request.CourseId),
-            Filter = request.Filter.ToFilter(),
-            PaginationInfo = request.PaginationInfo.ToPaginationInfo()
-        };
-    }
-
-    public static Proto.V1SearchStudentCourseHomeworksResponse ToV1SearchStudentCoursesResponse(
-        this SearchStudentCourseHomeworksQueryResponse queryResponse)
-    {
-        return new Proto.V1SearchStudentCourseHomeworksResponse
-        {
-            HomeworkInfos = { queryResponse.Homeworks.ToArrayBy(homework => homework.ToProto()) }
-        };
-    }
-
-    private static Proto.HomeworkInfo ToProto(this Homework homework)
-    {
-        return new Proto.HomeworkInfo
-        {
-            Id = (long)homework.Id,
-            Name = homework.Name,
-            Status = homework.Status.ToProto(),
-            Description = homework.Description,
-            Checklist = homework.CheckList,
-            Deadline = homework.Deadline.ToTimestamp(),
-            ReviewDeadline = homework.ReviewDeadline.ToTimestamp(),
-            AmountOfReviewers = homework.AmountOfReviewers
-        };
-    }
-
-    private static SearchCourseHomeworksQueryFilter ToFilter(this Proto.SearchCourseHomeworksFilter filterProto)
-    {
-        return new SearchCourseHomeworksQueryFilter
-        {
-            HomeworkStatuses = filterProto.HomeworkStatuses.ToArrayBy(homeworkStatus => homeworkStatus.ToModel())
-        };
-    }
-
-    private static HomeworkStatus ToModel(this Proto.HomeworkStatus homeworkStatusProto)
-    {
-        return homeworkStatusProto switch
-        {
-            Proto.HomeworkStatus.Draft => HomeworkStatus.Draft,
-            Proto.HomeworkStatus.Published => HomeworkStatus.Published,
-            Proto.HomeworkStatus.Reviewing => HomeworkStatus.Reviewing,
-            Proto.HomeworkStatus.Confirmation => HomeworkStatus.Confirmation,
-            Proto.HomeworkStatus.Finished => HomeworkStatus.Finished,
-            _ => throw new ArgumentOutOfRangeException(nameof(homeworkStatusProto), homeworkStatusProto, null)
-        };
-    }
-
-    private static Proto.HomeworkStatus ToProto(this HomeworkStatus homeworkStatus)
-    {
-        return homeworkStatus switch
-        {
-            HomeworkStatus.Draft => Proto.HomeworkStatus.Draft,
-            HomeworkStatus.Published => Proto.HomeworkStatus.Published,
-            HomeworkStatus.Reviewing => Proto.HomeworkStatus.Reviewing,
-            HomeworkStatus.Confirmation => Proto.HomeworkStatus.Confirmation,
-            HomeworkStatus.Finished => Proto.HomeworkStatus.Finished,
-            _ => throw new ArgumentOutOfRangeException(nameof(homeworkStatus), homeworkStatus, null)
-        };
-    }
-
-    private static PaginationInfo ToPaginationInfo(this Proto.PaginationInfo paginationInfoProto)
-    {
-        return new PaginationInfo
-        {
-            Offset = paginationInfoProto.Offset,
-            PageSize = paginationInfoProto.PageSize
-        };
     }
 }

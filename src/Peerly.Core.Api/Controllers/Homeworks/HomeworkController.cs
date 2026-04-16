@@ -9,7 +9,6 @@ using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateGroupHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PostponeHomeworkDeadlines;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PublishHomework;
-using Peerly.Core.ApplicationServices.Features.V1.Homeworks.SearchStudentCourseHomeworks;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.UpdateDraftHomework;
 using Peerly.Core.V1;
 
@@ -18,7 +17,6 @@ namespace Peerly.Core.Api.Controllers.Homeworks;
 [ExcludeFromCodeCoverage]
 public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
 {
-    private readonly IQueryHandler<SearchStudentCourseHomeworksQuery, SearchStudentCourseHomeworksQueryResponse> _searchStudentCourseHomeworksHandler;
     private readonly ICommandHandler<CreateCourseHomeworkCommand, CreateCourseHomeworkCommandResponse> _createHomeworkHandler;
     private readonly ICommandHandler<CreateGroupHomeworkCommand, CreateGroupHomeworkCommandResponse> _createGroupHomeworkHandler;
     private readonly ICommandHandler<PublishHomeworkCommand, Success> _publishHomeworkHandler;
@@ -28,7 +26,6 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
     private readonly ICommandHandler<PostponeHomeworkDeadlinesCommand, Success> _postponeHomeworkDeadlinesHandler;
 
     public HomeworkController(
-        IQueryHandler<SearchStudentCourseHomeworksQuery, SearchStudentCourseHomeworksQueryResponse> searchStudentCourseHomeworksHandler,
         ICommandHandler<CreateCourseHomeworkCommand, CreateCourseHomeworkCommandResponse> createHomeworkHandler,
         ICommandHandler<CreateGroupHomeworkCommand, CreateGroupHomeworkCommandResponse> createGroupHomeworkHandler,
         ICommandHandler<PublishHomeworkCommand, Success> publishHomeworkHandler,
@@ -37,7 +34,6 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
         ICommandHandler<UpdateDraftHomeworkCommand, Success> updateDraftHomeworkHandler,
         ICommandHandler<PostponeHomeworkDeadlinesCommand, Success> postponeHomeworkDeadlinesHandler)
     {
-        _searchStudentCourseHomeworksHandler = searchStudentCourseHomeworksHandler;
         _createHomeworkHandler = createHomeworkHandler;
         _createGroupHomeworkHandler = createGroupHomeworkHandler;
         _publishHomeworkHandler = publishHomeworkHandler;
@@ -94,15 +90,5 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
         var command = request.ToCreateHomeworkFileCommand();
         var commandResponse = await _createHomeworkAttachmentHandler.ExecuteAsync(command, context.CancellationToken);
         return commandResponse.ToV1CreateHomeworkAttachmentResponse();
-    }
-
-    // todo: поправить ручку
-    public override async Task<V1SearchStudentCourseHomeworksResponse> V1SearchStudentCourseHomeworks(
-        V1SearchStudentCourseHomeworksRequest request,
-        ServerCallContext context)
-    {
-        var query = request.ToSearchStudentCoursesQuery();
-        var queryResponse = await _searchStudentCourseHomeworksHandler.ExecuteAsync(query, context.CancellationToken);
-        return queryResponse.ToV1SearchStudentCoursesResponse();
     }
 }
