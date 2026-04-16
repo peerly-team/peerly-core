@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Peerly.Core.Api.Controllers.Courses;
 using Peerly.Core.Api.Controllers.Groups;
 using Peerly.Core.Api.Controllers.Homeworks;
+using Peerly.Core.Api.Controllers.Participants;
 using Peerly.Core.Api.Controllers.Storage;
 using Peerly.Core.Api.Controllers.Submissions;
 using Peerly.Core.Api.Extensions;
@@ -63,6 +64,7 @@ public static class Program
         app.MapGrpcService<HomeworkController>();
         app.MapGrpcService<SubmissionController>();
         app.MapGrpcService<GroupController>();
+        app.MapGrpcService<ParticipantController>();
 
         app.MapGrpcReflectionService();
 
