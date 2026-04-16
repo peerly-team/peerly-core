@@ -8,6 +8,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateCourseHomework
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateGroupHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ListStudentCourseHomeworks;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ListTeacherCourseHomeworks;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PostponeHomeworkDeadlines;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PublishHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.UpdateDraftHomework;
@@ -26,6 +27,7 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
     private readonly ICommandHandler<UpdateDraftHomeworkCommand, Success> _updateDraftHomeworkHandler;
     private readonly ICommandHandler<PostponeHomeworkDeadlinesCommand, Success> _postponeHomeworkDeadlinesHandler;
     private readonly IQueryHandler<ListStudentCourseHomeworksQuery, ListStudentCourseHomeworksQueryResponse> _listStudentCourseHomeworksHandler;
+    private readonly IQueryHandler<ListTeacherCourseHomeworksQuery, ListTeacherCourseHomeworksQueryResponse> _listTeacherCourseHomeworksHandler;
 
     public HomeworkController(
         ICommandHandler<CreateCourseHomeworkCommand, CreateCourseHomeworkCommandResponse> createHomeworkHandler,
@@ -35,7 +37,8 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
         ICommandHandler<CreateHomeworkFileCommand, CreateHomeworkFileCommandResponse> createHomeworkAttachmentHandler,
         ICommandHandler<UpdateDraftHomeworkCommand, Success> updateDraftHomeworkHandler,
         ICommandHandler<PostponeHomeworkDeadlinesCommand, Success> postponeHomeworkDeadlinesHandler,
-        IQueryHandler<ListStudentCourseHomeworksQuery, ListStudentCourseHomeworksQueryResponse> listStudentCourseHomeworksHandler)
+        IQueryHandler<ListStudentCourseHomeworksQuery, ListStudentCourseHomeworksQueryResponse> listStudentCourseHomeworksHandler,
+        IQueryHandler<ListTeacherCourseHomeworksQuery, ListTeacherCourseHomeworksQueryResponse> listTeacherCourseHomeworksHandler)
     {
         _createHomeworkHandler = createHomeworkHandler;
         _createGroupHomeworkHandler = createGroupHomeworkHandler;
@@ -45,6 +48,7 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
         _updateDraftHomeworkHandler = updateDraftHomeworkHandler;
         _postponeHomeworkDeadlinesHandler = postponeHomeworkDeadlinesHandler;
         _listStudentCourseHomeworksHandler = listStudentCourseHomeworksHandler;
+        _listTeacherCourseHomeworksHandler = listTeacherCourseHomeworksHandler;
     }
 
     public override async Task<V1CreateCourseHomeworkResponse> V1CreateCourseHomework(V1CreateCourseHomeworkRequest request, ServerCallContext context)
@@ -101,5 +105,12 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
         var query = request.ToListStudentCourseHomeworksQuery();
         var queryResponse = await _listStudentCourseHomeworksHandler.ExecuteAsync(query, context.CancellationToken);
         return queryResponse.ToV1ListStudentCourseHomeworksResponse();
+    }
+
+    public override async Task<V1ListTeacherCourseHomeworksResponse> V1ListTeacherCourseHomeworks(V1ListTeacherCourseHomeworksRequest request, ServerCallContext context)
+    {
+        var query = request.ToListTeacherCourseHomeworksQuery();
+        var queryResponse = await _listTeacherCourseHomeworksHandler.ExecuteAsync(query, context.CancellationToken);
+        return queryResponse.ToV1ListTeacherCourseHomeworksResponse();
     }
 }

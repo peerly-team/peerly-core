@@ -6,6 +6,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateCourseHomework
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateGroupHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ListStudentCourseHomeworks;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ListTeacherCourseHomeworks;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PostponeHomeworkDeadlines;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PublishHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.UpdateDraftHomework;
@@ -223,6 +224,24 @@ internal static class HomeworkControllerMapper
         this ListStudentCourseHomeworksQueryResponse queryResponse)
     {
         return new Proto.V1ListStudentCourseHomeworksResponse
+        {
+            HomeworkInfos = { queryResponse.Homeworks.ToArrayBy(homework => homework.ToProto()) }
+        };
+    }
+
+    public static ListTeacherCourseHomeworksQuery ToListTeacherCourseHomeworksQuery(this Proto.V1ListTeacherCourseHomeworksRequest request)
+    {
+        return new ListTeacherCourseHomeworksQuery
+        {
+            TeacherId = new TeacherId(request.TeacherId),
+            CourseId = new CourseId(request.CourseId)
+        };
+    }
+
+    public static Proto.V1ListTeacherCourseHomeworksResponse ToV1ListTeacherCourseHomeworksResponse(
+        this ListTeacherCourseHomeworksQueryResponse queryResponse)
+    {
+        return new Proto.V1ListTeacherCourseHomeworksResponse
         {
             HomeworkInfos = { queryResponse.Homeworks.ToArrayBy(homework => homework.ToProto()) }
         };
