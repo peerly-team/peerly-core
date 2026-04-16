@@ -13,16 +13,13 @@ internal sealed class ConfirmHomeworkHandler : ICommandHandler<ConfirmHomeworkCo
 {
     private readonly ICommonUnitOfWorkFactory _commonUnitOfWorkFactory;
     private readonly IConfirmHomeworkValidator _validator;
-    private readonly IConfirmHomeworkHandlerMapper _mapper;
 
     public ConfirmHomeworkHandler(
         ICommonUnitOfWorkFactory commonUnitOfWorkFactory,
-        IConfirmHomeworkValidator validator,
-        IConfirmHomeworkHandlerMapper mapper)
+        IConfirmHomeworkValidator validator)
     {
         _commonUnitOfWorkFactory = commonUnitOfWorkFactory;
         _validator = validator;
-        _mapper = mapper;
     }
 
     public async Task<CommandResponse<Success>> ExecuteAsync(
@@ -38,9 +35,6 @@ internal sealed class ConfirmHomeworkHandler : ICommandHandler<ConfirmHomeworkCo
         }
 
         await using var operationSet = await unitOfWork.StartOperationSet(cancellationToken);
-
-        var updateItems = _mapper.ToMarkBatchUpdateItems(command);
-        await unitOfWork.SubmittedHomeworkMarkRepository.BatchUpdateAsync(updateItems, cancellationToken);
 
         await unitOfWork.HomeworkRepository.UpdateAsync(
             command.HomeworkId,

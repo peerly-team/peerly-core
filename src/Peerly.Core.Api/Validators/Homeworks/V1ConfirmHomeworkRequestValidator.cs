@@ -12,15 +12,5 @@ internal sealed class V1ConfirmHomeworkRequestValidator : AbstractValidator<V1Co
 
         RuleFor(x => x.TeacherId)
             .GreaterThan(0);
-
-        RuleForEach(x => x.MarkCorrections)
-            .ChildRules(correction =>
-            {
-                correction.RuleFor(x => x.SubmittedHomeworkId)
-                    .GreaterThan(0);
-
-                correction.RuleFor(x => x.TeacherMark)
-                    .InclusiveBetween(0, 100);
-            });
     }
 }
