@@ -19,7 +19,7 @@ service HomeworkService {
   rpc V1GetStudentHomework(V1GetStudentHomeworkRequest) returns (V1GetStudentHomeworkResponse); // todo: реализовать GET api/v1/student/homeworks/{id}
   rpc V1GetTeacherHomework(V1GetTeacherHomeworkRequest) returns (V1GetTeacherHomeworkResponse); // todo: реализовать GET api/v1/teacher/homeworks/{id}
   rpc V1ListTeacherCourseHomeworks(V1ListTeacherCourseHomeworksRequest) returns (V1ListTeacherCourseHomeworksResponse); // todo: реализовать GET api/v1/teacher/courses/{course_id}/homeworks
-  rpc V1ListStudentCourseHomeworks(V1ListStudentCourseHomeworksRequest) returns (V1ListStudentCourseHomeworksResponse); // todo: реализовать GET api/v1/student/courses/{course_id}/homeworks
+  rpc V1ListStudentCourseHomeworks(V1ListStudentCourseHomeworksRequest) returns (V1ListStudentCourseHomeworksResponse);
   rpc V1SearchTeacherHomeworks(V1SearchTeacherHomeworksRequest) returns (V1SearchTeacherHomeworksResponse); // todo: реализовать GET api/v1/teacher/homeworks
   rpc V1SearchStudentHomeworks(V1SearchStudentHomeworksRequest) returns (V1SearchStudentHomeworksResponse); // todo: реализовать GET api/v1/student/homeworks
 }

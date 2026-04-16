@@ -1,14 +1,18 @@
 using System;
+using Google.Protobuf.WellKnownTypes;
 using OneOf.Types;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ConfirmHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateCourseHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateGroupHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ListStudentCourseHomeworks;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PostponeHomeworkDeadlines;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PublishHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.UpdateDraftHomework;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
+using Peerly.Core.Models.Homeworks;
+using Peerly.Core.Tools;
 using Proto = Peerly.Core.V1;
 
 namespace Peerly.Core.Api.Controllers.Homeworks;
@@ -204,5 +208,52 @@ internal static class HomeworkControllerMapper
                 ValidationError = validationError.ToProto<PostponeHomeworkDeadlinesCommand, Proto.V1PostponeHomeworkDeadlinesRequest>()
             },
             otherError => new Proto.V1PostponeHomeworkDeadlinesResponse { OtherError = otherError.ToProto() });
+    }
+
+    public static ListStudentCourseHomeworksQuery ToListStudentCourseHomeworksQuery(this Proto.V1ListStudentCourseHomeworksRequest request)
+    {
+        return new ListStudentCourseHomeworksQuery
+        {
+            StudentId = new StudentId(request.StudentId),
+            CourseId = new CourseId(request.CourseId)
+        };
+    }
+
+    public static Proto.V1ListStudentCourseHomeworksResponse ToV1ListStudentCourseHomeworksResponse(
+        this ListStudentCourseHomeworksQueryResponse queryResponse)
+    {
+        return new Proto.V1ListStudentCourseHomeworksResponse
+        {
+            HomeworkInfos = { queryResponse.Homeworks.ToArrayBy(homework => homework.ToProto()) }
+        };
+    }
+
+    private static Proto.HomeworkInfo ToProto(this Homework homework)
+    {
+        return new Proto.HomeworkInfo
+        {
+            Id = (long)homework.Id,
+            Name = homework.Name,
+            Status = homework.Status.ToProto(),
+            Description = homework.Description,
+            Checklist = homework.CheckList,
+            Deadline = homework.Deadline.ToTimestamp(),
+            ReviewDeadline = homework.ReviewDeadline.ToTimestamp(),
+            AmountOfReviewers = homework.AmountOfReviewers,
+            DiscrepancyThreshold = homework.DiscrepancyThreshold
+        };
+    }
+
+    private static Proto.HomeworkStatus ToProto(this HomeworkStatus homeworkStatus)
+    {
+        return homeworkStatus switch
+        {
+            HomeworkStatus.Draft => Proto.HomeworkStatus.Draft,
+            HomeworkStatus.Published => Proto.HomeworkStatus.Published,
+            HomeworkStatus.Reviewing => Proto.HomeworkStatus.Reviewing,
+            HomeworkStatus.Confirmation => Proto.HomeworkStatus.Confirmation,
+            HomeworkStatus.Finished => Proto.HomeworkStatus.Finished,
+            _ => throw new ArgumentOutOfRangeException(nameof(homeworkStatus), homeworkStatus, null)
+        };
     }
 }
