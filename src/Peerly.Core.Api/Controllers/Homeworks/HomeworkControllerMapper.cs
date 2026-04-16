@@ -1,6 +1,5 @@
 using System;
 using OneOf.Types;
-using System.Linq;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ConfirmHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateCourseHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateGroupHomework;
@@ -10,7 +9,6 @@ using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PublishHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.UpdateDraftHomework;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
-using Peerly.Core.Models.Homeworks;
 using Proto = Peerly.Core.V1;
 
 namespace Peerly.Core.Api.Controllers.Homeworks;
@@ -111,14 +109,7 @@ internal static class HomeworkControllerMapper
         return new ConfirmHomeworkCommand
         {
             HomeworkId = new HomeworkId(request.HomeworkId),
-            TeacherId = new TeacherId(request.TeacherId),
-            MarkCorrections = request.MarkCorrections
-                .Select(mc => new MarkCorrection
-                {
-                    SubmittedHomeworkId = new SubmittedHomeworkId(mc.SubmittedHomeworkId),
-                    TeacherMark = mc.TeacherMark
-                })
-                .ToArray()
+            TeacherId = new TeacherId(request.TeacherId)
         };
     }
 
