@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Grpc.Core;
 using OneOf.Types;
 using Peerly.Core.ApplicationServices.Abstractions;
-using Peerly.Core.ApplicationServices.Features.V1.Groups.AddGroupParticipant;
+using Peerly.Core.ApplicationServices.Features.V1.Groups.AddGroupStudent;
 using Peerly.Core.ApplicationServices.Features.V1.Participants.ListCourseParticipants;
 using Peerly.Core.ApplicationServices.Features.V1.Participants.ListGroupParticipants;
 using Peerly.Core.V1;
@@ -15,16 +15,16 @@ public sealed class ParticipantController : ParticipantService.ParticipantServic
 {
     private readonly IQueryHandler<ListCourseParticipantsQuery, ListCourseParticipantsQueryResponse> _listCourseParticipantsHandler;
     private readonly IQueryHandler<ListGroupParticipantsQuery, ListGroupParticipantsQueryResponse> _listGroupParticipantsHandler;
-    private readonly ICommandHandler<AddGroupParticipantCommand, Success> _addGroupParticipantHandler;
+    private readonly ICommandHandler<AddGroupStudentCommand, Success> _addGroupStudentHandler;
 
     public ParticipantController(
         IQueryHandler<ListCourseParticipantsQuery, ListCourseParticipantsQueryResponse> listCourseParticipantsHandler,
         IQueryHandler<ListGroupParticipantsQuery, ListGroupParticipantsQueryResponse> listGroupParticipantsHandler,
-        ICommandHandler<AddGroupParticipantCommand, Success> addGroupParticipantHandler)
+        ICommandHandler<AddGroupStudentCommand, Success> addGroupStudentHandler)
     {
         _listCourseParticipantsHandler = listCourseParticipantsHandler;
         _listGroupParticipantsHandler = listGroupParticipantsHandler;
-        _addGroupParticipantHandler = addGroupParticipantHandler;
+        _addGroupStudentHandler = addGroupStudentHandler;
     }
 
     public override async Task<V1ListCourseParticipantsResponse> V1ListCourseParticipants(V1ListCourseParticipantsRequest request, ServerCallContext context)
@@ -41,10 +41,10 @@ public sealed class ParticipantController : ParticipantService.ParticipantServic
         return queryResponse.ToV1ListGroupParticipantsResponse();
     }
 
-    public override async Task<V1AddGroupParticipantResponse> V1AddGroupParticipant(V1AddGroupParticipantRequest request, ServerCallContext context)
+    public override async Task<V1AddGroupStudentResponse> V1AddGroupStudent(V1AddGroupStudentRequest request, ServerCallContext context)
     {
-        var command = request.ToAddGroupParticipantCommand();
-        var commandResponse = await _addGroupParticipantHandler.ExecuteAsync(command, context.CancellationToken);
-        return commandResponse.ToV1AddGroupParticipantResponse();
+        var command = request.ToAddGroupStudentCommand();
+        var commandResponse = await _addGroupStudentHandler.ExecuteAsync(command, context.CancellationToken);
+        return commandResponse.ToV1AddGroupStudentResponse();
     }
 }
