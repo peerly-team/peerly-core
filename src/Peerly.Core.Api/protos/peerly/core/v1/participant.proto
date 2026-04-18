@@ -7,7 +7,7 @@ import "peerly/core/v1/common.proto";
 option csharp_namespace = "Peerly.Core.V1.Proto";
 
 service ParticipantService {
-  rpc V1AddGroupStudent(V1AddGroupStudentRequest) returns (V1AddGroupStudentResponse); // todo: реализовать PUT api/v1/groups/{group_id}/students
+  rpc V1AddGroupStudent(V1AddGroupStudentRequest) returns (V1AddGroupStudentResponse);
   rpc V1AddGroupTeacher(V1AddGroupTeacherRequest) returns (V1AddGroupTeacherResponse);
   rpc V1ListCourseParticipants(V1ListCourseParticipantsRequest) returns (V1ListCourseParticipantsResponse);
   rpc V1ListGroupParticipants(V1ListGroupParticipantsRequest) returns (V1ListGroupParticipantsResponse);

@@ -2,7 +2,7 @@ using OneOf.Types;
 using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.Identifiers;
 
-namespace Peerly.Core.ApplicationServices.Features.V1.Groups.AddGroupStudent;
+namespace Peerly.Core.ApplicationServices.Features.V1.Participants.AddGroupStudent;
 
 public sealed record AddGroupStudentCommand : ICommand<Success>
 {
