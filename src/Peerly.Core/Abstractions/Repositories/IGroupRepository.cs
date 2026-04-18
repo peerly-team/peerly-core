@@ -13,5 +13,6 @@ public interface IGroupRepository : IReadOnlyGroupRepository
 
 public interface IReadOnlyGroupRepository
 {
+    Task<bool> ExistsAsync(GroupId groupId, CancellationToken cancellationToken);
     Task<IReadOnlyCollection<Group>> ListAsync(GroupFilter filter, CancellationToken cancellationToken);
 }

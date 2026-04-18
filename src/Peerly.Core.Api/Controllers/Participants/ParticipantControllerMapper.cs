@@ -1,6 +1,7 @@
 using OneOf.Types;
 using Peerly.Core.ApplicationServices.Features.V1.Groups.AddGroupParticipant;
 using Peerly.Core.ApplicationServices.Features.V1.Participants.ListCourseParticipants;
+using Peerly.Core.ApplicationServices.Features.V1.Participants.ListGroupParticipants;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Teachers;
@@ -24,6 +25,24 @@ internal static class ParticipantControllerMapper
         this ListCourseParticipantsQueryResponse queryResponse)
     {
         return new V1ListCourseParticipantsResponse
+        {
+            Teachers = { queryResponse.Teachers.ToArrayBy(teacher => teacher.ToTeacherInfo()) },
+            Students = { queryResponse.Students.ToArrayBy(student => student.ToStudentInfo()) }
+        };
+    }
+
+    public static ListGroupParticipantsQuery ToListGroupParticipantsQuery(this V1ListGroupParticipantsRequest request)
+    {
+        return new ListGroupParticipantsQuery
+        {
+            GroupId = new GroupId(request.GroupId)
+        };
+    }
+
+    public static V1ListGroupParticipantsResponse ToV1ListGroupParticipantsResponse(
+        this ListGroupParticipantsQueryResponse queryResponse)
+    {
+        return new V1ListGroupParticipantsResponse
         {
             Teachers = { queryResponse.Teachers.ToArrayBy(teacher => teacher.ToTeacherInfo()) },
             Students = { queryResponse.Students.ToArrayBy(student => student.ToStudentInfo()) }

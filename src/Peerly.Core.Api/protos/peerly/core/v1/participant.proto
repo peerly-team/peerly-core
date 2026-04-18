@@ -8,7 +8,7 @@ option csharp_namespace = "Peerly.Core.V1.Proto";
 
 service ParticipantService {
   rpc V1ListCourseParticipants(V1ListCourseParticipantsRequest) returns (V1ListCourseParticipantsResponse);
-  rpc V1ListGroupParticipants(V1ListGroupParticipantsRequest) returns (V1ListGroupParticipantsResponse); // todo: реализовать GET api/v1/groups/{group_id}/participants
+  rpc V1ListGroupParticipants(V1ListGroupParticipantsRequest) returns (V1ListGroupParticipantsResponse);
   rpc V1AddGroupParticipant(V1AddGroupParticipantRequest) returns (V1AddGroupParticipantResponse); // todo: реализовать PUT api/v1/groups/{group_id}/participants
 }
 
@@ -42,6 +42,6 @@ message V1ListGroupParticipantsRequest {
 }
 
 message V1ListGroupParticipantsResponse {
-  TeacherInfo teacher = 1;
+  repeated TeacherInfo teachers = 1;
   repeated StudentInfo students = 2;
 }
