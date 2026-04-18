@@ -75,6 +75,30 @@ internal sealed class CourseTeacherRepository : ICourseTeacherRepository
         return courseIds.ToArrayBy(courseId => new CourseId(courseId));
     }
 
+    public async Task<IReadOnlyCollection<TeacherId>> ListTeacherIdAsync(CourseId courseId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            CourseId = (long)courseId
+        };
+
+        const string Query =
+            $"""
+             select {CourseTeacherTable.TeacherId}
+               from {CourseTeacherTable.TableName}
+              where {CourseTeacherTable.CourseId} = @{nameof(queryParams.CourseId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var teacherIds = await _connectionContext.Connection.QueryAsync<long>(command);
+
+        return teacherIds.ToArrayBy(teacherId => new TeacherId(teacherId));
+    }
+
     public async Task<bool> ExistsAsync(CourseTeacherExistsItem item, CancellationToken cancellationToken)
     {
         var queryParams = new

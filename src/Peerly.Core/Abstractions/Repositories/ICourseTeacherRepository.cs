@@ -14,5 +14,6 @@ public interface ICourseTeacherRepository : IReadOnlyCourseTeacherRepository
 public interface IReadOnlyCourseTeacherRepository
 {
     Task<IReadOnlyCollection<CourseId>> ListCourseIdAsync(TeacherId teacherId, CancellationToken cancellationToken);
+    Task<IReadOnlyCollection<TeacherId>> ListTeacherIdAsync(CourseId courseId, CancellationToken cancellationToken);
     Task<bool> ExistsAsync(CourseTeacherExistsItem item, CancellationToken cancellationToken);
 }
