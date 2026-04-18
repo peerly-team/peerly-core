@@ -1,5 +1,6 @@
 using OneOf.Types;
-using Peerly.Core.ApplicationServices.Features.V1.Groups.AddGroupStudent;
+using Peerly.Core.ApplicationServices.Features.V1.Participants.AddGroupStudent;
+using Peerly.Core.ApplicationServices.Features.V1.Participants.AddGroupTeacher;
 using Peerly.Core.ApplicationServices.Features.V1.Participants.ListCourseParticipants;
 using Peerly.Core.ApplicationServices.Features.V1.Participants.ListGroupParticipants;
 using Peerly.Core.ApplicationServices.Models.Common;
@@ -71,6 +72,30 @@ internal static class ParticipantControllerMapper
                 ValidationError = validationError.ToProto<AddGroupStudentCommand, V1AddGroupStudentRequest>()
             },
             otherError => new V1AddGroupStudentResponse { OtherError = otherError.ToProto() });
+    }
+
+    public static AddGroupTeacherCommand ToAddGroupTeacherCommand(this V1AddGroupTeacherRequest request)
+    {
+        return new AddGroupTeacherCommand
+        {
+            GroupId = new GroupId(request.GroupId),
+            TeacherId = new TeacherId(request.TeacherId),
+            ActorTeacherId = new TeacherId(request.ActorTeacherId)
+        };
+    }
+
+    public static V1AddGroupTeacherResponse ToV1AddGroupTeacherResponse(this CommandResponse<Success> commandResponse)
+    {
+        return commandResponse.Match(
+            _ => new V1AddGroupTeacherResponse
+            {
+                SuccessResponse = new V1AddGroupTeacherResponse.Types.Success()
+            },
+            validationError => new V1AddGroupTeacherResponse
+            {
+                ValidationError = validationError.ToProto<AddGroupTeacherCommand, V1AddGroupTeacherRequest>()
+            },
+            otherError => new V1AddGroupTeacherResponse { OtherError = otherError.ToProto() });
     }
 
     private static TeacherInfo ToTeacherInfo(this Teacher teacher)

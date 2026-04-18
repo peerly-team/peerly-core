@@ -1,7 +1,6 @@
 using Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.DeleteCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.UpdateCourse;
-using Peerly.Core.ApplicationServices.Features.V1.Groups.AddGroupStudent;
 using Peerly.Core.ApplicationServices.Features.V1.Groups.CreateGroup;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ConfirmHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateCourseHomework;
@@ -10,6 +9,8 @@ using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PostponeHomeworkDeadlines;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PublishHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.UpdateDraftHomework;
+using Peerly.Core.ApplicationServices.Features.V1.Participants.AddGroupStudent;
+using Peerly.Core.ApplicationServices.Features.V1.Participants.AddGroupTeacher;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedReview;
@@ -66,6 +67,10 @@ public static class ValidationPropertyMappingConfiguration
 
         ValidationPropertyMapping
             .AddMapping<AddGroupStudentCommand, V1AddGroupStudentRequest>()
+            .Build();
+
+        ValidationPropertyMapping
+            .AddMapping<AddGroupTeacherCommand, V1AddGroupTeacherRequest>()
             .Build();
 
         ValidationPropertyMapping
