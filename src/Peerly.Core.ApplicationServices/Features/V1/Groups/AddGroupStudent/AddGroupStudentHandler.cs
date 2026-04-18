@@ -7,21 +7,21 @@ using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Models.Groups;
 
-namespace Peerly.Core.ApplicationServices.Features.V1.Groups.AddGroupParticipant;
+namespace Peerly.Core.ApplicationServices.Features.V1.Groups.AddGroupStudent;
 
-internal sealed class AddGroupParticipantHandler : ICommandHandler<AddGroupParticipantCommand, Success>
+internal sealed class AddGroupStudentHandler : ICommandHandler<AddGroupStudentCommand, Success>
 {
     private readonly ICommonUnitOfWorkFactory _commonUnitOfWorkFactory;
     private readonly IClock _clock;
 
-    public AddGroupParticipantHandler(ICommonUnitOfWorkFactory commonUnitOfWorkFactory, IClock clock)
+    public AddGroupStudentHandler(ICommonUnitOfWorkFactory commonUnitOfWorkFactory, IClock clock)
     {
         _commonUnitOfWorkFactory = commonUnitOfWorkFactory;
         _clock = clock;
     }
 
     public async Task<CommandResponse<Success>> ExecuteAsync(
-        AddGroupParticipantCommand command,
+        AddGroupStudentCommand command,
         CancellationToken cancellationToken)
     {
         await using var unitOfWork = await _commonUnitOfWorkFactory.CreateAsync(cancellationToken);

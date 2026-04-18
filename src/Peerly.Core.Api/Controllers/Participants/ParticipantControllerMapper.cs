@@ -1,5 +1,5 @@
 using OneOf.Types;
-using Peerly.Core.ApplicationServices.Features.V1.Groups.AddGroupParticipant;
+using Peerly.Core.ApplicationServices.Features.V1.Groups.AddGroupStudent;
 using Peerly.Core.ApplicationServices.Features.V1.Participants.ListCourseParticipants;
 using Peerly.Core.ApplicationServices.Features.V1.Participants.ListGroupParticipants;
 using Peerly.Core.ApplicationServices.Models.Common;
@@ -49,9 +49,9 @@ internal static class ParticipantControllerMapper
         };
     }
 
-    public static AddGroupParticipantCommand ToAddGroupParticipantCommand(this V1AddGroupParticipantRequest request)
+    public static AddGroupStudentCommand ToAddGroupStudentCommand(this V1AddGroupStudentRequest request)
     {
-        return new AddGroupParticipantCommand
+        return new AddGroupStudentCommand
         {
             GroupId = new GroupId(request.GroupId),
             StudentId = new StudentId(request.StudentId),
@@ -59,18 +59,18 @@ internal static class ParticipantControllerMapper
         };
     }
 
-    public static V1AddGroupParticipantResponse ToV1AddGroupParticipantResponse(this CommandResponse<Success> commandResponse)
+    public static V1AddGroupStudentResponse ToV1AddGroupStudentResponse(this CommandResponse<Success> commandResponse)
     {
         return commandResponse.Match(
-            _ => new V1AddGroupParticipantResponse
+            _ => new V1AddGroupStudentResponse
             {
-                SuccessResponse = new V1AddGroupParticipantResponse.Types.Success()
+                SuccessResponse = new V1AddGroupStudentResponse.Types.Success()
             },
-            validationError => new V1AddGroupParticipantResponse
+            validationError => new V1AddGroupStudentResponse
             {
-                ValidationError = validationError.ToProto<AddGroupParticipantCommand, V1AddGroupParticipantRequest>()
+                ValidationError = validationError.ToProto<AddGroupStudentCommand, V1AddGroupStudentRequest>()
             },
-            otherError => new V1AddGroupParticipantResponse { OtherError = otherError.ToProto() });
+            otherError => new V1AddGroupStudentResponse { OtherError = otherError.ToProto() });
     }
 
     private static TeacherInfo ToTeacherInfo(this Teacher teacher)
