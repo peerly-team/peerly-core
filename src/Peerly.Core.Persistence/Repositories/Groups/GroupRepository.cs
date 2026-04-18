@@ -20,6 +20,34 @@ internal sealed class GroupRepository : IGroupRepository
         _connectionContext = connectionContext;
     }
 
+    public async Task<Group?> GetAsync(GroupId groupId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            GroupId = (long)groupId
+        };
+
+        const string Query =
+            $"""
+             select g.{GroupTable.Id},
+                    g.{GroupTable.CourseId},
+                    g.{GroupTable.Name},
+                    count(*) as student_count
+               from {GroupTable.TableName} g
+               left join {GroupStudentTable.TableName} gs on gs.{GroupStudentTable.GroupId} = g.{GroupTable.Id}
+              where g.{GroupTable.Id} = @{nameof(queryParams.GroupId)}
+              group by g.{GroupTable.Id}, g.{GroupTable.CourseId}, g.{GroupTable.Name};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+
+        return await _connectionContext.Connection.QuerySingleOrDefaultAsync<Group>(command);
+    }
+
     public async Task<bool> ExistsAsync(GroupId groupId, CancellationToken cancellationToken)
     {
         var queryParams = new

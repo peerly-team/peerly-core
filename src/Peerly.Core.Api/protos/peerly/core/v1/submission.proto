@@ -250,7 +250,7 @@ message V1ListSubmissionResultsResponse {
 
   message SubmissionResult {
     int64 submitted_homework_id = 1;
-    Student student = 2;
+    StudentInfo student = 2;
     repeated TeacherReview reviews = 3;
     google.protobuf.Int32Value average_mark = 4;
     google.protobuf.Int32Value final_mark = 5;
@@ -268,7 +268,7 @@ message V1GetTeacherSubmissionDetailResponse {
 
   message TeacherSubmissionDetail {
     int64 submitted_homework_id = 1;
-    Student student = 2;
+    StudentInfo student = 2;
     string comment = 3;
     repeated File files = 4;
     repeated TeacherReview reviews = 5;
@@ -302,7 +302,7 @@ message V1ListSubmittedHomeworksResponse {
 
   message SubmissionOverview {
     int64 submitted_homework_id = 1;
-    Student student = 2;
+    StudentInfo student = 2;
     google.protobuf.Int32Value final_mark = 3;
     int32 review_count = 4;
     bool has_discrepancy = 5;

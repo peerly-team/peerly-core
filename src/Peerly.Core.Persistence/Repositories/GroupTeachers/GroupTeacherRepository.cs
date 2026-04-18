@@ -74,6 +74,31 @@ internal sealed class GroupTeacherRepository : IGroupTeacherRepository
         return teacherIds.ToArrayBy(teacherId => new TeacherId(teacherId));
     }
 
+    public async Task<bool> ExistsAsync(GroupTeacher groupTeacher, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            GroupId = (long)groupTeacher.GroupId,
+            TeacherId = (long)groupTeacher.TeacherId
+        };
+
+        const string Query =
+            $"""
+             select exists(select
+                             from {GroupTeacherTable.TableName}
+                            where {GroupTeacherTable.GroupId} = @{nameof(queryParams.GroupId)}
+                              and {GroupTeacherTable.TeacherId} = @{nameof(queryParams.TeacherId)});
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+
+        return await _connectionContext.Connection.ExecuteScalarAsync<bool>(command);
+    }
+
     public async Task<IReadOnlyCollection<GroupTeacher>> ListAsync(GroupTeacherFilter filter, CancellationToken cancellationToken)
     {
         var queryParams = new
