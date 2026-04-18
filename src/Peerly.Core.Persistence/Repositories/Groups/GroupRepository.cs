@@ -20,6 +20,29 @@ internal sealed class GroupRepository : IGroupRepository
         _connectionContext = connectionContext;
     }
 
+    public async Task<bool> ExistsAsync(GroupId groupId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            GroupId = (long)groupId
+        };
+
+        const string Query =
+            $"""
+             select exists(select
+                             from {GroupTable.TableName}
+                            where {GroupTable.Id} = @{nameof(queryParams.GroupId)});
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+
+        return await _connectionContext.Connection.ExecuteScalarAsync<bool>(command);
+    }
+
     public async Task<IReadOnlyCollection<Group>> ListAsync(GroupFilter filter, CancellationToken cancellationToken)
     {
         var queryParams = new
