@@ -94,11 +94,16 @@ enum Role {
   ROLE_STUDENT = 3;
 }
 
-message Participant {
-  int64 id = 1;
+message TeacherInfo {
+  int64 teacher_id = 1;
   string email = 2;
   string name = 3;
-  Role role = 4;
+}
+
+message StudentInfo {
+  int64 student_id = 1;
+  string email = 2;
+  string name = 3;
 }
 
 message Student {
