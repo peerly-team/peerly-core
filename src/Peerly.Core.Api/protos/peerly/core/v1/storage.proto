@@ -19,6 +19,7 @@ message V1GenerateUploadUrlResponse {
 
 message V1GenerateDownloadUrlRequest {
   int64 file_id = 1;
+  bool is_reviewer = 2;
 }
 
 message V1GenerateDownloadUrlResponse {

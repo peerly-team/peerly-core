@@ -56,6 +56,12 @@ message CourseInfo {
   int64 homework_count = 6;
 }
 
+message GroupInfo {
+  int64 id = 1;
+  string name = 2;
+  int64 student_count = 3;
+}
+
 enum HomeworkStatus {
   HOMEWORK_STATUS_UNKNOWN = 0;
   HOMEWORK_STATUS_DRAFT = 1;
@@ -65,7 +71,7 @@ enum HomeworkStatus {
   HOMEWORK_STATUS_FINISHED = 5;
 }
 
-message SearchCourseHomeworksFilter {
+message SearchHomeworksFilter {
   repeated HomeworkStatus homework_statuses = 1;
 }
 
@@ -78,4 +84,38 @@ message HomeworkInfo {
   google.protobuf.Timestamp deadline = 6;
   google.protobuf.Timestamp review_deadline = 7;
   int32 amount_of_reviewers = 8;
+  int32 discrepancy_threshold = 9;
+}
+
+enum Role {
+  ROLE_UNKNOWN = 0;
+  ROLE_ADMIN = 1;
+  ROLE_TEACHER = 2;
+  ROLE_STUDENT = 3;
+}
+
+message TeacherInfo {
+  int64 teacher_id = 1;
+  string email = 2;
+  string name = 3;
+}
+
+message StudentInfo {
+  int64 student_id = 1;
+  string email = 2;
+  string name = 3;
+}
+
+message File {
+  int64 id = 1;
+  string name = 2;
+  int32 size = 3;
+}
+
+message TeacherReview {
+  int64 review_id = 1;
+  StudentInfo reviewer = 2;
+  int32 mark = 3;
+  string comment = 4;
+  google.protobuf.Timestamp created_at = 5;
 }

@@ -6,4 +6,5 @@ namespace Peerly.Core.ApplicationServices.Features.V1.Storage.GenerateDownloadUr
 public sealed record GenerateDownloadUrlQuery : IQuery<GenerateDownloadUrlQueryResponse>
 {
     public required FileId FileId { get; init; }
+    public bool IsReviewer { get; init; }
 }
