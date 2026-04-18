@@ -106,12 +106,6 @@ message StudentInfo {
   string name = 3;
 }
 
-message Student {
-  int64 id = 1;
-  string email = 2;
-  string name = 3;
-}
-
 message File {
   int64 id = 1;
   string name = 2;
@@ -120,7 +114,7 @@ message File {
 
 message TeacherReview {
   int64 review_id = 1;
-  Student reviewer = 2;
+  StudentInfo reviewer = 2;
   int32 mark = 3;
   string comment = 4;
   google.protobuf.Timestamp created_at = 5;

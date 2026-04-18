@@ -7,7 +7,7 @@ import "peerly/core/v1/common.proto";
 option csharp_namespace = "Peerly.Core.V1.Proto";
 
 service GroupService {
-  rpc V1GetTeacherGroup(V1GetTeacherGroupRequest) returns (V1GetTeacherGroupResponse); // todo: реализовать GET api/v1/teacher/groups/{group_id}
+  rpc V1GetTeacherGroup(V1GetTeacherGroupRequest) returns (V1GetTeacherGroupResponse);
   rpc V1GetStudentGroup(V1GetStudentGroupRequest) returns (V1GetStudentGroupResponse); // todo: реализовать GET api/v1/student/groups/{group_id}
   rpc V1CreateGroup(V1CreateGroupRequest) returns (V1CreateGroupResponse); // todo: реализовать POST api/v1/groups
   rpc V1ListTeacherCourseGroups(V1ListTeacherCourseGroupsRequest) returns (V1ListTeacherCourseGroupsResponse); // todo: реализовать GET api/v1/teacher/courses/{course_id}/groups
