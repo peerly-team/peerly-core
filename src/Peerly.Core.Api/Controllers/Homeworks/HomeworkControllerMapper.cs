@@ -6,6 +6,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateCourseHomework
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateGroupHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.GetStudentHomework;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.GetTeacherHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ListStudentCourseHomeworks;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ListTeacherCourseHomeworks;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PostponeHomeworkDeadlines;
@@ -268,6 +269,26 @@ internal static class HomeworkControllerMapper
         };
 
         return response;
+    }
+
+    public static GetTeacherHomeworkQuery ToGetTeacherHomeworkQuery(this Proto.V1GetTeacherHomeworkRequest request)
+    {
+        return new GetTeacherHomeworkQuery
+        {
+            HomeworkId = new HomeworkId(request.HomeworkId),
+            TeacherId = new TeacherId(request.TeacherId)
+        };
+    }
+
+    public static Proto.V1GetTeacherHomeworkResponse ToV1GetTeacherHomeworkResponse(this GetTeacherHomeworkQueryResponse queryResponse)
+    {
+        return new Proto.V1GetTeacherHomeworkResponse
+        {
+            HomeworkInfo = queryResponse.Homework.ToProto(),
+            SubmittedCount = queryResponse.SubmittedCount,
+            TotalStudentsCount = queryResponse.TotalStudentsCount,
+            Files = { queryResponse.Files.ToArrayBy(file => file.ToProto()) }
+        };
     }
 
     private static Proto.File ToProto(this File file)
