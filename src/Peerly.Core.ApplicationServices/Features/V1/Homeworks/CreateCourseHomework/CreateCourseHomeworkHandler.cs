@@ -3,19 +3,24 @@ using System.Threading.Tasks;
 using Peerly.Core.Abstractions.ApplicationServices;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Abstractions;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateCourseHomework.Abstractions;
 using Peerly.Core.ApplicationServices.Models.Common;
-using Peerly.Core.Models.Homeworks;
 
 namespace Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateCourseHomework;
 
 internal sealed class CreateCourseHomeworkHandler : ICommandHandler<CreateCourseHomeworkCommand, CreateCourseHomeworkCommandResponse>
 {
     private readonly ICommonUnitOfWorkFactory _commonUnitOfWorkFactory;
+    private readonly ICreateCourseHomeworkValidator _validator;
     private readonly IClock _clock;
 
-    public CreateCourseHomeworkHandler(ICommonUnitOfWorkFactory commonUnitOfWorkFactory, IClock clock)
+    public CreateCourseHomeworkHandler(
+        ICommonUnitOfWorkFactory commonUnitOfWorkFactory,
+        ICreateCourseHomeworkValidator validator,
+        IClock clock)
     {
         _commonUnitOfWorkFactory = commonUnitOfWorkFactory;
+        _validator = validator;
         _clock = clock;
     }
 
@@ -25,23 +30,13 @@ internal sealed class CreateCourseHomeworkHandler : ICommandHandler<CreateCourse
     {
         await using var unitOfWork = await _commonUnitOfWorkFactory.CreateAsync(cancellationToken);
 
-        // todo: добавить проверку, что курс существуют
-        // todo: добавить проверку, что препод может добавлять домашку на курс
-
-        var homeworkAddItem = new HomeworkAddItem
+        var validationError = await _validator.ValidateAsync(unitOfWork, command, cancellationToken);
+        if (validationError is not null)
         {
-            CourseId = command.CourseId,
-            TeacherId = command.TeacherId,
-            Name = command.Name,
-            Status = HomeworkStatus.Draft,
-            AmountOfReviewers = command.AmountOfReviewers,
-            Description = command.Description,
-            Checklist = command.Checklist,
-            Deadline = command.Deadline,
-            ReviewDeadline = command.ReviewDeadline,
-            DiscrepancyThreshold = command.DiscrepancyThreshold,
-            CreationTime = _clock.GetCurrentTime()
-        };
+            return validationError;
+        }
+
+        var homeworkAddItem = command.ToHomeworkAddItem(_clock.GetCurrentTime());
         var homeworkId = await unitOfWork.HomeworkRepository.AddAsync(homeworkAddItem, cancellationToken);
 
         return new CreateCourseHomeworkCommandResponse

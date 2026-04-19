@@ -10,6 +10,6 @@ internal sealed class CreateGroupHomeworkHandlerInstaller : IInstaller
 {
     public void InstallServices(IServiceCollection services)
     {
-        services.AddScoped<ICreateGroupHomeworkHandlerMapper, CreateGroupHomeworkHandlerMapper>();
+        services.AddScoped<ICreateGroupHomeworkValidator, CreateGroupHomeworkValidator>();
     }
 }

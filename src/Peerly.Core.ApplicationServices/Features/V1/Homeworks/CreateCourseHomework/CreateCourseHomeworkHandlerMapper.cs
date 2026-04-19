@@ -1,27 +1,25 @@
 using System;
-using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Courses;
 using Peerly.Core.Models.Homeworks;
 
-namespace Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateGroupHomework;
+namespace Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateCourseHomework;
 
-internal static class CreateGroupHomeworkHandlerMapper
+internal static class CreateCourseHomeworkHandlerMapper
 {
-    public static CourseTeacher ToCourseTeacher(this CreateGroupHomeworkCommand command, CourseId courseId)
+    public static CourseTeacher ToCourseTeacher(this CreateCourseHomeworkCommand command)
     {
         return new CourseTeacher
         {
-            CourseId = courseId,
+            CourseId = command.CourseId,
             TeacherId = command.TeacherId
         };
     }
 
-    public static HomeworkAddItem ToHomeworkAddItem(this CreateGroupHomeworkCommand command, CourseId courseId, DateTimeOffset creationTime)
+    public static HomeworkAddItem ToHomeworkAddItem(this CreateCourseHomeworkCommand command, DateTimeOffset creationTime)
     {
         return new HomeworkAddItem
         {
-            CourseId = courseId,
-            GroupId = command.GroupId,
+            CourseId = command.CourseId,
             TeacherId = command.TeacherId,
             Name = command.Name,
             Status = HomeworkStatus.Draft,
