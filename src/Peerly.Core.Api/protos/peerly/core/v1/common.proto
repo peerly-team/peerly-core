@@ -79,8 +79,8 @@ message HomeworkInfo {
   int64 id = 1;
   string name = 2;
   HomeworkStatus status = 3;
+  string checklist = 5;
   google.protobuf.StringValue description = 4;
-  google.protobuf.StringValue checklist = 5;
   google.protobuf.Timestamp deadline = 6;
   google.protobuf.Timestamp review_deadline = 7;
   int32 amount_of_reviewers = 8;
