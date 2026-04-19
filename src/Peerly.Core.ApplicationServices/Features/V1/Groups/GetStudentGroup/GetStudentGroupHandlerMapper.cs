@@ -1,15 +1,26 @@
+using System.Collections.Generic;
+using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Groups;
+using Peerly.Core.Tools;
 
 namespace Peerly.Core.ApplicationServices.Features.V1.Groups.GetStudentGroup;
 
 internal static class GetStudentGroupHandlerMapper
 {
-    public static GroupStudent ToGroupStudent(this GetStudentGroupQuery query)
+    public static GroupFilter ToGroupFilter(this GetStudentGroupQuery query, CourseId courseId)
     {
-        return new GroupStudent
+        return GroupFilter.Empty() with
         {
-            GroupId = query.GroupId,
-            StudentId = query.StudentId
+            CourseIds = [courseId]
+        };
+    }
+
+    public static GroupStudentFilter ToGroupStudentFilter(this GetStudentGroupQuery query, IReadOnlyCollection<Group> groupsOfCourse)
+    {
+        return new GroupStudentFilter
+        {
+            StudentIds = [query.StudentId],
+            GroupIds = groupsOfCourse.ToArrayBy(group => group.Id)
         };
     }
 }
