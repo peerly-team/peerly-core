@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Peerly.Core.Abstractions.UnitOfWork;
@@ -11,11 +10,16 @@ internal sealed class AddGroupStudentValidator : IAddGroupStudentValidator
 {
     public async Task<OtherError?> ValidateAsync(ICommonUnitOfWork unitOfWork, AddGroupStudentCommand command, CancellationToken cancellationToken)
     {
-        var groupFilter = command.ToGroupFilter();
-        var group = (await unitOfWork.GroupRepository.ListAsync(groupFilter, cancellationToken)).SingleOrDefault();
+        var group = await unitOfWork.GroupRepository.GetAsync(command.GroupId, cancellationToken);
         if (group is null)
         {
             return OtherError.NotFound();
+        }
+
+        var courseTeacher = command.ToCourseTeacher(group.CourseId);
+        if (!await unitOfWork.CourseTeacherRepository.ExistsAsync(courseTeacher, cancellationToken))
+        {
+            return OtherError.PermissionDenied();
         }
 
         var studentFilter = command.ToStudentFilter();
@@ -30,13 +34,6 @@ internal sealed class AddGroupStudentValidator : IAddGroupStudentValidator
         if (teachers.Count != teacherFilter.TeacherIds.Count)
         {
             return OtherError.NotFound();
-        }
-
-        var courseTeacherExistsItem = command.ToCourseTeacherExistsItem(group.CourseId);
-        var actorIsCourseTeacher = await unitOfWork.CourseTeacherRepository.ExistsAsync(courseTeacherExistsItem, cancellationToken);
-        if (!actorIsCourseTeacher)
-        {
-            return OtherError.PermissionDenied();
         }
 
         var groupStudentFilter = command.ToGroupStudentFilter();

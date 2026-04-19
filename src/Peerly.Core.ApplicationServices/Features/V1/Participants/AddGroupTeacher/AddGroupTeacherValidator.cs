@@ -25,7 +25,7 @@ internal sealed class AddGroupTeacherValidator : IAddGroupTeacherValidator
             return OtherError.NotFound();
         }
 
-        var courseTeacherExistsItem = command.ToCourseTeacherExistsItem(group.CourseId);
+        var courseTeacherExistsItem = command.ToCourseTeacher(group.CourseId);
         var actorIsCourseTeacher = await unitOfWork.CourseTeacherRepository.ExistsAsync(courseTeacherExistsItem, cancellationToken);
         if (!actorIsCourseTeacher)
         {

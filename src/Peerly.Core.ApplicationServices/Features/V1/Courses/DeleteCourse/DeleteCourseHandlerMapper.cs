@@ -4,9 +4,9 @@ namespace Peerly.Core.ApplicationServices.Features.V1.Courses.DeleteCourse;
 
 internal static class DeleteCourseHandlerMapper
 {
-    public static CourseTeacherExistsItem ToCourseTeacherExistsItem(this DeleteCourseCommand command)
+    public static CourseTeacher ToCourseTeacher(this DeleteCourseCommand command)
     {
-        return new CourseTeacherExistsItem
+        return new CourseTeacher
         {
             CourseId = command.CourseId,
             TeacherId = command.TeacherId

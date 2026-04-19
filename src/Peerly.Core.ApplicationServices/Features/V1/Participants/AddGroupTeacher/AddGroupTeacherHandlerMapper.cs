@@ -28,9 +28,9 @@ internal static class AddGroupTeacherHandlerMapper
         };
     }
 
-    public static CourseTeacherExistsItem ToCourseTeacherExistsItem(this AddGroupTeacherCommand command, CourseId courseId)
+    public static CourseTeacher ToCourseTeacher(this AddGroupTeacherCommand command, CourseId courseId)
     {
-        return new CourseTeacherExistsItem
+        return new CourseTeacher
         {
             CourseId = courseId,
             TeacherId = command.ActorTeacherId

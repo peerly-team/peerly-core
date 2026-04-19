@@ -9,14 +9,6 @@ namespace Peerly.Core.ApplicationServices.Features.V1.Participants.AddGroupStude
 
 internal static class AddGroupStudentHandlerMapper
 {
-    public static GroupFilter ToGroupFilter(this AddGroupStudentCommand command)
-    {
-        return GroupFilter.Empty() with
-        {
-            GroupIds = [command.GroupId]
-        };
-    }
-
     public static StudentFilter ToStudentFilter(this AddGroupStudentCommand command)
     {
         return new StudentFilter
@@ -33,9 +25,9 @@ internal static class AddGroupStudentHandlerMapper
         };
     }
 
-    public static CourseTeacherExistsItem ToCourseTeacherExistsItem(this AddGroupStudentCommand command, CourseId courseId)
+    public static CourseTeacher ToCourseTeacher(this AddGroupStudentCommand command, CourseId courseId)
     {
-        return new CourseTeacherExistsItem
+        return new CourseTeacher
         {
             CourseId = courseId,
             TeacherId = command.TeacherId

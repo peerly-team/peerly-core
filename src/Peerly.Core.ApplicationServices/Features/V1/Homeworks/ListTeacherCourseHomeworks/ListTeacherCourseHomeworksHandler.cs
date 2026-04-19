@@ -21,9 +21,8 @@ internal sealed class ListTeacherCourseHomeworksHandler : IQueryHandler<ListTeac
     {
         await using var unitOfWork = await _commonUnitOfWorkFactory.CreateReadOnlyAsync(cancellationToken);
 
-        var courseTeacherExistsItem = query.ToCourseTeacherExistsItem();
-        var isTeacherExists = await unitOfWork.ReadOnlyCourseTeacherRepository.ExistsAsync(courseTeacherExistsItem, cancellationToken);
-        if (!isTeacherExists)
+        var courseTeacher = query.ToCourseTeacher();
+        if (!await unitOfWork.ReadOnlyCourseTeacherRepository.ExistsAsync(courseTeacher, cancellationToken))
         {
             throw new NotFoundException();
         }

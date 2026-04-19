@@ -5,9 +5,9 @@ namespace Peerly.Core.ApplicationServices.Features.V1.Homeworks.ListTeacherCours
 
 internal static class ListTeacherCourseHomeworksHandlerMapper
 {
-    public static CourseTeacherExistsItem ToCourseTeacherExistsItem(this ListTeacherCourseHomeworksQuery query)
+    public static CourseTeacher ToCourseTeacher(this ListTeacherCourseHomeworksQuery query)
     {
-        return new CourseTeacherExistsItem
+        return new CourseTeacher
         {
             CourseId = query.CourseId,
             TeacherId = query.TeacherId

@@ -99,12 +99,12 @@ internal sealed class CourseTeacherRepository : ICourseTeacherRepository
         return teacherIds.ToArrayBy(teacherId => new TeacherId(teacherId));
     }
 
-    public async Task<bool> ExistsAsync(CourseTeacherExistsItem item, CancellationToken cancellationToken)
+    public async Task<bool> ExistsAsync(CourseTeacher courseTeacher, CancellationToken cancellationToken)
     {
         var queryParams = new
         {
-            CourseId = (long)item.CourseId,
-            TeacherId = (long)item.TeacherId
+            CourseId = (long)courseTeacher.CourseId,
+            TeacherId = (long)courseTeacher.TeacherId
         };
 
         const string Query =

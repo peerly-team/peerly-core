@@ -22,6 +22,8 @@ internal sealed class CreateCourseHandler : ICommandHandler<CreateCourseCommand,
     {
         await using var unitOfWork = await _unitOfWorkFactory.CreateAsync(cancellationToken);
 
+        // todo: проверить, что преподаватель существует
+
         var courseAddItem = _mapper.ToCourseAddItem(command);
         var courseId = await unitOfWork.CourseRepository.AddAsync(courseAddItem, cancellationToken);
 
