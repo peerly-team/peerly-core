@@ -49,6 +49,31 @@ internal sealed class GroupStudentRepository : IGroupStudentRepository
         await _connectionContext.Connection.ExecuteAsync(command);
     }
 
+    public async Task<bool> ExistsAsync(GroupStudent groupStudent, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            GroupId = (long)groupStudent.GroupId,
+            StudentId = (long)groupStudent.StudentId
+        };
+
+        const string Query =
+            $"""
+             select exists(select
+                             from {GroupStudentTable.TableName}
+                            where {GroupStudentTable.GroupId} = @{nameof(queryParams.GroupId)}
+                              and {GroupStudentTable.StudentId} = @{nameof(queryParams.StudentId)});
+             """;
+
+        var command = new CommandDefinition(
+            Query,
+            queryParams,
+            _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+
+        return await _connectionContext.Connection.ExecuteScalarAsync<bool>(command);
+    }
+
     public async Task<IReadOnlyCollection<GroupStudent>> ListAsync(GroupStudentFilter filter, CancellationToken cancellationToken)
     {
         var queryParams = new

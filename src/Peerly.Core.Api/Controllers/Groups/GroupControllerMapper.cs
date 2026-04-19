@@ -1,4 +1,5 @@
 using Peerly.Core.ApplicationServices.Features.V1.Groups.CreateGroup;
+using Peerly.Core.ApplicationServices.Features.V1.Groups.GetStudentGroup;
 using Peerly.Core.ApplicationServices.Features.V1.Groups.GetTeacherGroup;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
@@ -48,6 +49,23 @@ internal static class GroupControllerMapper
     public static V1GetTeacherGroupResponse ToV1GetTeacherGroupResponse(this GetTeacherGroupQueryResponse queryResponse)
     {
         return new V1GetTeacherGroupResponse
+        {
+            GroupInfo = queryResponse.Group.ToGroupInfo()
+        };
+    }
+
+    public static GetStudentGroupQuery ToGetStudentGroupQuery(this V1GetStudentGroupRequest request)
+    {
+        return new GetStudentGroupQuery
+        {
+            GroupId = new GroupId(request.GroupId),
+            StudentId = new StudentId(request.StudentId)
+        };
+    }
+
+    public static V1GetStudentGroupResponse ToV1GetStudentGroupResponse(this GetStudentGroupQueryResponse queryResponse)
+    {
+        return new V1GetStudentGroupResponse
         {
             GroupInfo = queryResponse.Group.ToGroupInfo()
         };

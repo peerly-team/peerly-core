@@ -12,5 +12,6 @@ public interface IGroupStudentRepository : IReadOnlyGroupStudentRepository
 
 public interface IReadOnlyGroupStudentRepository
 {
+    Task<bool> ExistsAsync(GroupStudent groupStudent, CancellationToken cancellationToken);
     Task<IReadOnlyCollection<GroupStudent>> ListAsync(GroupStudentFilter filter, CancellationToken cancellationToken);
 }

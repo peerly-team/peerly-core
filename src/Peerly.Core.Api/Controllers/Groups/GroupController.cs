@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Grpc.Core;
 using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.ApplicationServices.Features.V1.Groups.CreateGroup;
+using Peerly.Core.ApplicationServices.Features.V1.Groups.GetStudentGroup;
 using Peerly.Core.ApplicationServices.Features.V1.Groups.GetTeacherGroup;
 using Peerly.Core.V1;
 
@@ -13,13 +14,16 @@ public sealed class GroupController : GroupService.GroupServiceBase
 {
     private readonly ICommandHandler<CreateGroupCommand, CreateGroupCommandResponse> _createGroupHandler;
     private readonly IQueryHandler<GetTeacherGroupQuery, GetTeacherGroupQueryResponse> _getTeacherGroupHandler;
+    private readonly IQueryHandler<GetStudentGroupQuery, GetStudentGroupQueryResponse> _getStudentGroupHandler;
 
     public GroupController(
         ICommandHandler<CreateGroupCommand, CreateGroupCommandResponse> createGroupHandler,
-        IQueryHandler<GetTeacherGroupQuery, GetTeacherGroupQueryResponse> getTeacherGroupHandler)
+        IQueryHandler<GetTeacherGroupQuery, GetTeacherGroupQueryResponse> getTeacherGroupHandler,
+        IQueryHandler<GetStudentGroupQuery, GetStudentGroupQueryResponse> getStudentGroupHandler)
     {
         _createGroupHandler = createGroupHandler;
         _getTeacherGroupHandler = getTeacherGroupHandler;
+        _getStudentGroupHandler = getStudentGroupHandler;
     }
 
     public override async Task<V1CreateGroupResponse> V1CreateGroup(V1CreateGroupRequest request, ServerCallContext context)
@@ -34,5 +38,12 @@ public sealed class GroupController : GroupService.GroupServiceBase
         var query = request.ToGetTeacherGroupQuery();
         var queryResponse = await _getTeacherGroupHandler.ExecuteAsync(query, context.CancellationToken);
         return queryResponse.ToV1GetTeacherGroupResponse();
+    }
+
+    public override async Task<V1GetStudentGroupResponse> V1GetStudentGroup(V1GetStudentGroupRequest request, ServerCallContext context)
+    {
+        var query = request.ToGetStudentGroupQuery();
+        var queryResponse = await _getStudentGroupHandler.ExecuteAsync(query, context.CancellationToken);
+        return queryResponse.ToV1GetStudentGroupResponse();
     }
 }
