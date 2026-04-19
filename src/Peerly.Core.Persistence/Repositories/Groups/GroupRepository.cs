@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -5,6 +6,7 @@ using Dapper;
 using Peerly.Core.Abstractions.Repositories;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Groups;
+using Peerly.Core.Persistence.Common;
 using Peerly.Core.Persistence.UnitOfWork;
 using Peerly.Core.Tools;
 using static Peerly.Core.Persistence.Schemas.PeerlyCommonScheme;
@@ -133,5 +135,43 @@ internal sealed class GroupRepository : IGroupRepository
         var groupId = await _connectionContext.Connection.QuerySingleAsync<long>(command);
 
         return new GroupId(groupId);
+    }
+
+    public async Task<bool> UpdateAsync(
+        GroupId groupId,
+        Action<IUpdateBuilder<GroupUpdateItem>> configureUpdate,
+        CancellationToken cancellationToken)
+    {
+        var builder = new UpdateBuilder<GroupUpdateItem>();
+        configureUpdate(builder);
+
+        var configuration = builder.Build();
+        var queryParams = configuration.GetQueryParams();
+        queryParams.Add($"@{nameof(groupId)}", (long)groupId);
+
+        var query =
+            $"""
+             update {GroupTable.TableName} as new
+                set {GroupTable.UpdateTime} = now(),
+                    {GroupTable.Name} = case
+                    when {configuration.GetFlagParamName(item => item.Name)}
+                    then {configuration.GetParamName(item => item.Name)}
+                    else {GroupTable.Name}
+                    end
+              from (select {GroupTable.Id}
+                      from {GroupTable.TableName}
+                     where {GroupTable.Id} = @{nameof(groupId)}
+                       for update) as old
+             WHERE new.{GroupTable.Id} = old.{GroupTable.Id};
+             """;
+
+        var command = new CommandDefinition(
+            query,
+            queryParams,
+            _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var affectedRows = await _connectionContext.Connection.ExecuteAsync(command);
+
+        return affectedRows == 1;
     }
 }

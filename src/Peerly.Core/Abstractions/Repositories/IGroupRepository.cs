@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +10,11 @@ namespace Peerly.Core.Abstractions.Repositories;
 public interface IGroupRepository : IReadOnlyGroupRepository
 {
     Task<GroupId> AddAsync(GroupAddItem item, CancellationToken cancellationToken);
+
+    Task<bool> UpdateAsync(
+        GroupId groupId,
+        Action<IUpdateBuilder<GroupUpdateItem>> configureUpdate,
+        CancellationToken cancellationToken);
 }
 
 public interface IReadOnlyGroupRepository

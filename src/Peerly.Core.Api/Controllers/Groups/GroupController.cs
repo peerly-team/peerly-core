@@ -1,10 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Grpc.Core;
+using OneOf.Types;
 using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.ApplicationServices.Features.V1.Groups.CreateGroup;
 using Peerly.Core.ApplicationServices.Features.V1.Groups.GetStudentGroup;
 using Peerly.Core.ApplicationServices.Features.V1.Groups.GetTeacherGroup;
+using Peerly.Core.ApplicationServices.Features.V1.Groups.UpdateGroup;
 using Peerly.Core.V1;
 
 namespace Peerly.Core.Api.Controllers.Groups;
@@ -13,15 +15,18 @@ namespace Peerly.Core.Api.Controllers.Groups;
 public sealed class GroupController : GroupService.GroupServiceBase
 {
     private readonly ICommandHandler<CreateGroupCommand, CreateGroupCommandResponse> _createGroupHandler;
+    private readonly ICommandHandler<UpdateGroupCommand, Success> _updateGroupHandler;
     private readonly IQueryHandler<GetTeacherGroupQuery, GetTeacherGroupQueryResponse> _getTeacherGroupHandler;
     private readonly IQueryHandler<GetStudentGroupQuery, GetStudentGroupQueryResponse> _getStudentGroupHandler;
 
     public GroupController(
         ICommandHandler<CreateGroupCommand, CreateGroupCommandResponse> createGroupHandler,
+        ICommandHandler<UpdateGroupCommand, Success> updateGroupHandler,
         IQueryHandler<GetTeacherGroupQuery, GetTeacherGroupQueryResponse> getTeacherGroupHandler,
         IQueryHandler<GetStudentGroupQuery, GetStudentGroupQueryResponse> getStudentGroupHandler)
     {
         _createGroupHandler = createGroupHandler;
+        _updateGroupHandler = updateGroupHandler;
         _getTeacherGroupHandler = getTeacherGroupHandler;
         _getStudentGroupHandler = getStudentGroupHandler;
     }
@@ -31,6 +36,13 @@ public sealed class GroupController : GroupService.GroupServiceBase
         var command = request.ToCreateGroupCommand();
         var commandResponse = await _createGroupHandler.ExecuteAsync(command, context.CancellationToken);
         return commandResponse.ToV1CreateGroupResponse();
+    }
+
+    public override async Task<V1UpdateGroupResponse> V1UpdateGroup(V1UpdateGroupRequest request, ServerCallContext context)
+    {
+        var command = request.ToUpdateGroupCommand();
+        var commandResponse = await _updateGroupHandler.ExecuteAsync(command, context.CancellationToken);
+        return commandResponse.ToV1UpdateGroupResponse();
     }
 
     public override async Task<V1GetTeacherGroupResponse> V1GetTeacherGroup(V1GetTeacherGroupRequest request, ServerCallContext context)

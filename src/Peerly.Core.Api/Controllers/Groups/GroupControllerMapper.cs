@@ -1,6 +1,8 @@
+using OneOf.Types;
 using Peerly.Core.ApplicationServices.Features.V1.Groups.CreateGroup;
 using Peerly.Core.ApplicationServices.Features.V1.Groups.GetStudentGroup;
 using Peerly.Core.ApplicationServices.Features.V1.Groups.GetTeacherGroup;
+using Peerly.Core.ApplicationServices.Features.V1.Groups.UpdateGroup;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Groups;
@@ -35,6 +37,30 @@ internal static class GroupControllerMapper
                 ValidationError = validationError.ToProto<CreateGroupCommand, V1CreateGroupRequest>()
             },
             otherError => new V1CreateGroupResponse { OtherError = otherError.ToProto() });
+    }
+
+    public static UpdateGroupCommand ToUpdateGroupCommand(this V1UpdateGroupRequest request)
+    {
+        return new UpdateGroupCommand
+        {
+            GroupId = new GroupId(request.GroupId),
+            TeacherId = new TeacherId(request.TeacherId),
+            Name = request.Name
+        };
+    }
+
+    public static V1UpdateGroupResponse ToV1UpdateGroupResponse(this CommandResponse<Success> commandResponse)
+    {
+        return commandResponse.Match(
+            _ => new V1UpdateGroupResponse
+            {
+                SuccessResponse = new V1UpdateGroupResponse.Types.Success()
+            },
+            validationError => new V1UpdateGroupResponse
+            {
+                ValidationError = validationError.ToProto<UpdateGroupCommand, V1UpdateGroupRequest>()
+            },
+            otherError => new V1UpdateGroupResponse { OtherError = otherError.ToProto() });
     }
 
     public static GetTeacherGroupQuery ToGetTeacherGroupQuery(this V1GetTeacherGroupRequest request)
