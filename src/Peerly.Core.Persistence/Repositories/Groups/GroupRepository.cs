@@ -86,7 +86,7 @@ internal sealed class GroupRepository : IGroupRepository
              select g.{GroupTable.Id},
                     g.{GroupTable.CourseId},
                     g.{GroupTable.Name},
-                    count(*) as student_count
+                    count(gs.*) as student_count
                from {GroupTable.TableName} g
                left join {GroupStudentTable.TableName} gs on gs.{GroupStudentTable.GroupId} = g.{GroupTable.Id}
               where (cardinality(@{nameof(queryParams.GroupIds)}) = 0

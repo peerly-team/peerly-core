@@ -3,10 +3,13 @@ using Peerly.Core.ApplicationServices.Features.V1.Groups.CreateGroup;
 using Peerly.Core.ApplicationServices.Features.V1.Groups.DeleteGroup;
 using Peerly.Core.ApplicationServices.Features.V1.Groups.GetStudentGroup;
 using Peerly.Core.ApplicationServices.Features.V1.Groups.GetTeacherGroup;
+using Peerly.Core.ApplicationServices.Features.V1.Groups.ListStudentCourseGroups;
+using Peerly.Core.ApplicationServices.Features.V1.Groups.ListTeacherCourseGroups;
 using Peerly.Core.ApplicationServices.Features.V1.Groups.UpdateGroup;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Groups;
+using Peerly.Core.Tools;
 using Peerly.Core.V1;
 
 namespace Peerly.Core.Api.Controllers.Groups;
@@ -118,6 +121,40 @@ internal static class GroupControllerMapper
         return new V1GetStudentGroupResponse
         {
             GroupInfo = queryResponse.Group.ToGroupInfo()
+        };
+    }
+
+    public static ListTeacherCourseGroupsQuery ToListTeacherCourseGroupsQuery(this V1ListTeacherCourseGroupsRequest request)
+    {
+        return new ListTeacherCourseGroupsQuery
+        {
+            TeacherId = new TeacherId(request.TeacherId),
+            CourseId = new CourseId(request.CourseId)
+        };
+    }
+
+    public static V1ListTeacherCourseGroupsResponse ToV1ListTeacherCourseGroupsResponse(this ListTeacherCourseGroupsQueryResponse queryResponse)
+    {
+        return new V1ListTeacherCourseGroupsResponse
+        {
+            GroupInfos = { queryResponse.Groups.ToArrayBy(group => group.ToGroupInfo()) }
+        };
+    }
+
+    public static ListStudentCourseGroupsQuery ToListStudentCourseGroupsQuery(this V1ListStudentCourseGroupsRequest request)
+    {
+        return new ListStudentCourseGroupsQuery
+        {
+            StudentId = new StudentId(request.StudentId),
+            CourseId = new CourseId(request.CourseId)
+        };
+    }
+
+    public static V1ListStudentCourseGroupsResponse ToV1ListStudentCourseGroupsResponse(this ListStudentCourseGroupsQueryResponse queryResponse)
+    {
+        return new V1ListStudentCourseGroupsResponse
+        {
+            GroupInfos = { queryResponse.Groups.ToArrayBy(group => group.ToGroupInfo()) }
         };
     }
 

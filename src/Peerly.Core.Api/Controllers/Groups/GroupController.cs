@@ -7,6 +7,8 @@ using Peerly.Core.ApplicationServices.Features.V1.Groups.CreateGroup;
 using Peerly.Core.ApplicationServices.Features.V1.Groups.DeleteGroup;
 using Peerly.Core.ApplicationServices.Features.V1.Groups.GetStudentGroup;
 using Peerly.Core.ApplicationServices.Features.V1.Groups.GetTeacherGroup;
+using Peerly.Core.ApplicationServices.Features.V1.Groups.ListStudentCourseGroups;
+using Peerly.Core.ApplicationServices.Features.V1.Groups.ListTeacherCourseGroups;
 using Peerly.Core.ApplicationServices.Features.V1.Groups.UpdateGroup;
 using Peerly.Core.V1;
 
@@ -20,19 +22,25 @@ public sealed class GroupController : GroupService.GroupServiceBase
     private readonly ICommandHandler<DeleteGroupCommand, Success> _deleteGroupHandler;
     private readonly IQueryHandler<GetTeacherGroupQuery, GetTeacherGroupQueryResponse> _getTeacherGroupHandler;
     private readonly IQueryHandler<GetStudentGroupQuery, GetStudentGroupQueryResponse> _getStudentGroupHandler;
+    private readonly IQueryHandler<ListTeacherCourseGroupsQuery, ListTeacherCourseGroupsQueryResponse> _listTeacherCourseGroupsHandler;
+    private readonly IQueryHandler<ListStudentCourseGroupsQuery, ListStudentCourseGroupsQueryResponse> _listStudentCourseGroupsHandler;
 
     public GroupController(
         ICommandHandler<CreateGroupCommand, CreateGroupCommandResponse> createGroupHandler,
         ICommandHandler<UpdateGroupCommand, Success> updateGroupHandler,
         ICommandHandler<DeleteGroupCommand, Success> deleteGroupHandler,
         IQueryHandler<GetTeacherGroupQuery, GetTeacherGroupQueryResponse> getTeacherGroupHandler,
-        IQueryHandler<GetStudentGroupQuery, GetStudentGroupQueryResponse> getStudentGroupHandler)
+        IQueryHandler<GetStudentGroupQuery, GetStudentGroupQueryResponse> getStudentGroupHandler,
+        IQueryHandler<ListTeacherCourseGroupsQuery, ListTeacherCourseGroupsQueryResponse> listTeacherCourseGroupsHandler,
+        IQueryHandler<ListStudentCourseGroupsQuery, ListStudentCourseGroupsQueryResponse> listStudentCourseGroupsHandler)
     {
         _createGroupHandler = createGroupHandler;
         _updateGroupHandler = updateGroupHandler;
         _deleteGroupHandler = deleteGroupHandler;
         _getTeacherGroupHandler = getTeacherGroupHandler;
         _getStudentGroupHandler = getStudentGroupHandler;
+        _listTeacherCourseGroupsHandler = listTeacherCourseGroupsHandler;
+        _listStudentCourseGroupsHandler = listStudentCourseGroupsHandler;
     }
 
     public override async Task<V1CreateGroupResponse> V1CreateGroup(V1CreateGroupRequest request, ServerCallContext context)
@@ -68,5 +76,19 @@ public sealed class GroupController : GroupService.GroupServiceBase
         var query = request.ToGetStudentGroupQuery();
         var queryResponse = await _getStudentGroupHandler.ExecuteAsync(query, context.CancellationToken);
         return queryResponse.ToV1GetStudentGroupResponse();
+    }
+
+    public override async Task<V1ListTeacherCourseGroupsResponse> V1ListTeacherCourseGroups(V1ListTeacherCourseGroupsRequest request, ServerCallContext context)
+    {
+        var query = request.ToListTeacherCourseGroupsQuery();
+        var queryResponse = await _listTeacherCourseGroupsHandler.ExecuteAsync(query, context.CancellationToken);
+        return queryResponse.ToV1ListTeacherCourseGroupsResponse();
+    }
+
+    public override async Task<V1ListStudentCourseGroupsResponse> V1ListStudentCourseGroups(V1ListStudentCourseGroupsRequest request, ServerCallContext context)
+    {
+        var query = request.ToListStudentCourseGroupsQuery();
+        var queryResponse = await _listStudentCourseGroupsHandler.ExecuteAsync(query, context.CancellationToken);
+        return queryResponse.ToV1ListStudentCourseGroupsResponse();
     }
 }

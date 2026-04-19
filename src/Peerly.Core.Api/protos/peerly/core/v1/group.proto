@@ -12,8 +12,8 @@ service GroupService {
   rpc V1CreateGroup(V1CreateGroupRequest) returns (V1CreateGroupResponse);
   rpc V1UpdateGroup(V1UpdateGroupRequest) returns (V1UpdateGroupResponse);
   rpc V1DeleteGroup(V1DeleteGroupRequest) returns (V1DeleteGroupResponse);
-  rpc V1ListTeacherCourseGroups(V1ListTeacherCourseGroupsRequest) returns (V1ListTeacherCourseGroupsResponse); // todo: реализовать GET api/v1/teacher/courses/{course_id}/groups
-  rpc V1ListStudentCourseGroups(V1ListStudentCourseGroupsRequest) returns (V1ListStudentCourseGroupsResponse); // todo: реализовать GET api/v1/student/courses/{course_id}/groups
+  rpc V1ListTeacherCourseGroups(V1ListTeacherCourseGroupsRequest) returns (V1ListTeacherCourseGroupsResponse);
+  rpc V1ListStudentCourseGroups(V1ListStudentCourseGroupsRequest) returns (V1ListStudentCourseGroupsResponse);
 }
 
 message V1GetTeacherGroupRequest {
