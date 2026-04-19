@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Peerly.Core.Abstractions.Repositories;
+using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Groups;
 using Peerly.Core.Persistence.Repositories.GroupStudents.Models;
 using Peerly.Core.Persistence.UnitOfWork;
@@ -101,5 +102,26 @@ internal sealed class GroupStudentRepository : IGroupStudentRepository
         var groupStudentDbs = await _connectionContext.Connection.QueryAsync<GroupStudentDb>(command);
 
         return groupStudentDbs.ToArrayBy(groupStudentDb => groupStudentDb.ToGroupStudent());
+    }
+
+    public async Task DeleteByGroupAsync(GroupId groupId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            GroupId = (long)groupId
+        };
+
+        const string Query =
+            $"""
+             delete from {GroupStudentTable.TableName}
+                   where {GroupStudentTable.GroupId} = @{nameof(queryParams.GroupId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        await _connectionContext.Connection.ExecuteAsync(command);
     }
 }

@@ -9,6 +9,7 @@ namespace Peerly.Core.Abstractions.Repositories;
 public interface IGroupTeacherRepository : IReadOnlyGroupTeacherRepository
 {
     Task AddAsync(GroupTeacherAddItem item, CancellationToken cancellationToken);
+    Task DeleteByGroupAsync(GroupId groupId, CancellationToken cancellationToken);
 }
 
 public interface IReadOnlyGroupTeacherRepository

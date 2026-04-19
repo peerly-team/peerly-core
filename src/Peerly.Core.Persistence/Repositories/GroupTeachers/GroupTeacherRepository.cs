@@ -127,4 +127,25 @@ internal sealed class GroupTeacherRepository : IGroupTeacherRepository
 
         return groupTeacherDbs.ToArrayBy(groupTeacherDb => groupTeacherDb.ToGroupTeacher());
     }
+
+    public async Task DeleteByGroupAsync(GroupId groupId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            GroupId = (long)groupId
+        };
+
+        const string Query =
+            $"""
+             delete from {GroupTeacherTable.TableName}
+                   where {GroupTeacherTable.GroupId} = @{nameof(queryParams.GroupId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        await _connectionContext.Connection.ExecuteAsync(command);
+    }
 }

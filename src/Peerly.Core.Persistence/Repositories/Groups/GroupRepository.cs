@@ -174,4 +174,25 @@ internal sealed class GroupRepository : IGroupRepository
 
         return affectedRows == 1;
     }
+
+    public async Task DeleteAsync(GroupId groupId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            GroupId = (long)groupId
+        };
+
+        const string Query =
+            $"""
+             delete from {GroupTable.TableName}
+                   where {GroupTable.Id} = @{nameof(queryParams.GroupId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        await _connectionContext.Connection.ExecuteAsync(command);
+    }
 }

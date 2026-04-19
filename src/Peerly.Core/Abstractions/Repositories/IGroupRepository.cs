@@ -10,6 +10,7 @@ namespace Peerly.Core.Abstractions.Repositories;
 public interface IGroupRepository : IReadOnlyGroupRepository
 {
     Task<GroupId> AddAsync(GroupAddItem item, CancellationToken cancellationToken);
+    Task DeleteAsync(GroupId groupId, CancellationToken cancellationToken);
 
     Task<bool> UpdateAsync(
         GroupId groupId,

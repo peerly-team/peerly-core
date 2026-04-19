@@ -1,5 +1,6 @@
 using OneOf.Types;
 using Peerly.Core.ApplicationServices.Features.V1.Groups.CreateGroup;
+using Peerly.Core.ApplicationServices.Features.V1.Groups.DeleteGroup;
 using Peerly.Core.ApplicationServices.Features.V1.Groups.GetStudentGroup;
 using Peerly.Core.ApplicationServices.Features.V1.Groups.GetTeacherGroup;
 using Peerly.Core.ApplicationServices.Features.V1.Groups.UpdateGroup;
@@ -61,6 +62,29 @@ internal static class GroupControllerMapper
                 ValidationError = validationError.ToProto<UpdateGroupCommand, V1UpdateGroupRequest>()
             },
             otherError => new V1UpdateGroupResponse { OtherError = otherError.ToProto() });
+    }
+
+    public static DeleteGroupCommand ToDeleteGroupCommand(this V1DeleteGroupRequest request)
+    {
+        return new DeleteGroupCommand
+        {
+            GroupId = new GroupId(request.GroupId),
+            TeacherId = new TeacherId(request.TeacherId)
+        };
+    }
+
+    public static V1DeleteGroupResponse ToV1DeleteGroupResponse(this CommandResponse<Success> commandResponse)
+    {
+        return commandResponse.Match(
+            _ => new V1DeleteGroupResponse
+            {
+                SuccessResponse = new V1DeleteGroupResponse.Types.Success()
+            },
+            validationError => new V1DeleteGroupResponse
+            {
+                ValidationError = validationError.ToProto<DeleteGroupCommand, V1DeleteGroupRequest>()
+            },
+            otherError => new V1DeleteGroupResponse { OtherError = otherError.ToProto() });
     }
 
     public static GetTeacherGroupQuery ToGetTeacherGroupQuery(this V1GetTeacherGroupRequest request)
