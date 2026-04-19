@@ -44,7 +44,7 @@ internal sealed class SubmittedHomeworkRepository : ISubmittedHomeworkRepository
             parameters: queryParams,
             transaction: _connectionContext.Transaction,
             cancellationToken: cancellationToken);
-        var db = await _connectionContext.Connection.QuerySingleOrDefaultAsync<SubmittedHomeworkDb?>(command);
+        var db = await _connectionContext.Connection.QuerySingleOrDefaultAsync<SubmittedHomeworkDb>(command);
 
         return db?.ToSubmittedHomework();
     }
@@ -70,6 +70,32 @@ internal sealed class SubmittedHomeworkRepository : ISubmittedHomeworkRepository
             _connectionContext.Transaction,
             cancellationToken: cancellationToken);
         return await _connectionContext.Connection.QuerySingleAsync<bool>(command);
+    }
+
+    public async Task<SubmittedHomeworkId?> GetSubmittedHomeworkIdAsync(HomeworkStudent homeworkStudent, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            HomeworkId = (long)homeworkStudent.HomeworkId,
+            StudentId = (long)homeworkStudent.StudentId
+        };
+
+        const string Query =
+            $"""
+             select {SubmittedHomeworkTable.Id}
+               from {SubmittedHomeworkTable.TableName}
+              where {SubmittedHomeworkTable.HomeworkId} = @{nameof(queryParams.HomeworkId)}
+                and {SubmittedHomeworkTable.StudentId} = @{nameof(queryParams.StudentId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var id = await _connectionContext.Connection.QuerySingleOrDefaultAsync<long?>(command);
+
+        return id is null ? null : new SubmittedHomeworkId(id.Value);
     }
 
     public async Task<SubmittedHomeworkId> AddAsync(SubmittedHomeworkAddItem item, CancellationToken cancellationToken)

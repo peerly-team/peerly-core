@@ -5,6 +5,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ConfirmHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateCourseHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateGroupHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.GetStudentHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ListStudentCourseHomeworks;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ListTeacherCourseHomeworks;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PostponeHomeworkDeadlines;
@@ -12,6 +13,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PublishHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.UpdateDraftHomework;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
+using Peerly.Core.Models.Files;
 using Peerly.Core.Models.Homeworks;
 using Peerly.Core.Tools;
 using Proto = Peerly.Core.V1;
@@ -244,6 +246,37 @@ internal static class HomeworkControllerMapper
         return new Proto.V1ListTeacherCourseHomeworksResponse
         {
             HomeworkInfos = { queryResponse.Homeworks.ToArrayBy(homework => homework.ToProto()) }
+        };
+    }
+
+    public static GetStudentHomeworkQuery ToGetStudentHomeworkQuery(this Proto.V1GetStudentHomeworkRequest request)
+    {
+        return new GetStudentHomeworkQuery
+        {
+            HomeworkId = new HomeworkId(request.HomeworkId),
+            StudentId = new StudentId(request.StudentId)
+        };
+    }
+
+    public static Proto.V1GetStudentHomeworkResponse ToV1GetStudentHomeworkResponse(this GetStudentHomeworkQueryResponse queryResponse)
+    {
+        var response = new Proto.V1GetStudentHomeworkResponse
+        {
+            HomeworkInfo = queryResponse.Homework.ToProto(),
+            SubmittedHomeworkId = (long?)queryResponse.SubmittedHomeworkId,
+            Files = { queryResponse.Files.ToArrayBy(file => file.ToProto()) }
+        };
+
+        return response;
+    }
+
+    private static Proto.File ToProto(this File file)
+    {
+        return new Proto.File
+        {
+            Id = (long)file.Id,
+            Name = file.Name,
+            Size = file.Size
         };
     }
 

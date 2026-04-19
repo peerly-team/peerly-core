@@ -15,8 +15,8 @@ service HomeworkService {
   rpc V1UpdateDraftHomework(V1UpdateDraftHomeworkRequest) returns (V1UpdateDraftHomeworkResponse);
   rpc V1PostponeHomeworkDeadlines(V1PostponeHomeworkDeadlinesRequest) returns (V1PostponeHomeworkDeadlinesResponse);
   rpc V1PublishHomework(V1PublishHomeworkRequest) returns (V1PublishHomeworkResponse);
-  rpc V1ConfirmHomework(V1ConfirmHomeworkRequest) returns (V1ConfirmHomeworkResponse); // todo: добавить ...
-  rpc V1GetStudentHomework(V1GetStudentHomeworkRequest) returns (V1GetStudentHomeworkResponse); // todo: реализовать GET api/v1/student/homeworks/{id}
+  rpc V1ConfirmHomework(V1ConfirmHomeworkRequest) returns (V1ConfirmHomeworkResponse);
+  rpc V1GetStudentHomework(V1GetStudentHomeworkRequest) returns (V1GetStudentHomeworkResponse);
   rpc V1GetTeacherHomework(V1GetTeacherHomeworkRequest) returns (V1GetTeacherHomeworkResponse); // todo: реализовать GET api/v1/teacher/homeworks/{id}
   rpc V1ListTeacherCourseHomeworks(V1ListTeacherCourseHomeworksRequest) returns (V1ListTeacherCourseHomeworksResponse);
   rpc V1ListStudentCourseHomeworks(V1ListStudentCourseHomeworksRequest) returns (V1ListStudentCourseHomeworksResponse);
