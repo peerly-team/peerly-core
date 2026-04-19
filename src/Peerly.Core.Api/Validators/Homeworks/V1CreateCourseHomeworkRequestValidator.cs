@@ -16,7 +16,22 @@ internal sealed class V1CreateCourseHomeworkRequestValidator : AbstractValidator
         RuleFor(x => x.AmountOfReviewers)
             .GreaterThan(0);
 
+        RuleFor(x => x.Name)
+            .NotEmpty();
+
+        RuleFor(x => x.Checklist)
+            .NotEmpty();
+
         RuleFor(x => x.DiscrepancyThreshold)
-            .InclusiveBetween(0, 100);
+            .InclusiveBetween(1, 100);
+
+        RuleFor(x => x.Deadline)
+            .NotNull()
+            .Must((request, deadline) => deadline < request.ReviewDeadline)
+            .When(x => x.Deadline is not null && x.ReviewDeadline is not null, ApplyConditionTo.CurrentValidator)
+            .WithMessage("'Deadline' must be less than 'Review Deadline'.");
+
+        RuleFor(x => x.ReviewDeadline)
+            .NotNull();
     }
 }

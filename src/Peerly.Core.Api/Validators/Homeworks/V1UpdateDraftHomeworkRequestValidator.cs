@@ -22,13 +22,16 @@ internal sealed class V1UpdateDraftHomeworkRequestValidator : AbstractValidator<
         RuleFor(x => x.Checklist)
             .NotEmpty();
 
+        RuleFor(x => x.DiscrepancyThreshold)
+            .InclusiveBetween(1, 100);
+
         RuleFor(x => x.Deadline)
-            .NotNull();
+            .NotNull()
+            .Must((request, deadline) => deadline < request.ReviewDeadline)
+            .When(x => x.Deadline is not null && x.ReviewDeadline is not null, ApplyConditionTo.CurrentValidator)
+            .WithMessage("'Deadline' must be less than 'Review Deadline'.");
 
         RuleFor(x => x.ReviewDeadline)
             .NotNull();
-
-        RuleFor(x => x.DiscrepancyThreshold)
-            .InclusiveBetween(0, 100);
     }
 }
