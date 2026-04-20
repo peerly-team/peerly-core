@@ -17,7 +17,10 @@ internal static class ListStudentCourseHomeworksHandlerMapper
 
     public static GroupFilter ToGroupFilter(this ListStudentCourseHomeworksQuery query)
     {
-        return GroupFilter.Empty() with { CourseIds = [query.CourseId] };
+        return GroupFilter.Empty() with
+        {
+            CourseIds = [query.CourseId]
+        };
     }
 
     public static GroupStudentFilter ToGroupStudentFilter(this ListStudentCourseHomeworksQuery query, IReadOnlyCollection<GroupId> groupIds)

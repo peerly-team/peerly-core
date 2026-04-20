@@ -2,17 +2,23 @@ using System.Threading;
 using System.Threading.Tasks;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Abstractions;
+using Peerly.Core.ApplicationServices.Checkers.CourseAccess.Abstractions;
 using Peerly.Core.Exceptions;
 
 namespace Peerly.Core.ApplicationServices.Features.V1.Homeworks.ListTeacherCourseHomeworks;
 
-internal sealed class ListTeacherCourseHomeworksHandler : IQueryHandler<ListTeacherCourseHomeworksQuery, ListTeacherCourseHomeworksQueryResponse>
+internal sealed class
+    ListTeacherCourseHomeworksHandler : IQueryHandler<ListTeacherCourseHomeworksQuery, ListTeacherCourseHomeworksQueryResponse>
 {
     private readonly ICommonUnitOfWorkFactory _commonUnitOfWorkFactory;
+    private readonly ITeacherCourseAccessChecker _teacherCourseAccessChecker;
 
-    public ListTeacherCourseHomeworksHandler(ICommonUnitOfWorkFactory commonUnitOfWorkFactory)
+    public ListTeacherCourseHomeworksHandler(
+        ICommonUnitOfWorkFactory commonUnitOfWorkFactory,
+        ITeacherCourseAccessChecker teacherCourseAccessChecker)
     {
         _commonUnitOfWorkFactory = commonUnitOfWorkFactory;
+        _teacherCourseAccessChecker = teacherCourseAccessChecker;
     }
 
     public async Task<ListTeacherCourseHomeworksQueryResponse> ExecuteAsync(
@@ -22,7 +28,7 @@ internal sealed class ListTeacherCourseHomeworksHandler : IQueryHandler<ListTeac
         await using var unitOfWork = await _commonUnitOfWorkFactory.CreateReadOnlyAsync(cancellationToken);
 
         var courseTeacher = query.ToCourseTeacher();
-        if (!await unitOfWork.ReadOnlyCourseTeacherRepository.ExistsAsync(courseTeacher, cancellationToken))
+        if (!await _teacherCourseAccessChecker.RunAsync(courseTeacher, cancellationToken))
         {
             throw new NotFoundException();
         }
