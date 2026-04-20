@@ -10,6 +10,6 @@ internal sealed class CreateSubmittedHomeworkFileInstaller : IInstaller
 {
     public void InstallServices(IServiceCollection services)
     {
-        services.AddScoped<ICreateSubmittedHomeworkFileHandlerMapper, CreateSubmittedHomeworkFileHandlerMapper>();
+        services.AddScoped<ICreateSubmittedHomeworkFileValidator, CreateSubmittedHomeworkFileValidator>();
     }
 }

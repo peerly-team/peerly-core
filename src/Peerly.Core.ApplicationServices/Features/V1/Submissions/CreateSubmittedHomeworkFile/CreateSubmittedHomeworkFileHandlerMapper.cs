@@ -1,48 +1,57 @@
+using System;
 using System.Collections.Generic;
-using Peerly.Core.Abstractions.ApplicationServices;
-using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomeworkFile.Abstractions;
 using Peerly.Core.ApplicationServices.Services.Anonymization.Models;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Files;
 using Peerly.Core.Models.Groups;
 using Peerly.Core.Models.Students;
+using Peerly.Core.Models.Submissions;
 using Peerly.Core.Tools;
 
 namespace Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomeworkFile;
 
-internal sealed class CreateSubmittedHomeworkFileHandlerMapper : ICreateSubmittedHomeworkFileHandlerMapper
+internal static class CreateSubmittedHomeworkFileHandlerMapper
 {
-    private readonly IClock _clock;
-
-    public CreateSubmittedHomeworkFileHandlerMapper(IClock clock)
-    {
-        _clock = clock;
-    }
-
-    public FileAddItem ToFileAddItem(CreateSubmittedHomeworkFileCommand command)
+    public static FileAddItem ToFileAddItem(this CreateSubmittedHomeworkFileCommand command, DateTimeOffset creationTime)
     {
         return new FileAddItem
         {
             StorageId = command.StorageId,
             Name = command.FileName,
             Size = command.FileSize,
-            CreationTime = _clock.GetCurrentTime()
+            CreationTime = creationTime
         };
     }
 
-    public FileAddItem ToAnonymizedFileAddItem(CreateSubmittedHomeworkFileCommand command, AnonymizationResponse response)
+    public static FileAddItem ToAnonymizedFileAddItem(
+        this CreateSubmittedHomeworkFileCommand command,
+        AnonymizationResponse response,
+        DateTimeOffset creationTime)
     {
         return new FileAddItem
         {
             StorageId = response.AnonymizedStorageId,
             Name = command.FileName,
             Size = response.Size,
-            CreationTime = _clock.GetCurrentTime()
+            CreationTime = creationTime
+        };
+    }
+
+    public static SubmittedHomeworkFileAddItem ToSubmittedHomeworkFileAddItem(
+        this CreateSubmittedHomeworkFileCommand command,
+        FileId fileId,
+        FileId? anonymizedFileId)
+    {
+        return new SubmittedHomeworkFileAddItem
+        {
+            SubmittedHomeworkId = command.SubmittedHomeworkId,
+            FileId = fileId,
+            AnonymizedFileId = anonymizedFileId
         };
     }
 
     public static AnonymizationRequest ToAnonymizationItem(
-        CreateSubmittedHomeworkFileCommand command,
+        this CreateSubmittedHomeworkFileCommand command,
         IReadOnlyCollection<Student> students)
     {
         return new AnonymizationRequest
