@@ -3,29 +3,31 @@ using System.Threading;
 using System.Threading.Tasks;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Abstractions;
+using Peerly.Core.ApplicationServices.Checkers.CourseAccess.Abstractions;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.Shared.SearchCourses;
 using Peerly.Core.Exceptions;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Groups;
-using Peerly.Core.Tools;
 
 namespace Peerly.Core.ApplicationServices.Features.V1.Courses.GetStudentCourse;
 
 internal sealed class GetStudentCourseHandler : IQueryHandler<GetStudentCourseQuery, GetStudentCourseQueryResponse>
 {
     private readonly ICommonUnitOfWorkFactory _commonUnitOfWorkFactory;
+    private readonly IStudentCourseAccessChecker _studentCourseAccessChecker;
 
-    public GetStudentCourseHandler(ICommonUnitOfWorkFactory commonUnitOfWorkFactory)
+    public GetStudentCourseHandler(ICommonUnitOfWorkFactory commonUnitOfWorkFactory, IStudentCourseAccessChecker studentCourseAccessChecker)
     {
         _commonUnitOfWorkFactory = commonUnitOfWorkFactory;
+        _studentCourseAccessChecker = studentCourseAccessChecker;
     }
 
     public async Task<GetStudentCourseQueryResponse> ExecuteAsync(GetStudentCourseQuery query, CancellationToken cancellationToken)
     {
         await using var unitOfWork = await _commonUnitOfWorkFactory.CreateReadOnlyAsync(cancellationToken);
 
-        var isCourseStudentExists = await IsCourseStudentExistsAsync(query, unitOfWork, cancellationToken);
-        if (!isCourseStudentExists)
+        var courseStudent = query.ToCourseStudent();
+        if (!await _studentCourseAccessChecker.RunAsync(courseStudent, cancellationToken))
         {
             throw new NotFoundException();
         }
@@ -48,27 +50,6 @@ internal sealed class GetStudentCourseHandler : IQueryHandler<GetStudentCourseQu
                 HomeworkCount = homeworkCount
             }
         };
-    }
-
-    private static async Task<bool> IsCourseStudentExistsAsync(
-        GetStudentCourseQuery query,
-        ICommonReadOnlyUnitOfWork unitOfWork,
-        CancellationToken cancellationToken)
-    {
-        var groupFilter = GroupFilter.Empty() with { CourseIds = [query.CourseId] };
-        var groups = await unitOfWork.ReadOnlyGroupRepository.ListAsync(groupFilter, cancellationToken);
-        if (groups.Count == 0)
-        {
-            return false;
-        }
-
-        var groupStudentFilter = new GroupStudentFilter
-        {
-            GroupIds = groups.ToArrayBy(group => group.Id),
-            StudentIds = [query.StudentId]
-        };
-        var groupStudents = await unitOfWork.ReadOnlyGroupStudentRepository.ListAsync(groupStudentFilter, cancellationToken);
-        return groupStudents.Count > 0;
     }
 
     private static async Task<int> GetStudentCountAsync(

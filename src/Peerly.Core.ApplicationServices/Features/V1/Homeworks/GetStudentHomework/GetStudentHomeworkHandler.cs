@@ -1,21 +1,25 @@
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Abstractions;
+using Peerly.Core.ApplicationServices.Checkers.CourseAccess.Abstractions;
 using Peerly.Core.Exceptions;
+using Peerly.Core.Models.Groups;
 using Peerly.Core.Models.Homeworks;
-using Peerly.Core.Tools;
 
 namespace Peerly.Core.ApplicationServices.Features.V1.Homeworks.GetStudentHomework;
 
 internal sealed class GetStudentHomeworkHandler : IQueryHandler<GetStudentHomeworkQuery, GetStudentHomeworkQueryResponse>
 {
     private readonly ICommonUnitOfWorkFactory _commonUnitOfWorkFactory;
+    private readonly IStudentCourseAccessChecker _studentCourseAccessChecker;
 
-    public GetStudentHomeworkHandler(ICommonUnitOfWorkFactory commonUnitOfWorkFactory)
+    public GetStudentHomeworkHandler(
+        ICommonUnitOfWorkFactory commonUnitOfWorkFactory,
+        IStudentCourseAccessChecker studentCourseAccessChecker)
     {
         _commonUnitOfWorkFactory = commonUnitOfWorkFactory;
+        _studentCourseAccessChecker = studentCourseAccessChecker;
     }
 
     public async Task<GetStudentHomeworkQueryResponse> ExecuteAsync(
@@ -33,7 +37,8 @@ internal sealed class GetStudentHomeworkHandler : IQueryHandler<GetStudentHomewo
         await EnsureStudentHasAccessAsync(unitOfWork, query, homework, cancellationToken);
 
         var homeworkStudent = query.ToHomeworkStudent(homework.Id);
-        var submittedHomeworkId = await unitOfWork.ReadOnlySubmittedHomeworkRepository.GetSubmittedHomeworkIdAsync(homeworkStudent, cancellationToken);
+        var submittedHomeworkId =
+            await unitOfWork.ReadOnlySubmittedHomeworkRepository.GetSubmittedHomeworkIdAsync(homeworkStudent, cancellationToken);
         var files = await unitOfWork.ReadOnlyHomeworkFileRepository.ListFilesAsync(homework.Id, cancellationToken);
 
         return new GetStudentHomeworkQueryResponse
@@ -44,27 +49,30 @@ internal sealed class GetStudentHomeworkHandler : IQueryHandler<GetStudentHomewo
         };
     }
 
-    private static async Task EnsureStudentHasAccessAsync(
+    private async Task EnsureStudentHasAccessAsync(
         ICommonReadOnlyUnitOfWork unitOfWork,
         GetStudentHomeworkQuery query,
         Homework homework,
         CancellationToken cancellationToken)
     {
-        var courseGroupFilter = query.ToCourseGroupFilter(homework.CourseId);
-        var courseGroups = await unitOfWork.ReadOnlyGroupRepository.ListAsync(courseGroupFilter, cancellationToken);
-        if (courseGroups.Count == 0)
+        var courseStudent = query.ToCourseStudent(homework.CourseId);
+        if (!await _studentCourseAccessChecker.RunAsync(courseStudent, cancellationToken))
         {
             throw new NotFoundException();
         }
 
-        var groupStudentFilter = query.ToGroupStudentFilter(courseGroups.ToArrayBy(group => group.Id));
-        var studentGroups = await unitOfWork.ReadOnlyGroupStudentRepository.ListAsync(groupStudentFilter, cancellationToken);
-        if (studentGroups.Count == 0)
+        if (homework.GroupId is not { } homeworkGroupId)
         {
-            throw new NotFoundException();
+            return;
         }
 
-        if (homework.GroupId is { } homeworkGroupId && studentGroups.All(groupStudent => groupStudent.GroupId != homeworkGroupId))
+        var groupStudentFilter = new GroupStudentFilter
+        {
+            GroupIds = [homeworkGroupId],
+            StudentIds = [query.StudentId]
+        };
+        var groupStudents = await unitOfWork.ReadOnlyGroupStudentRepository.ListAsync(groupStudentFilter, cancellationToken);
+        if (groupStudents.Count == 0)
         {
             throw new NotFoundException();
         }

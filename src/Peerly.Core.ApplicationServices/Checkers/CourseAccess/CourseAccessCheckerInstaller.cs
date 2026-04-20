@@ -9,5 +9,6 @@ internal sealed class CourseAccessCheckerInstaller : IInstaller
     public void InstallServices(IServiceCollection services)
     {
         services.AddScoped<ITeacherCourseAccessChecker, TeacherCourseAccessChecker>();
+        services.AddScoped<IStudentCourseAccessChecker, StudentCourseAccessChecker>();
     }
 }
