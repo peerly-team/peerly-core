@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,6 +12,11 @@ namespace Peerly.Core.Abstractions.Repositories;
 public interface ISubmittedHomeworkRepository : IReadOnlySubmittedHomeworkRepository
 {
     Task<SubmittedHomeworkId> AddAsync(SubmittedHomeworkAddItem item, CancellationToken cancellationToken);
+
+    Task<bool> UpdateAsync(
+        SubmittedHomeworkId submittedHomeworkId,
+        Action<IUpdateBuilder<SubmittedHomeworkUpdateItem>> configureUpdate,
+        CancellationToken cancellationToken);
 }
 
 public interface IReadOnlySubmittedHomeworkRepository

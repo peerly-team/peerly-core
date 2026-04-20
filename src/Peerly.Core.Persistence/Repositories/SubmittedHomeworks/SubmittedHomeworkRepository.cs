@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using Peerly.Core.Abstractions.Repositories;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Homeworks;
 using Peerly.Core.Models.Submissions;
+using Peerly.Core.Persistence.Common;
 using Peerly.Core.Persistence.Repositories.SubmittedHomeworks.Models;
 using Peerly.Core.Persistence.UnitOfWork;
 using Peerly.Core.Tools;
@@ -131,6 +133,44 @@ internal sealed class SubmittedHomeworkRepository : ISubmittedHomeworkRepository
         var submittedHomeworkId = await _connectionContext.Connection.QuerySingleAsync<long>(command);
 
         return new SubmittedHomeworkId(submittedHomeworkId);
+    }
+
+    public async Task<bool> UpdateAsync(
+        SubmittedHomeworkId submittedHomeworkId,
+        Action<IUpdateBuilder<SubmittedHomeworkUpdateItem>> configureUpdate,
+        CancellationToken cancellationToken)
+    {
+        var builder = new UpdateBuilder<SubmittedHomeworkUpdateItem>();
+        configureUpdate(builder);
+
+        var configuration = builder.Build();
+        var queryParams = configuration.GetQueryParams();
+        queryParams.Add($"@{nameof(submittedHomeworkId)}", (long)submittedHomeworkId);
+
+        var query =
+            $"""
+             update {SubmittedHomeworkTable.TableName} as new
+                set {SubmittedHomeworkTable.UpdateTime} = now(),
+                    {SubmittedHomeworkTable.Comment} = case
+                    when {configuration.GetFlagParamName(item => item.Comment)}
+                    then {configuration.GetParamName(item => item.Comment)}
+                    else {SubmittedHomeworkTable.Comment}
+                    end
+              from (select {SubmittedHomeworkTable.Id}
+                      from {SubmittedHomeworkTable.TableName}
+                     where {SubmittedHomeworkTable.Id} = @{nameof(submittedHomeworkId)}
+                       for update) as old
+             WHERE new.{SubmittedHomeworkTable.Id} = old.{SubmittedHomeworkTable.Id};
+             """;
+
+        var command = new CommandDefinition(
+            query,
+            queryParams,
+            _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var affectedRows = await _connectionContext.Connection.ExecuteAsync(command);
+
+        return affectedRows == 1;
     }
 
     public async Task<IReadOnlyCollection<SubmittedHomeworkStudent>> ListSubmittedHomeworkStudentAsync(

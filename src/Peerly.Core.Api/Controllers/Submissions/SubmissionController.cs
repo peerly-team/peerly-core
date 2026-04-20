@@ -5,6 +5,8 @@ using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedReview;
+using OneOf.Types;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedHomework;
 using Peerly.Core.V1;
 
 namespace Peerly.Core.Api.Controllers.Submissions;
@@ -15,15 +17,18 @@ public sealed class SubmissionController : SubmissionService.SubmissionServiceBa
     private readonly ICommandHandler<CreateSubmittedHomeworkCommand, CreateSubmittedHomeworkCommandResponse> _createSubmittedHomeworkHandler;
     private readonly ICommandHandler<CreateSubmittedHomeworkFileCommand, CreateSubmittedHomeworkFileCommandResponse> _createSubmittedHomeworkFileHandler;
     private readonly ICommandHandler<CreateSubmittedReviewCommand, CreateSubmittedReviewCommandResponse> _createSubmittedReviewHandler;
+    private readonly ICommandHandler<UpdateSubmittedHomeworkCommand, Success> _updateSubmittedHomeworkHandler;
 
     public SubmissionController(
         ICommandHandler<CreateSubmittedHomeworkCommand, CreateSubmittedHomeworkCommandResponse> createSubmittedHomeworkHandler,
         ICommandHandler<CreateSubmittedHomeworkFileCommand, CreateSubmittedHomeworkFileCommandResponse> createSubmittedHomeworkFileHandler,
-        ICommandHandler<CreateSubmittedReviewCommand, CreateSubmittedReviewCommandResponse> createSubmittedReviewHandler)
+        ICommandHandler<CreateSubmittedReviewCommand, CreateSubmittedReviewCommandResponse> createSubmittedReviewHandler,
+        ICommandHandler<UpdateSubmittedHomeworkCommand, Success> updateSubmittedHomeworkHandler)
     {
         _createSubmittedHomeworkHandler = createSubmittedHomeworkHandler;
         _createSubmittedHomeworkFileHandler = createSubmittedHomeworkFileHandler;
         _createSubmittedReviewHandler = createSubmittedReviewHandler;
+        _updateSubmittedHomeworkHandler = updateSubmittedHomeworkHandler;
     }
 
     public override async Task<V1CreateSubmittedHomeworkResponse> V1CreateSubmittedHomework(
@@ -49,5 +54,14 @@ public sealed class SubmissionController : SubmissionService.SubmissionServiceBa
         var command = request.ToCreateSubmittedReviewCommand();
         var commandResponse = await _createSubmittedReviewHandler.ExecuteAsync(command, context.CancellationToken);
         return commandResponse.ToV1CreateSubmittedReviewResponse();
+    }
+
+    public override async Task<V1UpdateSubmittedHomeworkResponse> V1UpdateSubmittedHomework(
+        V1UpdateSubmittedHomeworkRequest request,
+        ServerCallContext context)
+    {
+        var command = request.ToUpdateSubmittedHomeworkCommand();
+        var commandResponse = await _updateSubmittedHomeworkHandler.ExecuteAsync(command, context.CancellationToken);
+        return commandResponse.ToV1UpdateSubmittedHomeworkResponse();
     }
 }

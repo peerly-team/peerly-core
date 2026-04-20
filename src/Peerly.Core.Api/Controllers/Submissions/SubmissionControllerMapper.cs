@@ -1,7 +1,9 @@
 using System;
+using OneOf.Types;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedReview;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedHomework;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
 using Proto = Peerly.Core.V1;
@@ -67,6 +69,31 @@ internal static class SubmissionControllerMapper
                 ValidationError = validationError.ToProto<CreateSubmittedHomeworkFileCommand, Proto.V1CreateSubmittedHomeworkFileRequest>()
             },
             otherError => new Proto.V1CreateSubmittedHomeworkFileResponse { OtherError = otherError.ToProto() });
+    }
+
+    public static UpdateSubmittedHomeworkCommand ToUpdateSubmittedHomeworkCommand(this Proto.V1UpdateSubmittedHomeworkRequest request)
+    {
+        return new UpdateSubmittedHomeworkCommand
+        {
+            SubmittedHomeworkId = new SubmittedHomeworkId(request.SubmittedHomeworkId),
+            StudentId = new StudentId(request.StudentId),
+            Comment = request.Comment
+        };
+    }
+
+    public static Proto.V1UpdateSubmittedHomeworkResponse ToV1UpdateSubmittedHomeworkResponse(
+        this CommandResponse<Success> commandResponse)
+    {
+        return commandResponse.Match(
+            _ => new Proto.V1UpdateSubmittedHomeworkResponse
+            {
+                SuccessResponse = new Proto.V1UpdateSubmittedHomeworkResponse.Types.Success()
+            },
+            validationError => new Proto.V1UpdateSubmittedHomeworkResponse
+            {
+                ValidationError = validationError.ToProto<UpdateSubmittedHomeworkCommand, Proto.V1UpdateSubmittedHomeworkRequest>()
+            },
+            otherError => new Proto.V1UpdateSubmittedHomeworkResponse { OtherError = otherError.ToProto() });
     }
 
     public static CreateSubmittedReviewCommand ToCreateSubmittedReviewCommand(this Proto.V1CreateSubmittedReviewRequest request)
