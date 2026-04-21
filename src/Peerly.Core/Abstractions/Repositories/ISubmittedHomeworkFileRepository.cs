@@ -10,6 +10,8 @@ public interface ISubmittedHomeworkFileRepository : IReadOnlySubmittedHomeworkFi
     Task<bool> AddAsync(SubmittedHomeworkFileAddItem item, CancellationToken cancellationToken);
 
     Task DeleteBySubmittedHomeworkAsync(SubmittedHomeworkId submittedHomeworkId, CancellationToken cancellationToken);
+
+    Task DeleteAsync(SubmittedHomeworkId submittedHomeworkId, FileId fileId, CancellationToken cancellationToken);
 }
 
 public interface IReadOnlySubmittedHomeworkFileRepository

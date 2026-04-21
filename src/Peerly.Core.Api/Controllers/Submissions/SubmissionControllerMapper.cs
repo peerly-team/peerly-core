@@ -4,6 +4,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHom
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedReview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedHomework;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedHomework;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
@@ -119,6 +120,31 @@ internal static class SubmissionControllerMapper
                 ValidationError = validationError.ToProto<DeleteSubmittedHomeworkCommand, Proto.V1DeleteSubmittedHomeworkRequest>()
             },
             otherError => new Proto.V1DeleteSubmittedHomeworkResponse { OtherError = otherError.ToProto() });
+    }
+
+    public static DeleteSubmittedHomeworkFileCommand ToDeleteSubmittedHomeworkFileCommand(this Proto.V1DeleteSubmittedHomeworkFileRequest request)
+    {
+        return new DeleteSubmittedHomeworkFileCommand
+        {
+            SubmittedHomeworkId = new SubmittedHomeworkId(request.SubmittedHomeworkId),
+            FileId = new FileId(request.FileId),
+            StudentId = new StudentId(request.StudentId)
+        };
+    }
+
+    public static Proto.V1DeleteSubmittedHomeworkFileResponse ToV1DeleteSubmittedHomeworkFileResponse(
+        this CommandResponse<Success> commandResponse)
+    {
+        return commandResponse.Match(
+            _ => new Proto.V1DeleteSubmittedHomeworkFileResponse
+            {
+                SuccessResponse = new Proto.V1DeleteSubmittedHomeworkFileResponse.Types.Success()
+            },
+            validationError => new Proto.V1DeleteSubmittedHomeworkFileResponse
+            {
+                ValidationError = validationError.ToProto<DeleteSubmittedHomeworkFileCommand, Proto.V1DeleteSubmittedHomeworkFileRequest>()
+            },
+            otherError => new Proto.V1DeleteSubmittedHomeworkFileResponse { OtherError = otherError.ToProto() });
     }
 
     public static CreateSubmittedReviewCommand ToCreateSubmittedReviewCommand(this Proto.V1CreateSubmittedReviewRequest request)

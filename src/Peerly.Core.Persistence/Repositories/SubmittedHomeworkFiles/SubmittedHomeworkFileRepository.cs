@@ -70,6 +70,29 @@ internal sealed class SubmittedHomeworkFileRepository : ISubmittedHomeworkFileRe
         await _connectionContext.Connection.ExecuteAsync(command);
     }
 
+    public async Task DeleteAsync(SubmittedHomeworkId submittedHomeworkId, FileId fileId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            SubmittedHomeworkId = (long)submittedHomeworkId,
+            FileId = (long)fileId
+        };
+
+        const string Query =
+            $"""
+             delete from {SubmittedHomeworkFileTable.TableName}
+                   where {SubmittedHomeworkFileTable.SubmittedHomeworkId} = @{nameof(queryParams.SubmittedHomeworkId)}
+                     and {SubmittedHomeworkFileTable.FileId} = @{nameof(queryParams.FileId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        await _connectionContext.Connection.ExecuteAsync(command);
+    }
+
     public async Task<FileId?> GetAnonymizedFileIdAsync(FileId fileId, CancellationToken cancellationToken)
     {
         var queryParams = new

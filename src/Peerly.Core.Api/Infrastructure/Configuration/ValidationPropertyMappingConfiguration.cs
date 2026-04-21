@@ -17,6 +17,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHom
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedReview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedHomework;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedHomework;
 using Peerly.Core.V1;
 
@@ -111,6 +112,10 @@ public static class ValidationPropertyMappingConfiguration
 
         ValidationPropertyMapping
             .AddMapping<DeleteSubmittedHomeworkCommand, V1DeleteSubmittedHomeworkRequest>()
+            .Build();
+
+        ValidationPropertyMapping
+            .AddMapping<DeleteSubmittedHomeworkFileCommand, V1DeleteSubmittedHomeworkFileRequest>()
             .Build();
     }
 }

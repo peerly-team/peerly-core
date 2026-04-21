@@ -7,6 +7,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHom
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedReview;
 using OneOf.Types;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedHomework;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedHomework;
 using Peerly.Core.V1;
 
@@ -20,19 +21,22 @@ public sealed class SubmissionController : SubmissionService.SubmissionServiceBa
     private readonly ICommandHandler<CreateSubmittedReviewCommand, CreateSubmittedReviewCommandResponse> _createSubmittedReviewHandler;
     private readonly ICommandHandler<UpdateSubmittedHomeworkCommand, Success> _updateSubmittedHomeworkHandler;
     private readonly ICommandHandler<DeleteSubmittedHomeworkCommand, Success> _deleteSubmittedHomeworkHandler;
+    private readonly ICommandHandler<DeleteSubmittedHomeworkFileCommand, Success> _deleteSubmittedHomeworkFileHandler;
 
     public SubmissionController(
         ICommandHandler<CreateSubmittedHomeworkCommand, CreateSubmittedHomeworkCommandResponse> createSubmittedHomeworkHandler,
         ICommandHandler<CreateSubmittedHomeworkFileCommand, CreateSubmittedHomeworkFileCommandResponse> createSubmittedHomeworkFileHandler,
         ICommandHandler<CreateSubmittedReviewCommand, CreateSubmittedReviewCommandResponse> createSubmittedReviewHandler,
         ICommandHandler<UpdateSubmittedHomeworkCommand, Success> updateSubmittedHomeworkHandler,
-        ICommandHandler<DeleteSubmittedHomeworkCommand, Success> deleteSubmittedHomeworkHandler)
+        ICommandHandler<DeleteSubmittedHomeworkCommand, Success> deleteSubmittedHomeworkHandler,
+        ICommandHandler<DeleteSubmittedHomeworkFileCommand, Success> deleteSubmittedHomeworkFileHandler)
     {
         _createSubmittedHomeworkHandler = createSubmittedHomeworkHandler;
         _createSubmittedHomeworkFileHandler = createSubmittedHomeworkFileHandler;
         _createSubmittedReviewHandler = createSubmittedReviewHandler;
         _updateSubmittedHomeworkHandler = updateSubmittedHomeworkHandler;
         _deleteSubmittedHomeworkHandler = deleteSubmittedHomeworkHandler;
+        _deleteSubmittedHomeworkFileHandler = deleteSubmittedHomeworkFileHandler;
     }
 
     public override async Task<V1CreateSubmittedHomeworkResponse> V1CreateSubmittedHomework(
@@ -76,5 +80,14 @@ public sealed class SubmissionController : SubmissionService.SubmissionServiceBa
         var command = request.ToDeleteSubmittedHomeworkCommand();
         var commandResponse = await _deleteSubmittedHomeworkHandler.ExecuteAsync(command, context.CancellationToken);
         return commandResponse.ToV1DeleteSubmittedHomeworkResponse();
+    }
+
+    public override async Task<V1DeleteSubmittedHomeworkFileResponse> V1DeleteSubmittedHomeworkFile(
+        V1DeleteSubmittedHomeworkFileRequest request,
+        ServerCallContext context)
+    {
+        var command = request.ToDeleteSubmittedHomeworkFileCommand();
+        var commandResponse = await _deleteSubmittedHomeworkFileHandler.ExecuteAsync(command, context.CancellationToken);
+        return commandResponse.ToV1DeleteSubmittedHomeworkFileResponse();
     }
 }
