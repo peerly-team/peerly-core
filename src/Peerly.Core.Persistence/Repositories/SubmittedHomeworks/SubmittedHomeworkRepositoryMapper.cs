@@ -13,7 +13,8 @@ internal static class SubmittedHomeworkRepositoryMapper
         {
             Id = new SubmittedHomeworkId(db.Id),
             HomeworkId = new HomeworkId(db.HomeworkId),
-            StudentId = new StudentId(db.StudentId)
+            StudentId = new StudentId(db.StudentId),
+            Comment = db.Comment
         };
     }
 

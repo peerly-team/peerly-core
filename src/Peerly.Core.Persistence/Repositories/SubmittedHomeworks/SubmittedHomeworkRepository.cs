@@ -36,7 +36,8 @@ internal sealed class SubmittedHomeworkRepository : ISubmittedHomeworkRepository
             $"""
              select {SubmittedHomeworkTable.Id},
                     {SubmittedHomeworkTable.HomeworkId},
-                    {SubmittedHomeworkTable.StudentId}
+                    {SubmittedHomeworkTable.StudentId},
+                    {SubmittedHomeworkTable.Comment}
                from {SubmittedHomeworkTable.TableName}
               where {SubmittedHomeworkTable.Id} = @{nameof(queryParams.Id)};
              """;

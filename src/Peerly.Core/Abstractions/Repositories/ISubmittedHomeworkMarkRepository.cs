@@ -24,4 +24,6 @@ public interface IReadOnlySubmittedHomeworkMarkRepository
     Task<IReadOnlyCollection<SubmittedHomeworkMark>> ListAsync(
         HomeworkId homeworkId,
         CancellationToken cancellationToken);
+
+    Task<SubmittedHomeworkMark?> GetBySubmittedHomeworkAsync(SubmittedHomeworkId submittedHomeworkId, CancellationToken cancellationToken);
 }

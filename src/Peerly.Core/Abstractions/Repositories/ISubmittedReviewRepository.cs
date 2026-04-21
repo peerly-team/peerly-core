@@ -18,4 +18,8 @@ public interface IReadOnlySubmittedReviewRepository
     Task<IReadOnlyCollection<SubmittedHomeworkReviewerMark>> ListSubmittedReviewMarksAsync(
         HomeworkId homeworkId,
         CancellationToken cancellationToken);
+
+    Task<IReadOnlyCollection<SubmittedReview>> ListBySubmittedHomeworkAsync(
+        SubmittedHomeworkId submittedHomeworkId,
+        CancellationToken cancellationToken);
 }

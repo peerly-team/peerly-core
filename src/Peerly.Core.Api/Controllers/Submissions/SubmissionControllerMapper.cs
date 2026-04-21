@@ -1,13 +1,18 @@
 using System;
+using Google.Protobuf.WellKnownTypes;
 using OneOf.Types;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedReview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedHomeworkFile;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedHomework;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
+using Peerly.Core.Models.Files;
+using Peerly.Core.Models.Submissions;
+using Peerly.Core.Tools;
 using Proto = Peerly.Core.V1;
 
 namespace Peerly.Core.Api.Controllers.Submissions;
@@ -83,8 +88,7 @@ internal static class SubmissionControllerMapper
         };
     }
 
-    public static Proto.V1UpdateSubmittedHomeworkResponse ToV1UpdateSubmittedHomeworkResponse(
-        this CommandResponse<Success> commandResponse)
+    public static Proto.V1UpdateSubmittedHomeworkResponse ToV1UpdateSubmittedHomeworkResponse(this CommandResponse<Success> commandResponse)
     {
         return commandResponse.Match(
             _ => new Proto.V1UpdateSubmittedHomeworkResponse
@@ -107,8 +111,7 @@ internal static class SubmissionControllerMapper
         };
     }
 
-    public static Proto.V1DeleteSubmittedHomeworkResponse ToV1DeleteSubmittedHomeworkResponse(
-        this CommandResponse<Success> commandResponse)
+    public static Proto.V1DeleteSubmittedHomeworkResponse ToV1DeleteSubmittedHomeworkResponse(this CommandResponse<Success> commandResponse)
     {
         return commandResponse.Match(
             _ => new Proto.V1DeleteSubmittedHomeworkResponse
@@ -122,7 +125,8 @@ internal static class SubmissionControllerMapper
             otherError => new Proto.V1DeleteSubmittedHomeworkResponse { OtherError = otherError.ToProto() });
     }
 
-    public static DeleteSubmittedHomeworkFileCommand ToDeleteSubmittedHomeworkFileCommand(this Proto.V1DeleteSubmittedHomeworkFileRequest request)
+    public static DeleteSubmittedHomeworkFileCommand ToDeleteSubmittedHomeworkFileCommand(
+        this Proto.V1DeleteSubmittedHomeworkFileRequest request)
     {
         return new DeleteSubmittedHomeworkFileCommand
         {
@@ -145,6 +149,50 @@ internal static class SubmissionControllerMapper
                 ValidationError = validationError.ToProto<DeleteSubmittedHomeworkFileCommand, Proto.V1DeleteSubmittedHomeworkFileRequest>()
             },
             otherError => new Proto.V1DeleteSubmittedHomeworkFileResponse { OtherError = otherError.ToProto() });
+    }
+
+    public static GetSubmittedHomeworkQuery ToGetSubmittedHomeworkQuery(this Proto.V1GetSubmittedHomeworkRequest request)
+    {
+        return new GetSubmittedHomeworkQuery
+        {
+            SubmittedHomeworkId = new SubmittedHomeworkId(request.SubmittedHomeworkId),
+            StudentId = new StudentId(request.StudentId)
+        };
+    }
+
+    public static Proto.V1GetSubmittedHomeworkResponse ToV1GetSubmittedHomeworkResponse(this GetSubmittedHomeworkQueryResponse queryResponse)
+    {
+        return new Proto.V1GetSubmittedHomeworkResponse
+        {
+            Submission = new Proto.V1GetSubmittedHomeworkResponse.Types.SubmissionDetail
+            {
+                SubmittedHomeworkId = (long)queryResponse.Submission.Id,
+                Comment = queryResponse.Submission.Comment,
+                FinalMark = queryResponse.FinalMark,
+                Reviews = { queryResponse.Reviews.ToArrayBy(review => review.ToProto()) },
+                Files = { queryResponse.Files.ToArrayBy(file => file.ToProto()) }
+            }
+        };
+    }
+
+    private static Proto.File ToProto(this File file)
+    {
+        return new Proto.File
+        {
+            Id = (long)file.Id,
+            Name = file.Name,
+            Size = file.Size
+        };
+    }
+
+    private static Proto.V1GetSubmittedHomeworkResponse.Types.Review ToProto(this SubmittedReview review)
+    {
+        return new Proto.V1GetSubmittedHomeworkResponse.Types.Review
+        {
+            Mark = review.Mark,
+            Comment = review.Comment,
+            CreatedAt = Timestamp.FromDateTimeOffset(review.CreationTime)
+        };
     }
 
     public static CreateSubmittedReviewCommand ToCreateSubmittedReviewCommand(this Proto.V1CreateSubmittedReviewRequest request)
