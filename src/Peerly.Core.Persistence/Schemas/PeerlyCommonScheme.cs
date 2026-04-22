@@ -179,6 +179,7 @@ internal static class PeerlyCommonScheme
         public const string Mark = "mark";
         public const string Comment = "comment";
         public const string CreationTime = "creation_time";
+        public const string UpdateTime = "update_time";
     }
 
     public static class SubmittedHomeworkMarkTable

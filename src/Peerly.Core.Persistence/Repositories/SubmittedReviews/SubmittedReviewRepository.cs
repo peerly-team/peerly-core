@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -5,6 +6,7 @@ using Dapper;
 using Peerly.Core.Abstractions.Repositories;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Submissions;
+using Peerly.Core.Persistence.Common;
 using Peerly.Core.Persistence.Repositories.SubmittedReviews.Models;
 using Peerly.Core.Persistence.UnitOfWork;
 using Peerly.Core.Tools;
@@ -57,6 +59,49 @@ internal sealed class SubmittedReviewRepository : ISubmittedReviewRepository
         var submittedReviewId = await _connectionContext.Connection.QuerySingleAsync<long>(command);
 
         return new SubmittedReviewId(submittedReviewId);
+    }
+
+    public async Task<bool> UpdateAsync(
+        SubmittedReviewId submittedReviewId,
+        Action<IUpdateBuilder<SubmittedReviewUpdateItem>> configureUpdate,
+        CancellationToken cancellationToken)
+    {
+        var builder = new UpdateBuilder<SubmittedReviewUpdateItem>();
+        configureUpdate(builder);
+
+        var configuration = builder.Build();
+        var queryParams = configuration.GetQueryParams();
+        queryParams.Add($"@{nameof(submittedReviewId)}", (long)submittedReviewId);
+
+        var query =
+            $"""
+             update {SubmittedReviewTable.TableName} as new
+                set {SubmittedReviewTable.UpdateTime} = now(),
+                    {SubmittedReviewTable.Mark} = case
+                    when {configuration.GetFlagParamName(item => item.Mark)}
+                    then {configuration.GetParamName(item => item.Mark)}
+                    else {SubmittedReviewTable.Mark}
+                    end,
+                    {SubmittedReviewTable.Comment} = case
+                    when {configuration.GetFlagParamName(item => item.Comment)}
+                    then {configuration.GetParamName(item => item.Comment)}
+                    else {SubmittedReviewTable.Comment}
+                    end
+              from (select {SubmittedReviewTable.Id}
+                      from {SubmittedReviewTable.TableName}
+                     where {SubmittedReviewTable.Id} = @{nameof(submittedReviewId)}
+                       for update) as old
+             WHERE new.{SubmittedReviewTable.Id} = old.{SubmittedReviewTable.Id};
+             """;
+
+        var command = new CommandDefinition(
+            query,
+            queryParams,
+            _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var affectedRows = await _connectionContext.Connection.ExecuteAsync(command);
+
+        return affectedRows == 1;
     }
 
     public async Task<bool> ExistsAsync(SubmittedHomeworkStudent submittedHomeworkStudent, CancellationToken cancellationToken)

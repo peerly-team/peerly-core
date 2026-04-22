@@ -10,6 +10,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetAssignedReview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.ListAssignedReviews;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedHomework;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedReview;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Files;
@@ -249,6 +250,31 @@ internal static class SubmissionControllerMapper
         }
 
         return new Proto.V1GetAssignedReviewResponse { Submission = submission };
+    }
+
+    public static UpdateSubmittedReviewCommand ToUpdateSubmittedReviewCommand(this Proto.V1UpdateSubmittedReviewRequest request)
+    {
+        return new UpdateSubmittedReviewCommand
+        {
+            SubmittedReviewId = new SubmittedReviewId(request.SubmittedReviewId),
+            StudentId = new StudentId(request.StudentId),
+            Mark = request.Mark,
+            Comment = request.Comment
+        };
+    }
+
+    public static Proto.V1UpdateSubmittedReviewResponse ToV1UpdateSubmittedReviewResponse(this CommandResponse<Success> commandResponse)
+    {
+        return commandResponse.Match(
+            _ => new Proto.V1UpdateSubmittedReviewResponse
+            {
+                SuccessResponse = new Proto.V1UpdateSubmittedReviewResponse.Types.Success()
+            },
+            validationError => new Proto.V1UpdateSubmittedReviewResponse
+            {
+                ValidationError = validationError.ToProto<UpdateSubmittedReviewCommand, Proto.V1UpdateSubmittedReviewRequest>()
+            },
+            otherError => new Proto.V1UpdateSubmittedReviewResponse { OtherError = otherError.ToProto() });
     }
 
     public static CreateSubmittedReviewCommand ToCreateSubmittedReviewCommand(this Proto.V1CreateSubmittedReviewRequest request)

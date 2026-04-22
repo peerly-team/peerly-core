@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +10,11 @@ namespace Peerly.Core.Abstractions.Repositories;
 public interface ISubmittedReviewRepository : IReadOnlySubmittedReviewRepository
 {
     Task<SubmittedReviewId> AddAsync(SubmittedReviewAddItem item, CancellationToken cancellationToken);
+
+    Task<bool> UpdateAsync(
+        SubmittedReviewId submittedReviewId,
+        Action<IUpdateBuilder<SubmittedReviewUpdateItem>> configureUpdate,
+        CancellationToken cancellationToken);
 }
 
 public interface IReadOnlySubmittedReviewRepository
