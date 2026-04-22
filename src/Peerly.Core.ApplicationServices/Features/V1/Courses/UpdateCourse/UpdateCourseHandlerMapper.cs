@@ -4,9 +4,9 @@ namespace Peerly.Core.ApplicationServices.Features.V1.Courses.UpdateCourse;
 
 internal static class UpdateCourseHandlerMapper
 {
-    public static CourseTeacherExistsItem ToCourseTeacherExistsItem(this UpdateCourseCommand command)
+    public static CourseTeacher ToCourseTeacher(this UpdateCourseCommand command)
     {
-        return new CourseTeacherExistsItem
+        return new CourseTeacher
         {
             CourseId = command.CourseId,
             TeacherId = command.TeacherId

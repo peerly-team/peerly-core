@@ -1,9 +1,12 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Peerly.Core.Abstractions.Repositories;
+using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Groups;
+using Peerly.Core.Persistence.Common;
 using Peerly.Core.Persistence.UnitOfWork;
 using Peerly.Core.Tools;
 using static Peerly.Core.Persistence.Schemas.PeerlyCommonScheme;
@@ -19,6 +22,57 @@ internal sealed class GroupRepository : IGroupRepository
         _connectionContext = connectionContext;
     }
 
+    public async Task<Group?> GetAsync(GroupId groupId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            GroupId = (long)groupId
+        };
+
+        const string Query =
+            $"""
+             select g.{GroupTable.Id},
+                    g.{GroupTable.CourseId},
+                    g.{GroupTable.Name},
+                    count(*) as student_count
+               from {GroupTable.TableName} g
+               left join {GroupStudentTable.TableName} gs on gs.{GroupStudentTable.GroupId} = g.{GroupTable.Id}
+              where g.{GroupTable.Id} = @{nameof(queryParams.GroupId)}
+              group by g.{GroupTable.Id}, g.{GroupTable.CourseId}, g.{GroupTable.Name};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+
+        return await _connectionContext.Connection.QuerySingleOrDefaultAsync<Group>(command);
+    }
+
+    public async Task<bool> ExistsAsync(GroupId groupId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            GroupId = (long)groupId
+        };
+
+        const string Query =
+            $"""
+             select exists(select
+                             from {GroupTable.TableName}
+                            where {GroupTable.Id} = @{nameof(queryParams.GroupId)});
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+
+        return await _connectionContext.Connection.ExecuteScalarAsync<bool>(command);
+    }
+
     public async Task<IReadOnlyCollection<Group>> ListAsync(GroupFilter filter, CancellationToken cancellationToken)
     {
         var queryParams = new
@@ -32,7 +86,7 @@ internal sealed class GroupRepository : IGroupRepository
              select g.{GroupTable.Id},
                     g.{GroupTable.CourseId},
                     g.{GroupTable.Name},
-                    count(*) as student_count
+                    count(gs.*) as student_count
                from {GroupTable.TableName} g
                left join {GroupStudentTable.TableName} gs on gs.{GroupStudentTable.GroupId} = g.{GroupTable.Id}
               where (cardinality(@{nameof(queryParams.GroupIds)}) = 0
@@ -49,5 +103,96 @@ internal sealed class GroupRepository : IGroupRepository
             cancellationToken: cancellationToken);
 
         return [.. await _connectionContext.Connection.QueryAsync<Group>(command)];
+    }
+
+    public async Task<GroupId> AddAsync(GroupAddItem item, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            CourseId = (long)item.CourseId,
+            item.Name,
+            item.CreationTime
+        };
+
+        const string Query =
+            $"""
+             insert into {GroupTable.TableName} (
+                         {GroupTable.CourseId},
+                         {GroupTable.Name},
+                         {GroupTable.CreationTime})
+                  values (
+                         @{nameof(queryParams.CourseId)},
+                         @{nameof(queryParams.Name)},
+                         @{nameof(queryParams.CreationTime)})
+               returning {GroupTable.Id};
+             """;
+
+        var command = new CommandDefinition(
+            Query,
+            queryParams,
+            _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var groupId = await _connectionContext.Connection.QuerySingleAsync<long>(command);
+
+        return new GroupId(groupId);
+    }
+
+    public async Task<bool> UpdateAsync(
+        GroupId groupId,
+        Action<IUpdateBuilder<GroupUpdateItem>> configureUpdate,
+        CancellationToken cancellationToken)
+    {
+        var builder = new UpdateBuilder<GroupUpdateItem>();
+        configureUpdate(builder);
+
+        var configuration = builder.Build();
+        var queryParams = configuration.GetQueryParams();
+        queryParams.Add($"@{nameof(groupId)}", (long)groupId);
+
+        var query =
+            $"""
+             update {GroupTable.TableName} as new
+                set {GroupTable.UpdateTime} = now(),
+                    {GroupTable.Name} = case
+                    when {configuration.GetFlagParamName(item => item.Name)}
+                    then {configuration.GetParamName(item => item.Name)}
+                    else {GroupTable.Name}
+                    end
+              from (select {GroupTable.Id}
+                      from {GroupTable.TableName}
+                     where {GroupTable.Id} = @{nameof(groupId)}
+                       for update) as old
+             WHERE new.{GroupTable.Id} = old.{GroupTable.Id};
+             """;
+
+        var command = new CommandDefinition(
+            query,
+            queryParams,
+            _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var affectedRows = await _connectionContext.Connection.ExecuteAsync(command);
+
+        return affectedRows == 1;
+    }
+
+    public async Task DeleteAsync(GroupId groupId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            GroupId = (long)groupId
+        };
+
+        const string Query =
+            $"""
+             delete from {GroupTable.TableName}
+                   where {GroupTable.Id} = @{nameof(queryParams.GroupId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        await _connectionContext.Connection.ExecuteAsync(command);
     }
 }

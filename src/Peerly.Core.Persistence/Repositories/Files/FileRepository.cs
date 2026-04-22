@@ -44,7 +44,7 @@ internal sealed class FileRepository : IFileRepository
             cancellationToken: cancellationToken);
         var fileDb = await _connectionContext.Connection.QuerySingleOrDefaultAsync<FileDb>(command);
 
-        return fileDb.ToFile();
+        return fileDb?.ToFile();
     }
 
     public async Task<FileId> AddAsync(FileAddItem item, CancellationToken cancellationToken)

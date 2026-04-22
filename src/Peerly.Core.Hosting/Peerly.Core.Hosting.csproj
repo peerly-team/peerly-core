@@ -7,6 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Peerly.Core.Api\Peerly.Core.Api.csproj" />
     <ProjectReference Include="..\Peerly.Core.FileStorage\Peerly.Core.FileStorage.csproj" />
+    <ProjectReference Include="..\Peerly.Core.Messaging\Peerly.Core.Messaging.csproj" />
     <ProjectReference Include="..\Peerly.Core.Persistence\Peerly.Core.Persistence.csproj" />
   </ItemGroup>
 </Project>

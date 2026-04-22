@@ -2,10 +2,10 @@
 -- +goose StatementBegin
 create table distribution_reviewers
 (
-    homework_id bigint not null,
-    student_id  bigint not null,
+    submitted_homework_id bigint not null,
+    student_id            bigint not null,
 
-    primary key (homework_id, student_id)
+    primary key (submitted_homework_id, student_id)
 );
 -- +goose StatementEnd
 

@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Peerly.Core.Abstractions.Repositories;
+using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Groups;
 using Peerly.Core.Persistence.Repositories.GroupStudents.Models;
 using Peerly.Core.Persistence.UnitOfWork;
@@ -18,6 +19,60 @@ internal sealed class GroupStudentRepository : IGroupStudentRepository
     public GroupStudentRepository(IConnectionContext connectionContext)
     {
         _connectionContext = connectionContext;
+    }
+
+    public async Task AddAsync(GroupStudentAddItem item, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            GroupId = (long)item.GroupId,
+            StudentId = (long)item.StudentId,
+            item.CreationTime
+        };
+
+        const string Query =
+            $"""
+             insert into {GroupStudentTable.TableName} (
+                         {GroupStudentTable.GroupId},
+                         {GroupStudentTable.StudentId},
+                         {GroupStudentTable.CreationTime})
+                  values (
+                         @{nameof(queryParams.GroupId)},
+                         @{nameof(queryParams.StudentId)},
+                         @{nameof(queryParams.CreationTime)});
+             """;
+
+        var command = new CommandDefinition(
+            Query,
+            queryParams,
+            _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        await _connectionContext.Connection.ExecuteAsync(command);
+    }
+
+    public async Task<bool> ExistsAsync(GroupStudent groupStudent, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            GroupId = (long)groupStudent.GroupId,
+            StudentId = (long)groupStudent.StudentId
+        };
+
+        const string Query =
+            $"""
+             select exists(select
+                             from {GroupStudentTable.TableName}
+                            where {GroupStudentTable.GroupId} = @{nameof(queryParams.GroupId)}
+                              and {GroupStudentTable.StudentId} = @{nameof(queryParams.StudentId)});
+             """;
+
+        var command = new CommandDefinition(
+            Query,
+            queryParams,
+            _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+
+        return await _connectionContext.Connection.ExecuteScalarAsync<bool>(command);
     }
 
     public async Task<IReadOnlyCollection<GroupStudent>> ListAsync(GroupStudentFilter filter, CancellationToken cancellationToken)
@@ -47,5 +102,26 @@ internal sealed class GroupStudentRepository : IGroupStudentRepository
         var groupStudentDbs = await _connectionContext.Connection.QueryAsync<GroupStudentDb>(command);
 
         return groupStudentDbs.ToArrayBy(groupStudentDb => groupStudentDb.ToGroupStudent());
+    }
+
+    public async Task DeleteByGroupAsync(GroupId groupId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            GroupId = (long)groupId
+        };
+
+        const string Query =
+            $"""
+             delete from {GroupStudentTable.TableName}
+                   where {GroupStudentTable.GroupId} = @{nameof(queryParams.GroupId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        await _connectionContext.Connection.ExecuteAsync(command);
     }
 }

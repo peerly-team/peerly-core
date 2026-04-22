@@ -27,6 +27,12 @@ internal sealed class UpdateCourseHandler : ICommandHandler<UpdateCourseCommand,
 
         await using var unitOfWork = await _commonUnitOfWorkFactory.CreateAsync(cancellationToken);
 
+        var courseTeacher = command.ToCourseTeacher();
+        if (!await unitOfWork.CourseTeacherRepository.ExistsAsync(courseTeacher, cancellationToken))
+        {
+            return OtherError.PermissionDenied();
+        }
+
         var course = await unitOfWork.CourseRepository.GetAsync(command.CourseId, cancellationToken);
         if (course is null)
         {
@@ -38,12 +44,6 @@ internal sealed class UpdateCourseHandler : ICommandHandler<UpdateCourseCommand,
             return ValidationError.From(CourseErrors.IncorrectCourseStatusForUpdate);
         }
 
-        var courseTeacherExistsItem = command.ToCourseTeacherExistsItem();
-        var isCourseTeacherExists = await unitOfWork.CourseTeacherRepository.ExistsAsync(courseTeacherExistsItem, cancellationToken);
-        if (!isCourseTeacherExists)
-        {
-            return OtherError.PermissionDenied();
-        }
 
         _ = await unitOfWork.CourseRepository.UpdateAsync(
             command.CourseId,
