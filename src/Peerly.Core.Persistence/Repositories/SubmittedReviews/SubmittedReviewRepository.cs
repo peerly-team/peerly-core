@@ -83,6 +83,34 @@ internal sealed class SubmittedReviewRepository : ISubmittedReviewRepository
         return await _connectionContext.Connection.QuerySingleAsync<bool>(command);
     }
 
+    public async Task<SubmittedReviewId?> GetSubmittedReviewIdAsync(
+        SubmittedHomeworkStudent submittedHomeworkStudent,
+        CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            SubmittedHomeworkId = (long)submittedHomeworkStudent.SubmittedHomeworkId,
+            StudentId = (long)submittedHomeworkStudent.StudentId
+        };
+
+        const string Query =
+            $"""
+             select {SubmittedReviewTable.Id}
+               from {SubmittedReviewTable.TableName}
+              where {SubmittedReviewTable.SubmittedHomeworkId} = @{nameof(queryParams.SubmittedHomeworkId)}
+                and {SubmittedReviewTable.StudentId} = @{nameof(queryParams.StudentId)};
+             """;
+
+        var command = new CommandDefinition(
+            Query,
+            queryParams,
+            _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var id = await _connectionContext.Connection.QuerySingleOrDefaultAsync<long?>(command);
+
+        return id is not null ? new SubmittedReviewId(id.Value) : null;
+    }
+
     public async Task<IReadOnlyCollection<SubmittedReview>> ListBySubmittedHomeworkAsync(
         SubmittedHomeworkId submittedHomeworkId,
         CancellationToken cancellationToken)

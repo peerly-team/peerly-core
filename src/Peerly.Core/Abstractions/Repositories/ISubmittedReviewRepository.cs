@@ -13,6 +13,7 @@ public interface ISubmittedReviewRepository : IReadOnlySubmittedReviewRepository
 
 public interface IReadOnlySubmittedReviewRepository
 {
+    Task<SubmittedReviewId?> GetSubmittedReviewIdAsync(SubmittedHomeworkStudent submittedHomeworkStudent, CancellationToken cancellationToken);
     Task<bool> ExistsAsync(SubmittedHomeworkStudent submittedHomeworkStudent, CancellationToken cancellationToken);
 
     Task<IReadOnlyCollection<SubmittedHomeworkReviewerMark>> ListSubmittedReviewMarksAsync(

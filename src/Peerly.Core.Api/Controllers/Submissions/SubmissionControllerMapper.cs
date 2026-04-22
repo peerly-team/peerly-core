@@ -6,6 +6,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHom
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedReview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedHomeworkFile;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetAssignedReview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.ListAssignedReviews;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedHomework;
@@ -221,6 +222,33 @@ internal static class SubmissionControllerMapper
             HomeworkName = item.HomeworkName,
             IsReviewed = item.IsReviewed
         };
+    }
+
+    public static GetAssignedReviewQuery ToGetAssignedReviewQuery(this Proto.V1GetAssignedReviewRequest request)
+    {
+        return new GetAssignedReviewQuery
+        {
+            SubmittedHomeworkId = new SubmittedHomeworkId(request.SubmittedHomeworkId),
+            StudentId = new StudentId(request.StudentId)
+        };
+    }
+
+    public static Proto.V1GetAssignedReviewResponse ToV1GetAssignedReviewResponse(this GetAssignedReviewQueryResponse queryResponse)
+    {
+        var submission = new Proto.V1GetAssignedReviewResponse.Types.SubmissionForReview
+        {
+            SubmittedHomeworkId = (long)queryResponse.SubmittedHomeworkId,
+            Comment = queryResponse.Comment,
+            Checklist = queryResponse.Checklist,
+            Files = { queryResponse.Files.ToArrayBy(file => file.ToProto()) }
+        };
+
+        if (queryResponse.SubmittedReviewId is { } reviewId)
+        {
+            submission.SubmittedReviewId = (long)reviewId;
+        }
+
+        return new Proto.V1GetAssignedReviewResponse { Submission = submission };
     }
 
     public static CreateSubmittedReviewCommand ToCreateSubmittedReviewCommand(this Proto.V1CreateSubmittedReviewRequest request)

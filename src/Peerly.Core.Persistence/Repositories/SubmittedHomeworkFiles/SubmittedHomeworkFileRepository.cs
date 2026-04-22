@@ -128,6 +128,37 @@ internal sealed class SubmittedHomeworkFileRepository : ISubmittedHomeworkFileRe
         return dbs.ToArrayBy(db => db.ToFile());
     }
 
+    public async Task<IReadOnlyCollection<File>> ListAnonymizedBySubmittedHomeworkAsync(
+        SubmittedHomeworkId submittedHomeworkId,
+        CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            SubmittedHomeworkId = (long)submittedHomeworkId
+        };
+
+        const string Query =
+            $"""
+             select f.{FileTable.Id},
+                    f.{FileTable.StorageId},
+                    f.{FileTable.Name},
+                    f.{FileTable.Size}
+               from {SubmittedHomeworkFileTable.TableName} shf
+               join {FileTable.TableName} f
+                 on f.{FileTable.Id} = coalesce(shf.{SubmittedHomeworkFileTable.AnonymizedFileId}, shf.{SubmittedHomeworkFileTable.FileId})
+              where shf.{SubmittedHomeworkFileTable.SubmittedHomeworkId} = @{nameof(queryParams.SubmittedHomeworkId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var dbs = await _connectionContext.Connection.QueryAsync<FileDb>(command);
+
+        return dbs.ToArrayBy(db => db.ToFile());
+    }
+
     public async Task<FileId?> GetAnonymizedFileIdAsync(FileId fileId, CancellationToken cancellationToken)
     {
         var queryParams = new

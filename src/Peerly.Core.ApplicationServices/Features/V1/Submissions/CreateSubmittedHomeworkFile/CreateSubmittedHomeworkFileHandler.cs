@@ -55,6 +55,7 @@ internal sealed class CreateSubmittedHomeworkFileHandler : ICommandHandler<Creat
             return OtherError.NotFound(HomeworkErrors.HomeworkNotFound);
         }
 
+        // todo: добавить анонимизацию названия файла, чтобы не было случаев, когда пользователь назвал файл своим именем
         var students = await GetStudentsAsync(unitOfWork, homework, cancellationToken);
         var anonymizationResponse = await _anonymizationService.AnonymizeAsync(command.ToAnonymizationItem(students), cancellationToken);
 

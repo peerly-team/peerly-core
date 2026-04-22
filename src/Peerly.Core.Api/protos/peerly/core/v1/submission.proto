@@ -167,8 +167,8 @@ message V1GetAssignedReviewResponse {
     // NOTE: если есть персональные данные, то передаем идентификатор анонимизированного файла
     repeated File files = 3;
     string checklist = 4;
+    optional int64 submitted_review_id = 5;
   }
-
 }
 
 message V1CreateSubmittedReviewRequest {
