@@ -6,6 +6,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHom
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedReview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedHomeworkFile;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedReview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetAssignedReview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.ListAssignedReviews;
@@ -250,6 +251,29 @@ internal static class SubmissionControllerMapper
         }
 
         return new Proto.V1GetAssignedReviewResponse { Submission = submission };
+    }
+
+    public static DeleteSubmittedReviewCommand ToDeleteSubmittedReviewCommand(this Proto.V1DeleteSubmittedReviewRequest request)
+    {
+        return new DeleteSubmittedReviewCommand
+        {
+            SubmittedReviewId = new SubmittedReviewId(request.SubmittedReviewId),
+            StudentId = new StudentId(request.StudentId)
+        };
+    }
+
+    public static Proto.V1DeleteSubmittedReviewResponse ToV1DeleteSubmittedReviewResponse(this CommandResponse<Success> commandResponse)
+    {
+        return commandResponse.Match(
+            _ => new Proto.V1DeleteSubmittedReviewResponse
+            {
+                SuccessResponse = new Proto.V1DeleteSubmittedReviewResponse.Types.Success()
+            },
+            validationError => new Proto.V1DeleteSubmittedReviewResponse
+            {
+                ValidationError = validationError.ToProto<DeleteSubmittedReviewCommand, Proto.V1DeleteSubmittedReviewRequest>()
+            },
+            otherError => new Proto.V1DeleteSubmittedReviewResponse { OtherError = otherError.ToProto() });
     }
 
     public static UpdateSubmittedReviewCommand ToUpdateSubmittedReviewCommand(this Proto.V1UpdateSubmittedReviewRequest request)

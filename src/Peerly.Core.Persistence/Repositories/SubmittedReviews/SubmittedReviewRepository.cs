@@ -61,6 +61,27 @@ internal sealed class SubmittedReviewRepository : ISubmittedReviewRepository
         return new SubmittedReviewId(submittedReviewId);
     }
 
+    public async Task DeleteAsync(SubmittedReviewId submittedReviewId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            Id = (long)submittedReviewId
+        };
+
+        const string Query =
+            $"""
+             delete from {SubmittedReviewTable.TableName}
+                   where {SubmittedReviewTable.Id} = @{nameof(queryParams.Id)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        await _connectionContext.Connection.ExecuteAsync(command);
+    }
+
     public async Task<bool> UpdateAsync(
         SubmittedReviewId submittedReviewId,
         Action<IUpdateBuilder<SubmittedReviewUpdateItem>> configureUpdate,

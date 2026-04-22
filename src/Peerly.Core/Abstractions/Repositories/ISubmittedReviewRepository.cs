@@ -15,6 +15,8 @@ public interface ISubmittedReviewRepository : IReadOnlySubmittedReviewRepository
         SubmittedReviewId submittedReviewId,
         Action<IUpdateBuilder<SubmittedReviewUpdateItem>> configureUpdate,
         CancellationToken cancellationToken);
+
+    Task DeleteAsync(SubmittedReviewId submittedReviewId, CancellationToken cancellationToken);
 }
 
 public interface IReadOnlySubmittedReviewRepository
