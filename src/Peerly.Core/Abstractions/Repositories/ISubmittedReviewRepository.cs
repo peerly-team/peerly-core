@@ -22,4 +22,9 @@ public interface IReadOnlySubmittedReviewRepository
     Task<IReadOnlyCollection<SubmittedReview>> ListBySubmittedHomeworkAsync(
         SubmittedHomeworkId submittedHomeworkId,
         CancellationToken cancellationToken);
+
+    Task<IReadOnlyCollection<SubmittedHomeworkId>> ListReviewedByAsync(
+        StudentId studentId,
+        HomeworkId homeworkId,
+        CancellationToken cancellationToken);
 }

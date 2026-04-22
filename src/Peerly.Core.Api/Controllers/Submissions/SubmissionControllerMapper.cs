@@ -7,6 +7,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedRev
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetSubmittedHomework;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.ListAssignedReviews;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedHomework;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
@@ -192,6 +193,33 @@ internal static class SubmissionControllerMapper
             Mark = review.Mark,
             Comment = review.Comment,
             CreatedAt = Timestamp.FromDateTimeOffset(review.CreationTime)
+        };
+    }
+
+    public static ListAssignedReviewsQuery ToListAssignedReviewsQuery(this Proto.V1ListAssignedReviewsRequest request)
+    {
+        return new ListAssignedReviewsQuery
+        {
+            HomeworkId = new HomeworkId(request.HomeworkId),
+            StudentId = new StudentId(request.StudentId)
+        };
+    }
+
+    public static Proto.V1ListAssignedReviewsResponse ToV1ListAssignedReviewsResponse(this ListAssignedReviewsQueryResponse queryResponse)
+    {
+        return new Proto.V1ListAssignedReviewsResponse
+        {
+            AssignedReviews = { queryResponse.AssignedReviews.ToArrayBy(item => item.ToProto()) }
+        };
+    }
+
+    private static Proto.V1ListAssignedReviewsResponse.Types.AssignedReview ToProto(this AssignedReview item)
+    {
+        return new Proto.V1ListAssignedReviewsResponse.Types.AssignedReview
+        {
+            SubmittedHomeworkId = (long)item.SubmittedHomeworkId,
+            HomeworkName = item.HomeworkName,
+            IsReviewed = item.IsReviewed
         };
     }
 

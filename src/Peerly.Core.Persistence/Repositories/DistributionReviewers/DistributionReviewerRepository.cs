@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Peerly.Core.Abstractions.Repositories;
+using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Homeworks;
 using Peerly.Core.Persistence.UnitOfWork;
 using Peerly.Core.Tools;
@@ -50,6 +51,36 @@ internal sealed class DistributionReviewerRepository : IDistributionReviewerRepo
             transaction: _connectionContext.Transaction,
             cancellationToken: cancellationToken);
         await _connectionContext.Connection.ExecuteAsync(command);
+    }
+
+    public async Task<IReadOnlyCollection<SubmittedHomeworkId>> ListAssignedByAsync(
+        StudentId studentId,
+        HomeworkId homeworkId,
+        CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            StudentId = (long)studentId,
+            HomeworkId = (long)homeworkId
+        };
+
+        const string Query =
+            $"""
+             select dr.{DistributionReviewerTable.SubmittedHomeworkId}
+               from {DistributionReviewerTable.TableName} dr
+               join {SubmittedHomeworkTable.TableName} sh on sh.{SubmittedHomeworkTable.Id} = dr.{DistributionReviewerTable.SubmittedHomeworkId}
+              where dr.{DistributionReviewerTable.StudentId} = @{nameof(queryParams.StudentId)}
+                and sh.{SubmittedHomeworkTable.HomeworkId} = @{nameof(queryParams.HomeworkId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var ids = await _connectionContext.Connection.QueryAsync<long>(command);
+
+        return ids.ToArrayBy(id => new SubmittedHomeworkId(id));
     }
 
     public async Task<bool> ExistsAsync(SubmittedHomeworkStudent submittedHomeworkStudent, CancellationToken cancellationToken)

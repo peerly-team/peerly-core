@@ -114,6 +114,36 @@ internal sealed class SubmittedReviewRepository : ISubmittedReviewRepository
         return dbs.ToArrayBy(db => db.ToSubmittedReview());
     }
 
+    public async Task<IReadOnlyCollection<SubmittedHomeworkId>> ListReviewedByAsync(
+        StudentId studentId,
+        HomeworkId homeworkId,
+        CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            StudentId = (long)studentId,
+            HomeworkId = (long)homeworkId
+        };
+
+        const string Query =
+            $"""
+             select sr.{SubmittedReviewTable.SubmittedHomeworkId}
+               from {SubmittedReviewTable.TableName} sr
+               join {SubmittedHomeworkTable.TableName} sh on sh.{SubmittedHomeworkTable.Id} = sr.{SubmittedReviewTable.SubmittedHomeworkId}
+              where sr.{SubmittedReviewTable.StudentId} = @{nameof(queryParams.StudentId)}
+                and sh.{SubmittedHomeworkTable.HomeworkId} = @{nameof(queryParams.HomeworkId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var ids = await _connectionContext.Connection.QueryAsync<long>(command);
+
+        return ids.ToArrayBy(id => new SubmittedHomeworkId(id));
+    }
+
     public async Task<IReadOnlyCollection<SubmittedHomeworkReviewerMark>> ListSubmittedReviewMarksAsync(
         HomeworkId homeworkId,
         CancellationToken cancellationToken)

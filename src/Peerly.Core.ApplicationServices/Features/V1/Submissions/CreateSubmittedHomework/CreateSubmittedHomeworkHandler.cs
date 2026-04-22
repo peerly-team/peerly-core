@@ -37,6 +37,8 @@ internal sealed class CreateSubmittedHomeworkHandler :
             return validationError;
         }
 
+        // todo: добавить проверку, что на пользователе нет отправленного ДЗ
+
         var submittedHomeworkAddItem = command.ToSubmittedHomeworkAddItem(_clock.GetCurrentTime());
         var submittedHomeworkId = await unitOfWork.SubmittedHomeworkRepository.AddAsync(submittedHomeworkAddItem, cancellationToken);
 
