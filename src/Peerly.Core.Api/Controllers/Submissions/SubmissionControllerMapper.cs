@@ -1,5 +1,4 @@
 using System;
-using Google.Protobuf.WellKnownTypes;
 using OneOf.Types;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomeworkFile;
@@ -166,17 +165,23 @@ internal static class SubmissionControllerMapper
 
     public static Proto.V1GetSubmittedHomeworkResponse ToV1GetSubmittedHomeworkResponse(this GetSubmittedHomeworkQueryResponse queryResponse)
     {
-        return new Proto.V1GetSubmittedHomeworkResponse
+        var response = new Proto.V1GetSubmittedHomeworkResponse
         {
-            Submission = new Proto.V1GetSubmittedHomeworkResponse.Types.SubmissionDetail
+            SubmittedHomework = new Proto.V1GetSubmittedHomeworkResponse.Types.SubmittedHomeworkInfo
             {
-                SubmittedHomeworkId = (long)queryResponse.Submission.Id,
-                Comment = queryResponse.Submission.Comment,
-                FinalMark = queryResponse.FinalMark,
-                Reviews = { queryResponse.Reviews.ToArrayBy(review => review.ToProto()) },
+                Id = (long)queryResponse.SubmittedHomework.Id,
+                Comment = queryResponse.SubmittedHomework.Comment,
                 Files = { queryResponse.Files.ToArrayBy(file => file.ToProto()) }
-            }
+            },
+            SubmittedReviews = { queryResponse.SubmittedReviews.ToArrayBy(review => review.ToProto()) }
         };
+
+        if (queryResponse.FinalMark is { } finalMark)
+        {
+            response.FinalMark = finalMark;
+        }
+
+        return response;
     }
 
     private static Proto.File ToProto(this File file)
@@ -189,13 +194,13 @@ internal static class SubmissionControllerMapper
         };
     }
 
-    private static Proto.V1GetSubmittedHomeworkResponse.Types.Review ToProto(this SubmittedReview review)
+    private static Proto.SubmittedReviewInfo ToProto(this SubmittedReview review)
     {
-        return new Proto.V1GetSubmittedHomeworkResponse.Types.Review
+        return new Proto.SubmittedReviewInfo
         {
+            Id = (long)review.Id,
             Mark = review.Mark,
-            Comment = review.Comment,
-            CreatedAt = Timestamp.FromDateTimeOffset(review.CreationTime)
+            Comment = review.Comment
         };
     }
 
@@ -245,9 +250,9 @@ internal static class SubmissionControllerMapper
             Files = { queryResponse.Files.ToArrayBy(file => file.ToProto()) }
         };
 
-        if (queryResponse.SubmittedReviewId is { } reviewId)
+        if (queryResponse.SubmittedReviewId is { } submittedReviewId)
         {
-            submission.SubmittedReviewId = (long)reviewId;
+            submission.SubmittedReviewId = (long)submittedReviewId;
         }
 
         return new Proto.V1GetAssignedReviewResponse { Submission = submission };

@@ -117,5 +117,10 @@ message TeacherReview {
   StudentInfo reviewer = 2;
   int32 mark = 3;
   string comment = 4;
-  google.protobuf.Timestamp created_at = 5;
+}
+
+message SubmittedReviewInfo {
+  int64 id = 1;
+  int32 mark = 2;
+  string comment = 3;
 }

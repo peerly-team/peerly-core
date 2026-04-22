@@ -121,20 +121,14 @@ message V1GetSubmittedHomeworkRequest {
 }
 
 message V1GetSubmittedHomeworkResponse {
-  SubmissionDetail submission = 1;
+  SubmittedHomeworkInfo submitted_homework = 1;
+  repeated SubmittedReviewInfo submitted_reviews = 2;
+  optional int32 final_mark = 3;
 
-  message SubmissionDetail {
-    int64 submitted_homework_id = 1;
+  message SubmittedHomeworkInfo {
+    int64 id = 1;
     string comment = 2;
     repeated File files = 3;
-    repeated Review reviews = 4;
-    google.protobuf.Int32Value final_mark = 5;
-  }
-
-  message Review {
-    int32 mark = 1;
-    string comment = 2;
-    google.protobuf.Timestamp created_at = 3;
   }
 }
 
@@ -228,16 +222,7 @@ message V1GetSubmittedReviewRequest {
 }
 
 message V1GetSubmittedReviewResponse {
-  SubmittedReviewDetail review = 1;
-
-
-  message SubmittedReviewDetail {
-    int64 submitted_review_id = 1;
-    int64 submitted_homework_id = 2;
-    int32 mark = 3;
-    string comment = 4;
-    google.protobuf.Timestamp created_at = 5;
-  }
+  SubmittedReviewInfo submitted_review = 1;
 }
 
 message V1ListSubmissionResultsRequest {
@@ -298,12 +283,12 @@ message V1ListSubmittedHomeworksRequest {
 }
 
 message V1ListSubmittedHomeworksResponse {
-  repeated SubmissionOverview submissions = 1;
+  repeated SubmittedHomeworkOverview submitted_homeworks = 1;
 
-  message SubmissionOverview {
-    int64 submitted_homework_id = 1;
+  message SubmittedHomeworkOverview {
+    int64 id = 1;
     StudentInfo student = 2;
-    google.protobuf.Int32Value final_mark = 3;
+    int32 final_mark = 3;
     int32 review_count = 4;
     bool has_discrepancy = 5;
   }

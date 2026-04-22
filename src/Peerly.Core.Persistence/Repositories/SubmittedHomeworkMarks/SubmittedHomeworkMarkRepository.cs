@@ -190,10 +190,8 @@ internal sealed class SubmittedHomeworkMarkRepository : ISubmittedHomeworkMarkRe
 
         const string Query =
             $"""
-             select shm.{SubmittedHomeworkMarkTable.SubmittedHomeworkId},
-                    shm.{SubmittedHomeworkMarkTable.ReviewersMark},
+             select shm.{SubmittedHomeworkMarkTable.ReviewersMark},
                     shm.{SubmittedHomeworkMarkTable.TeacherMark},
-                    shm.{SubmittedHomeworkMarkTable.TeacherId},
                     shm.{SubmittedHomeworkMarkTable.HasDiscrepancy}
                from {SubmittedHomeworkMarkTable.TableName} shm
                join {SubmittedHomeworkTable.TableName} sh

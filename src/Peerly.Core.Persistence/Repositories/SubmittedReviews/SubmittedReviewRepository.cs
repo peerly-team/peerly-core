@@ -189,11 +189,8 @@ internal sealed class SubmittedReviewRepository : ISubmittedReviewRepository
         const string Query =
             $"""
              select {SubmittedReviewTable.Id},
-                    {SubmittedReviewTable.SubmittedHomeworkId},
-                    {SubmittedReviewTable.StudentId},
                     {SubmittedReviewTable.Mark},
-                    {SubmittedReviewTable.Comment},
-                    {SubmittedReviewTable.CreationTime}
+                    {SubmittedReviewTable.Comment}
                from {SubmittedReviewTable.TableName}
               where {SubmittedReviewTable.SubmittedHomeworkId} = @{nameof(queryParams.SubmittedHomeworkId)};
              """;
