@@ -59,6 +59,10 @@ public static class Program
     {
         app.UseRouting();
 
+        // gRPC-Web работает поверх HTTP/1.1 — обязательный мост, пока бэкенд живёт
+        // за YC Serverless Containers edge, который не проксирует HTTP/2.
+        app.UseGrpcWeb(new GrpcWebOptions { DefaultEnabled = true });
+
         app.MapGrpcService<StorageController>();
         app.MapGrpcService<CourseController>();
         app.MapGrpcService<HomeworkController>();

@@ -3,6 +3,7 @@
     <!-- Third-party packages -->
     <PackageReference Include="Grpc.AspNetCore"/>
     <PackageReference Include="Grpc.AspNetCore.Server.Reflection"/>
+    <PackageReference Include="Grpc.AspNetCore.Web"/>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Peerly.Core.Api\Peerly.Core.Api.csproj" />
