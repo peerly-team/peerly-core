@@ -36,7 +36,7 @@ internal sealed class GetAssignedReviewHandler : IQueryHandler<GetAssignedReview
         var files = await unitOfWork.ReadOnlySubmittedHomeworkFileRepository.ListAnonymizedBySubmittedHomeworkAsync(query.SubmittedHomeworkId, cancellationToken);
 
         var submittedHomeworkStudent = query.ToSubmittedHomeworkStudent();
-        var submittedReviewId = await unitOfWork.ReadOnlySubmittedReviewRepository.GetSubmittedReviewIdAsync(submittedHomeworkStudent, cancellationToken);
+        var submittedReviewId = await unitOfWork.ReadOnlySubmittedReviewRepository.GetIdAsync(submittedHomeworkStudent, cancellationToken);
 
         return new GetAssignedReviewQueryResponse
         {

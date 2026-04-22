@@ -149,7 +149,33 @@ internal sealed class SubmittedReviewRepository : ISubmittedReviewRepository
         return await _connectionContext.Connection.QuerySingleAsync<bool>(command);
     }
 
-    public async Task<SubmittedReviewId?> GetSubmittedReviewIdAsync(
+    public async Task<SubmittedReview?> GetAsync(SubmittedReviewId submittedReviewId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            Id = (long)submittedReviewId
+        };
+
+        const string Query =
+            $"""
+             select {SubmittedReviewTable.Id},
+                    {SubmittedReviewTable.Mark},
+                    {SubmittedReviewTable.Comment}
+               from {SubmittedReviewTable.TableName}
+              where {SubmittedReviewTable.Id} = @{nameof(queryParams.Id)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var db = await _connectionContext.Connection.QuerySingleOrDefaultAsync<SubmittedReviewDb>(command);
+
+        return db?.ToSubmittedReview();
+    }
+
+    public async Task<SubmittedReviewId?> GetIdAsync(
         SubmittedHomeworkStudent submittedHomeworkStudent,
         CancellationToken cancellationToken)
     {

@@ -8,6 +8,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedHom
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedReview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetAssignedReview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetSubmittedHomework;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetSubmittedReview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.ListAssignedReviews;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedReview;
@@ -333,5 +334,22 @@ internal static class SubmissionControllerMapper
                 ValidationError = validationError.ToProto<CreateSubmittedReviewCommand, Proto.V1CreateSubmittedReviewRequest>()
             },
             otherError => new Proto.V1CreateSubmittedReviewResponse { OtherError = otherError.ToProto() });
+    }
+
+    public static GetSubmittedReviewQuery ToGetSubmittedReviewQuery(this Proto.V1GetSubmittedReviewRequest request)
+    {
+        return new GetSubmittedReviewQuery
+        {
+            SubmittedReviewId = new SubmittedReviewId(request.SubmittedReviewId),
+            StudentId = new StudentId(request.StudentId)
+        };
+    }
+
+    public static Proto.V1GetSubmittedReviewResponse ToV1GetSubmittedReviewResponse(this GetSubmittedReviewQueryResponse queryResponse)
+    {
+        return new Proto.V1GetSubmittedReviewResponse
+        {
+            SubmittedReview = queryResponse.SubmittedReview.ToProto()
+        };
     }
 }
