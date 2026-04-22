@@ -8,6 +8,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ConfirmHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateCourseHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateGroupHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.DeleteHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PostponeHomeworkDeadlines;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PublishHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.UpdateDraftHomework;
@@ -113,6 +114,10 @@ public static class ValidationPropertyMappingConfiguration
 
         ValidationPropertyMapping
             .AddMapping<PostponeHomeworkDeadlinesCommand, V1PostponeHomeworkDeadlinesRequest>()
+            .Build();
+
+        ValidationPropertyMapping
+            .AddMapping<DeleteHomeworkCommand, V1DeleteHomeworkRequest>()
             .Build();
 
         ValidationPropertyMapping

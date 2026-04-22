@@ -15,6 +15,8 @@ public interface IHomeworkRepository : IReadOnlyHomeworkRepository
         HomeworkId homeworkId,
         Action<IUpdateBuilder<HomeworkUpdateItem>> configureUpdate,
         CancellationToken cancellationToken);
+
+    Task DeleteAsync(HomeworkId homeworkId, CancellationToken cancellationToken);
 }
 
 public interface IReadOnlyHomeworkRepository

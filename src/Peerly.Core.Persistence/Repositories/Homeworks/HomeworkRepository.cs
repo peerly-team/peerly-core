@@ -254,4 +254,25 @@ internal sealed class HomeworkRepository : IHomeworkRepository
 
         return affectedRows == 1;
     }
+
+    public async Task DeleteAsync(HomeworkId homeworkId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            HomeworkId = (long)homeworkId
+        };
+
+        const string Query =
+            $"""
+             delete from {HomeworkTable.TableName}
+                   where {HomeworkTable.Id} = @{nameof(queryParams.HomeworkId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        await _connectionContext.Connection.ExecuteAsync(command);
+    }
 }

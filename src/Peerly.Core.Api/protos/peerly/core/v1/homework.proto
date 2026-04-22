@@ -16,6 +16,8 @@ service HomeworkService {
   rpc V1PostponeHomeworkDeadlines(V1PostponeHomeworkDeadlinesRequest) returns (V1PostponeHomeworkDeadlinesResponse);
   rpc V1PublishHomework(V1PublishHomeworkRequest) returns (V1PublishHomeworkResponse);
   rpc V1ConfirmHomework(V1ConfirmHomeworkRequest) returns (V1ConfirmHomeworkResponse);
+  rpc V1DeleteHomework(V1DeleteHomeworkRequest) returns (V1DeleteHomeworkResponse);
+  rpc V1DeleteHomeworkFile(V1DeleteHomeworkFileRequest) returns (V1DeleteHomeworkFileResponse);
   rpc V1GetStudentHomework(V1GetStudentHomeworkRequest) returns (V1GetStudentHomeworkResponse);
   rpc V1GetTeacherHomework(V1GetTeacherHomeworkRequest) returns (V1GetTeacherHomeworkResponse);
   rpc V1ListTeacherCourseHomeworks(V1ListTeacherCourseHomeworksRequest) returns (V1ListTeacherCourseHomeworksResponse);
@@ -113,6 +115,37 @@ message V1ConfirmHomeworkRequest {
 }
 
 message V1ConfirmHomeworkResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}
+
+message V1DeleteHomeworkRequest {
+  int64 homework_id = 1;
+  int64 teacher_id = 2;
+}
+
+message V1DeleteHomeworkResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}
+
+message V1DeleteHomeworkFileRequest {
+  int64 homework_id = 1;
+  int64 file_id = 2;
+  int64 teacher_id = 3;
+}
+
+message V1DeleteHomeworkFileResponse {
   oneof response {
     Success success_response = 1;
     ValidationError validation_error = 2;

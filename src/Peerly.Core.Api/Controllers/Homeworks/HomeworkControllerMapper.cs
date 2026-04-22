@@ -5,6 +5,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ConfirmHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateCourseHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateGroupHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.DeleteHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.GetStudentHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.GetTeacherHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ListStudentCourseHomeworks;
@@ -289,6 +290,26 @@ internal static class HomeworkControllerMapper
             TotalStudentsCount = queryResponse.TotalStudentsCount,
             Files = { queryResponse.Files.ToArrayBy(file => file.ToProto()) }
         };
+    }
+
+    public static DeleteHomeworkCommand ToDeleteHomeworkCommand(this Proto.V1DeleteHomeworkRequest request)
+    {
+        return new DeleteHomeworkCommand
+        {
+            HomeworkId = new HomeworkId(request.HomeworkId),
+            TeacherId = new TeacherId(request.TeacherId)
+        };
+    }
+
+    public static Proto.V1DeleteHomeworkResponse ToV1DeleteHomeworkResponse(this CommandResponse<Success> commandResponse)
+    {
+        return commandResponse.Match(
+            _ => new Proto.V1DeleteHomeworkResponse { SuccessResponse = new Proto.V1DeleteHomeworkResponse.Types.Success() },
+            validationError => new Proto.V1DeleteHomeworkResponse
+            {
+                ValidationError = validationError.ToProto<DeleteHomeworkCommand, Proto.V1DeleteHomeworkRequest>()
+            },
+            otherError => new Proto.V1DeleteHomeworkResponse { OtherError = otherError.ToProto() });
     }
 
     private static Proto.File ToProto(this File file)
