@@ -8,6 +8,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateCourseHomework
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateGroupHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.DeleteHomework;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.DeleteHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.GetStudentHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.GetTeacherHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ListStudentCourseHomeworks;
@@ -34,6 +35,7 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
     private readonly IQueryHandler<GetStudentHomeworkQuery, GetStudentHomeworkQueryResponse> _getStudentHomeworkHandler;
     private readonly IQueryHandler<GetTeacherHomeworkQuery, GetTeacherHomeworkQueryResponse> _getTeacherHomeworkHandler;
     private readonly ICommandHandler<DeleteHomeworkCommand, Success> _deleteHomeworkHandler;
+    private readonly ICommandHandler<DeleteHomeworkFileCommand, Success> _deleteHomeworkFileHandler;
 
     public HomeworkController(
         ICommandHandler<CreateCourseHomeworkCommand, CreateCourseHomeworkCommandResponse> createHomeworkHandler,
@@ -47,7 +49,8 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
         IQueryHandler<ListTeacherCourseHomeworksQuery, ListTeacherCourseHomeworksQueryResponse> listTeacherCourseHomeworksHandler,
         IQueryHandler<GetStudentHomeworkQuery, GetStudentHomeworkQueryResponse> getStudentHomeworkHandler,
         IQueryHandler<GetTeacherHomeworkQuery, GetTeacherHomeworkQueryResponse> getTeacherHomeworkHandler,
-        ICommandHandler<DeleteHomeworkCommand, Success> deleteHomeworkHandler)
+        ICommandHandler<DeleteHomeworkCommand, Success> deleteHomeworkHandler,
+        ICommandHandler<DeleteHomeworkFileCommand, Success> deleteHomeworkFileHandler)
     {
         _createHomeworkHandler = createHomeworkHandler;
         _createGroupHomeworkHandler = createGroupHomeworkHandler;
@@ -61,6 +64,7 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
         _getStudentHomeworkHandler = getStudentHomeworkHandler;
         _getTeacherHomeworkHandler = getTeacherHomeworkHandler;
         _deleteHomeworkHandler = deleteHomeworkHandler;
+        _deleteHomeworkFileHandler = deleteHomeworkFileHandler;
     }
 
     public override async Task<V1CreateCourseHomeworkResponse> V1CreateCourseHomework(V1CreateCourseHomeworkRequest request, ServerCallContext context)
@@ -145,5 +149,12 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
         var command = request.ToDeleteHomeworkCommand();
         var commandResponse = await _deleteHomeworkHandler.ExecuteAsync(command, context.CancellationToken);
         return commandResponse.ToV1DeleteHomeworkResponse();
+    }
+
+    public override async Task<V1DeleteHomeworkFileResponse> V1DeleteHomeworkFile(V1DeleteHomeworkFileRequest request, ServerCallContext context)
+    {
+        var command = request.ToDeleteHomeworkFileCommand();
+        var commandResponse = await _deleteHomeworkFileHandler.ExecuteAsync(command, context.CancellationToken);
+        return commandResponse.ToV1DeleteHomeworkFileResponse();
     }
 }

@@ -102,4 +102,27 @@ internal sealed class HomeworkFileRepository : IHomeworkFileRepository
             cancellationToken: cancellationToken);
         await _connectionContext.Connection.ExecuteAsync(command);
     }
+
+    public async Task DeleteAsync(HomeworkId homeworkId, FileId fileId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            HomeworkId = (long)homeworkId,
+            FileId = (long)fileId
+        };
+
+        const string Query =
+            $"""
+             delete from {HomeworkFileTable.TableName}
+                   where {HomeworkFileTable.HomeworkId} = @{nameof(queryParams.HomeworkId)}
+                     and {HomeworkFileTable.FileId} = @{nameof(queryParams.FileId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        await _connectionContext.Connection.ExecuteAsync(command);
+    }
 }

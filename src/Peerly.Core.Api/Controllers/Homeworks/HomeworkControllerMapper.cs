@@ -6,6 +6,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateCourseHomework
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateGroupHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.CreateHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.DeleteHomework;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.DeleteHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.GetStudentHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.GetTeacherHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ListStudentCourseHomeworks;
@@ -310,6 +311,27 @@ internal static class HomeworkControllerMapper
                 ValidationError = validationError.ToProto<DeleteHomeworkCommand, Proto.V1DeleteHomeworkRequest>()
             },
             otherError => new Proto.V1DeleteHomeworkResponse { OtherError = otherError.ToProto() });
+    }
+
+    public static DeleteHomeworkFileCommand ToDeleteHomeworkFileCommand(this Proto.V1DeleteHomeworkFileRequest request)
+    {
+        return new DeleteHomeworkFileCommand
+        {
+            HomeworkId = new HomeworkId(request.HomeworkId),
+            FileId = new FileId(request.FileId),
+            TeacherId = new TeacherId(request.TeacherId)
+        };
+    }
+
+    public static Proto.V1DeleteHomeworkFileResponse ToV1DeleteHomeworkFileResponse(this CommandResponse<Success> commandResponse)
+    {
+        return commandResponse.Match(
+            _ => new Proto.V1DeleteHomeworkFileResponse { SuccessResponse = new Proto.V1DeleteHomeworkFileResponse.Types.Success() },
+            validationError => new Proto.V1DeleteHomeworkFileResponse
+            {
+                ValidationError = validationError.ToProto<DeleteHomeworkFileCommand, Proto.V1DeleteHomeworkFileRequest>()
+            },
+            otherError => new Proto.V1DeleteHomeworkFileResponse { OtherError = otherError.ToProto() });
     }
 
     private static Proto.File ToProto(this File file)

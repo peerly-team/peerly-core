@@ -10,7 +10,7 @@ namespace Peerly.Core.Abstractions.Repositories;
 public interface IHomeworkFileRepository : IReadOnlyHomeworkFileRepository
 {
     Task<bool> AddAsync(HomeworkFileAddItem item, CancellationToken cancellationToken);
-
+    Task DeleteAsync(HomeworkId homeworkId, FileId fileId, CancellationToken cancellationToken);
     Task DeleteByHomeworkAsync(HomeworkId homeworkId, CancellationToken cancellationToken);
 }
 
