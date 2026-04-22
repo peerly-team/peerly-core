@@ -13,6 +13,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PublishHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.UpdateDraftHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Participants.AddGroupStudent;
 using Peerly.Core.ApplicationServices.Features.V1.Participants.AddGroupTeacher;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.CorrectSubmittedHomeworkMark;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedReview;
@@ -156,6 +157,10 @@ public static class ValidationPropertyMappingConfiguration
 
         ValidationPropertyMapping
             .AddMapping<GetTeacherSubmittedHomeworkQuery, V1GetTeacherSubmittedHomeworkRequest>()
+            .Build();
+
+        ValidationPropertyMapping
+            .AddMapping<CorrectSubmittedHomeworkMarkCommand, V1CorrectSubmittedHomeworkMarkRequest>()
             .Build();
     }
 }

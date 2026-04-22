@@ -25,7 +25,7 @@ service SubmissionService {
 
   rpc V1ListSubmittedHomeworkOverview(V1ListSubmittedHomeworkOverviewRequest) returns (V1ListSubmittedHomeworkOverviewResponse);
   rpc V1GetTeacherSubmittedHomework(V1GetTeacherSubmittedHomeworkRequest) returns (V1GetTeacherSubmittedHomeworkResponse);
-  rpc V1CorrectSubmissionMark(V1CorrectSubmissionMarkRequest) returns (V1CorrectSubmissionMarkResponse);
+  rpc V1CorrectSubmittedHomeworkMark(V1CorrectSubmittedHomeworkMarkRequest) returns (V1CorrectSubmittedHomeworkMarkResponse);
 }
 
 message V1CreateSubmittedHomeworkRequest {
@@ -248,13 +248,13 @@ message V1GetTeacherSubmittedHomeworkResponse {
   google.protobuf.Int32Value teacher_mark = 5;
 }
 
-message V1CorrectSubmissionMarkRequest {
+message V1CorrectSubmittedHomeworkMarkRequest {
   int64 submitted_homework_id = 1;
   int64 teacher_id = 2;
   int32 teacher_mark = 3;
 }
 
-message V1CorrectSubmissionMarkResponse {
+message V1CorrectSubmittedHomeworkMarkResponse {
   oneof response {
     Success success_response = 1;
     ValidationError validation_error = 2;

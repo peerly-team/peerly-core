@@ -1,5 +1,6 @@
 using System;
 using OneOf.Types;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.CorrectSubmittedHomeworkMark;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedReview;
@@ -431,5 +432,29 @@ internal static class SubmissionControllerMapper
         {
             SubmittedReview = queryResponse.SubmittedReview.ToProto()
         };
+    }
+
+    public static CorrectSubmittedHomeworkMarkCommand ToCorrectSubmittedHomeworkMarkCommand(this Proto.V1CorrectSubmittedHomeworkMarkRequest request)
+    {
+        return new CorrectSubmittedHomeworkMarkCommand
+        {
+            SubmittedHomeworkId = new SubmittedHomeworkId(request.SubmittedHomeworkId),
+            TeacherId = new TeacherId(request.TeacherId),
+            TeacherMark = request.TeacherMark
+        };
+    }
+
+    public static Proto.V1CorrectSubmittedHomeworkMarkResponse ToV1CorrectSubmittedHomeworkMarkResponse(this CommandResponse<Success> commandResponse)
+    {
+        return commandResponse.Match(
+            _ => new Proto.V1CorrectSubmittedHomeworkMarkResponse
+            {
+                SuccessResponse = new Proto.V1CorrectSubmittedHomeworkMarkResponse.Types.Success()
+            },
+            validationError => new Proto.V1CorrectSubmittedHomeworkMarkResponse
+            {
+                ValidationError = validationError.ToProto<CorrectSubmittedHomeworkMarkCommand, Proto.V1CorrectSubmittedHomeworkMarkRequest>()
+            },
+            otherError => new Proto.V1CorrectSubmittedHomeworkMarkResponse { OtherError = otherError.ToProto() });
     }
 }
