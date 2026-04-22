@@ -12,6 +12,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedRev
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetAssignedReview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetSubmittedReview;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetTeacherSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.ListAssignedReviews;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.ListSubmittedHomeworkOverview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedHomework;
@@ -36,6 +37,7 @@ public sealed class SubmissionController : SubmissionService.SubmissionServiceBa
     private readonly ICommandHandler<UpdateSubmittedReviewCommand, Success> _updateSubmittedReviewHandler;
     private readonly ICommandHandler<DeleteSubmittedReviewCommand, Success> _deleteSubmittedReviewHandler;
     private readonly IQueryHandler<GetSubmittedReviewQuery, GetSubmittedReviewQueryResponse> _getSubmittedReviewHandler;
+    private readonly IQueryHandler<GetTeacherSubmittedHomeworkQuery, GetTeacherSubmittedHomeworkQueryResponse> _getTeacherSubmittedHomeworkHandler;
 
     public SubmissionController(
         ICommandHandler<CreateSubmittedHomeworkCommand, CreateSubmittedHomeworkCommandResponse> createSubmittedHomeworkHandler,
@@ -50,7 +52,8 @@ public sealed class SubmissionController : SubmissionService.SubmissionServiceBa
         IQueryHandler<GetAssignedReviewQuery, GetAssignedReviewQueryResponse> getAssignedReviewHandler,
         ICommandHandler<UpdateSubmittedReviewCommand, Success> updateSubmittedReviewHandler,
         ICommandHandler<DeleteSubmittedReviewCommand, Success> deleteSubmittedReviewHandler,
-        IQueryHandler<GetSubmittedReviewQuery, GetSubmittedReviewQueryResponse> getSubmittedReviewHandler)
+        IQueryHandler<GetSubmittedReviewQuery, GetSubmittedReviewQueryResponse> getSubmittedReviewHandler,
+        IQueryHandler<GetTeacherSubmittedHomeworkQuery, GetTeacherSubmittedHomeworkQueryResponse> getTeacherSubmittedHomeworkHandler)
     {
         _createSubmittedHomeworkHandler = createSubmittedHomeworkHandler;
         _createSubmittedHomeworkFileHandler = createSubmittedHomeworkFileHandler;
@@ -65,6 +68,7 @@ public sealed class SubmissionController : SubmissionService.SubmissionServiceBa
         _updateSubmittedReviewHandler = updateSubmittedReviewHandler;
         _deleteSubmittedReviewHandler = deleteSubmittedReviewHandler;
         _getSubmittedReviewHandler = getSubmittedReviewHandler;
+        _getTeacherSubmittedHomeworkHandler = getTeacherSubmittedHomeworkHandler;
     }
 
     public override async Task<V1CreateSubmittedHomeworkResponse> V1CreateSubmittedHomework(
@@ -180,5 +184,14 @@ public sealed class SubmissionController : SubmissionService.SubmissionServiceBa
         var query = request.ToGetSubmittedReviewQuery();
         var queryResponse = await _getSubmittedReviewHandler.ExecuteAsync(query, context.CancellationToken);
         return queryResponse.ToV1GetSubmittedReviewResponse();
+    }
+
+    public override async Task<V1GetTeacherSubmittedHomeworkResponse> V1GetTeacherSubmittedHomework(
+        V1GetTeacherSubmittedHomeworkRequest request,
+        ServerCallContext context)
+    {
+        var query = request.ToGetTeacherSubmittedHomeworkQuery();
+        var queryResponse = await _getTeacherSubmittedHomeworkHandler.ExecuteAsync(query, context.CancellationToken);
+        return queryResponse.ToV1GetTeacherSubmittedHomeworkResponse();
     }
 }

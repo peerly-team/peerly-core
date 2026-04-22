@@ -9,6 +9,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedRev
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetAssignedReview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetSubmittedReview;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetTeacherSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.ListAssignedReviews;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.ListSubmittedHomeworkOverview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedHomework;
@@ -254,21 +255,15 @@ internal static class SubmissionControllerMapper
 
     private static Proto.V1ListSubmittedHomeworkOverviewResponse.Types.SubmittedHomeworkOverview ToProto(this SubmittedHomeworkOverview overview)
     {
-        var proto = new Proto.V1ListSubmittedHomeworkOverviewResponse.Types.SubmittedHomeworkOverview
+        return new Proto.V1ListSubmittedHomeworkOverviewResponse.Types.SubmittedHomeworkOverview
         {
             Id = (long)overview.SubmittedHomeworkId,
             Student = overview.Student.ToProto(),
             ReviewCount = overview.ReviewCount,
             ReviewersMark = overview.ReviewersMark,
-            HasDiscrepancy = overview.HasDiscrepancy
+            HasDiscrepancy = overview.HasDiscrepancy,
+            TeacherMark = overview.TeacherMark
         };
-
-        if (overview.TeacherMark is { } teacherMark)
-        {
-            proto.TeacherMark = teacherMark;
-        }
-
-        return proto;
     }
 
     private static Proto.StudentInfo ToProto(this Student student)
@@ -306,6 +301,42 @@ internal static class SubmissionControllerMapper
         }
 
         return new Proto.V1GetAssignedReviewResponse { Submission = submission };
+    }
+
+    public static GetTeacherSubmittedHomeworkQuery ToGetTeacherSubmittedHomeworkQuery(this Proto.V1GetTeacherSubmittedHomeworkRequest request)
+    {
+        return new GetTeacherSubmittedHomeworkQuery
+        {
+            SubmittedHomeworkId = new SubmittedHomeworkId(request.SubmittedHomeworkId),
+            TeacherId = new TeacherId(request.TeacherId)
+        };
+    }
+
+    public static Proto.V1GetTeacherSubmittedHomeworkResponse ToV1GetTeacherSubmittedHomeworkResponse(
+        this GetTeacherSubmittedHomeworkQueryResponse queryResponse)
+    {
+        return new Proto.V1GetTeacherSubmittedHomeworkResponse
+        {
+            SubmittedHomework = new Proto.SubmittedHomeworkInfo
+            {
+                Id = (long)queryResponse.SubmittedHomework.Id,
+                Comment = queryResponse.SubmittedHomework.Comment,
+                Files = { queryResponse.Files.ToArrayBy(file => file.ToProto()) }
+            },
+            Student = queryResponse.Student.ToProto(),
+            SubmittedReviews = { queryResponse.SubmittedReviews.ToArrayBy(review => review.ToProto()) },
+            ReviewersMark = queryResponse.ReviewersMark,
+            TeacherMark = queryResponse.TeacherMark
+        };
+    }
+
+    private static Proto.TeacherSubmittedReviewInfo ToProto(this TeacherSubmittedReview teacherSubmittedReview)
+    {
+        return new Proto.TeacherSubmittedReviewInfo
+        {
+            SubmittedReview = teacherSubmittedReview.Review.ToProto(),
+            Reviewer = teacherSubmittedReview.Reviewer.ToProto()
+        };
     }
 
     public static DeleteSubmittedReviewCommand ToDeleteSubmittedReviewCommand(this Proto.V1DeleteSubmittedReviewRequest request)

@@ -22,6 +22,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedRev
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetAssignedReview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetSubmittedReview;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetTeacherSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.ListAssignedReviews;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.ListSubmittedHomeworkOverview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedHomework;
@@ -151,6 +152,10 @@ public static class ValidationPropertyMappingConfiguration
 
         ValidationPropertyMapping
             .AddMapping<GetSubmittedReviewQuery, V1GetSubmittedReviewRequest>()
+            .Build();
+
+        ValidationPropertyMapping
+            .AddMapping<GetTeacherSubmittedHomeworkQuery, V1GetTeacherSubmittedHomeworkRequest>()
             .Build();
     }
 }
