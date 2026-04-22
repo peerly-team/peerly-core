@@ -50,6 +50,7 @@ public class UnitOfWorkInstaller : IInstaller
                 Database = opt.Database,
                 Username = opt.UserName,
                 Password = opt.Password,
+                SslMode = opt.SslMode,
                 Pooling = true,
             };
 
