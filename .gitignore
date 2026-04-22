@@ -88,7 +88,7 @@ StyleCopReport.xml
 *.vssscc
 .builds
 *.pidb
-*.svclog
+*.svcl1/og
 *.scc
 
 # Chutzpah Test files
@@ -431,6 +431,7 @@ $RECYCLE.BIN/
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+/docs/
 
 # Local developer overrides (never commit)
 **/appsettings.Local.json

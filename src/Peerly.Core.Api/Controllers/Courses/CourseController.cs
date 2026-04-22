@@ -21,7 +21,7 @@ public sealed class CourseController : CourseService.CourseServiceBase
     private readonly IQueryHandler<SearchCoursesQuery, SearchCoursesQueryResponse> _searchCoursesHandler;
     private readonly IQueryHandler<SearchStudentCoursesQuery, SearchStudentCoursesQueryResponse> _searchStudentCoursesHandler;
     private readonly IQueryHandler<SearchTeacherCoursesQuery, SearchTeacherCoursesQueryResponse> _searchTeacherCoursesHandler;
-    private readonly ICommandHandler<CreateCourseCommand, Success> _createCourseHandler;
+    private readonly ICommandHandler<CreateCourseCommand, CreateCourseCommandResponse> _createCourseHandler;
     private readonly ICommandHandler<DeleteCourseCommand, Success> _deleteCourseHandler;
     private readonly ICommandHandler<UpdateCourseCommand, Success> _updateCourseHandler;
     private readonly IQueryHandler<GetTeacherCourseQuery, GetTeacherCourseQueryResponse> _getTeacherCourseHandler;
@@ -31,7 +31,7 @@ public sealed class CourseController : CourseService.CourseServiceBase
         IQueryHandler<SearchCoursesQuery, SearchCoursesQueryResponse> searchCoursesHandler,
         IQueryHandler<SearchStudentCoursesQuery, SearchStudentCoursesQueryResponse> searchStudentCoursesHandler,
         IQueryHandler<SearchTeacherCoursesQuery, SearchTeacherCoursesQueryResponse> searchTeacherCoursesHandler,
-        ICommandHandler<CreateCourseCommand, Success> createCourseHandler,
+        ICommandHandler<CreateCourseCommand, CreateCourseCommandResponse> createCourseHandler,
         ICommandHandler<DeleteCourseCommand, Success> deleteCourseHandler,
         ICommandHandler<UpdateCourseCommand, Success> updateCourseHandler,
         IQueryHandler<GetTeacherCourseQuery, GetTeacherCourseQueryResponse> getTeacherCourseHandler,
@@ -64,8 +64,8 @@ public sealed class CourseController : CourseService.CourseServiceBase
     public override async Task<V1CreateCourseResponse> V1CreateCourse(V1CreateCourseRequest request, ServerCallContext context)
     {
         var command = request.ToCreateCourseCommand();
-        var responseCommand = await _createCourseHandler.ExecuteAsync(command, context.CancellationToken);
-        return responseCommand.ToV1CreateCourseResponse();
+        var commandResponse = await _createCourseHandler.ExecuteAsync(command, context.CancellationToken);
+        return commandResponse.ToV1CreateCourseResponse();
     }
 
     public override async Task<V1SearchCoursesResponse> V1SearchCourses(V1SearchCoursesRequest request, ServerCallContext context)

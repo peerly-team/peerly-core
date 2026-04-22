@@ -7,7 +7,11 @@
     <!-- Third-party packages -->
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+    <PackageReference Include="Quartz" />
+    <PackageReference Include="Quartz.Extensions.Hosting" />
     <PackageReference Include="Scrutor" />
     <PackageReference Include="OneOf" />
+    <PackageReference Include="UTF.Unknown" />
   </ItemGroup>
 </Project>

@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+package peerly.core.v1;
+
+import "peerly/core/v1/common.proto";
+
+option csharp_namespace = "Peerly.Core.V1.Proto";
+
+service GroupService {
+  rpc V1GetTeacherGroup(V1GetTeacherGroupRequest) returns (V1GetTeacherGroupResponse);
+  rpc V1GetStudentGroup(V1GetStudentGroupRequest) returns (V1GetStudentGroupResponse);
+  rpc V1CreateGroup(V1CreateGroupRequest) returns (V1CreateGroupResponse);
+  rpc V1UpdateGroup(V1UpdateGroupRequest) returns (V1UpdateGroupResponse);
+  rpc V1DeleteGroup(V1DeleteGroupRequest) returns (V1DeleteGroupResponse);
+  rpc V1ListTeacherCourseGroups(V1ListTeacherCourseGroupsRequest) returns (V1ListTeacherCourseGroupsResponse);
+  rpc V1ListStudentCourseGroups(V1ListStudentCourseGroupsRequest) returns (V1ListStudentCourseGroupsResponse);
+}
+
+message V1GetTeacherGroupRequest {
+  int64 group_id = 1;
+  int64 teacher_id = 2;
+}
+
+message V1GetTeacherGroupResponse {
+  GroupInfo group_info = 1;
+}
+
+message V1GetStudentGroupRequest {
+  int64 group_id = 1;
+  int64 student_id = 2;
+}
+
+message V1GetStudentGroupResponse {
+  GroupInfo group_info = 1;
+}
+
+message V1CreateGroupRequest {
+  int64 course_id = 1;
+  string name = 2;
+  int64 teacher_id = 3;
+}
+
+message V1CreateGroupResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {
+    int64 group_id = 1;
+  }
+}
+
+message V1ListTeacherCourseGroupsRequest {
+  int64 course_id = 1;
+  int64 teacher_id = 2;
+}
+
+message V1ListTeacherCourseGroupsResponse {
+  repeated GroupInfo group_infos = 1;
+}
+
+message V1ListStudentCourseGroupsRequest {
+  int64 course_id = 1;
+  int64 student_id = 2;
+}
+
+message V1ListStudentCourseGroupsResponse {
+  repeated GroupInfo group_infos = 1;
+}
+
+message V1UpdateGroupRequest {
+  int64 group_id = 1;
+  int64 teacher_id = 2;
+  string name = 3;
+}
+
+message V1UpdateGroupResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}
+
+message V1DeleteGroupRequest {
+  int64 group_id = 1;
+  int64 teacher_id = 2;
+}
+
+message V1DeleteGroupResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}

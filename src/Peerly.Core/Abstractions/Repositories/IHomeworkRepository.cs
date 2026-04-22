@@ -15,10 +15,13 @@ public interface IHomeworkRepository : IReadOnlyHomeworkRepository
         HomeworkId homeworkId,
         Action<IUpdateBuilder<HomeworkUpdateItem>> configureUpdate,
         CancellationToken cancellationToken);
+
+    Task DeleteAsync(HomeworkId homeworkId, CancellationToken cancellationToken);
 }
 
 public interface IReadOnlyHomeworkRepository
 {
+    Task<Homework?> GetAsync(HomeworkId homeworkId, CancellationToken cancellationToken);
     Task<int> GetHomeworkCountAsync(CourseId courseId, CancellationToken cancellationToken);
     Task<IReadOnlyCollection<Homework>> ListAsync(HomeworkFilter filter, CancellationToken cancellationToken);
 }

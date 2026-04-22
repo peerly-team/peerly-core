@@ -6,19 +6,14 @@ namespace Peerly.Core.Persistence.Repositories.Files;
 
 internal static class FileRepositoryMapper
 {
-    public static File? ToFile(this FileDb? fileDb)
+    public static File ToFile(this FileDb db)
     {
-        if (fileDb is null)
-        {
-            return null;
-        }
-
         return new File
         {
-            Id = new FileId(fileDb.Id),
-            StorageId = (StorageId)fileDb.StorageId,
-            Name = fileDb.Name,
-            Size = fileDb.Size
+            Id = new FileId(db.Id),
+            StorageId = (StorageId)db.StorageId,
+            Name = db.Name,
+            Size = db.Size
         };
     }
 }

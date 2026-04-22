@@ -22,9 +22,8 @@ internal sealed class DeleteCourseHandler : ICommandHandler<DeleteCourseCommand,
     {
         await using var unitOfWork = await _commonUnitOfWorkFactory.CreateAsync(cancellationToken);
 
-        var courseTeacherExistsItem = command.ToCourseTeacherExistsItem();
-        var isCourseTeacherExists = await unitOfWork.CourseTeacherRepository.ExistsAsync(courseTeacherExistsItem, cancellationToken);
-        if (!isCourseTeacherExists)
+        var courseTeacher = command.ToCourseTeacher();
+        if (!await unitOfWork.CourseTeacherRepository.ExistsAsync(courseTeacher, cancellationToken))
         {
             return OtherError.PermissionDenied();
         }

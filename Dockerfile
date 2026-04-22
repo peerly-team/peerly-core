@@ -16,6 +16,7 @@ COPY src/Peerly.Core.Api/Peerly.Core.Api.csproj                                 
 COPY src/Peerly.Core.ApplicationServices/Peerly.Core.ApplicationServices.csproj src/Peerly.Core.ApplicationServices/
 COPY src/Peerly.Core.FileStorage/Peerly.Core.FileStorage.csproj                 src/Peerly.Core.FileStorage/
 COPY src/Peerly.Core.Hosting/Peerly.Core.Hosting.csproj                         src/Peerly.Core.Hosting/
+COPY src/Peerly.Core.Messaging/Peerly.Core.Messaging.csproj                     src/Peerly.Core.Messaging/
 COPY src/Peerly.Core.Persistence/Peerly.Core.Persistence.csproj                 src/Peerly.Core.Persistence/
 COPY src/Peerly.Core.Tools/Peerly.Core.Tools.csproj                             src/Peerly.Core.Tools/
 
