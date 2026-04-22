@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Homeworks;
 using Peerly.Core.Models.Submissions;
-using SubmittedHomeworkStudent = Peerly.Core.Models.Homeworks.SubmittedHomeworkStudent;
 
 namespace Peerly.Core.Abstractions.Repositories;
 

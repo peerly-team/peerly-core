@@ -12,7 +12,6 @@ using Peerly.Core.Persistence.Repositories.SubmittedHomeworks.Models;
 using Peerly.Core.Persistence.UnitOfWork;
 using Peerly.Core.Tools;
 using static Peerly.Core.Persistence.Schemas.PeerlyCommonScheme;
-using SubmittedHomeworkStudent = Peerly.Core.Models.Homeworks.SubmittedHomeworkStudent;
 
 namespace Peerly.Core.Persistence.Repositories.SubmittedHomeworks;
 

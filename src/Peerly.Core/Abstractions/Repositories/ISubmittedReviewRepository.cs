@@ -24,10 +24,7 @@ public interface IReadOnlySubmittedReviewRepository
     Task<SubmittedReview?> GetAsync(SubmittedReviewId submittedReviewId, CancellationToken cancellationToken);
     Task<SubmittedReviewId?> GetIdAsync(SubmittedHomeworkStudent submittedHomeworkStudent, CancellationToken cancellationToken);
     Task<bool> ExistsAsync(SubmittedHomeworkStudent submittedHomeworkStudent, CancellationToken cancellationToken);
-
-    Task<IReadOnlyCollection<SubmittedHomeworkReviewerMark>> ListSubmittedReviewMarksAsync(
-        HomeworkId homeworkId,
-        CancellationToken cancellationToken);
+    Task<IReadOnlyCollection<SubmittedHomeworkReviewerMark>> ListSubmittedReviewMarksAsync(HomeworkId homeworkId, CancellationToken cancellationToken);
 
     Task<IReadOnlyCollection<SubmittedReview>> ListBySubmittedHomeworkAsync(
         SubmittedHomeworkId submittedHomeworkId,

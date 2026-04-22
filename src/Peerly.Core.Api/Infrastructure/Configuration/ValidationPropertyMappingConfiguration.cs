@@ -23,6 +23,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetAssignedReview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetSubmittedReview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.ListAssignedReviews;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.ListSubmittedHomeworkOverview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedReview;
 using Peerly.Core.V1;
@@ -130,6 +131,10 @@ public static class ValidationPropertyMappingConfiguration
 
         ValidationPropertyMapping
             .AddMapping<ListAssignedReviewsQuery, V1ListAssignedReviewsRequest>()
+            .Build();
+
+        ValidationPropertyMapping
+            .AddMapping<ListSubmittedHomeworkOverviewQuery, V1ListSubmittedHomeworkOverviewRequest>()
             .Build();
 
         ValidationPropertyMapping

@@ -1,7 +1,6 @@
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Submissions;
 using Peerly.Core.Persistence.Repositories.SubmittedHomeworks.Models;
-using SubmittedHomeworkStudent = Peerly.Core.Models.Homeworks.SubmittedHomeworkStudent;
 
 namespace Peerly.Core.Persistence.Repositories.SubmittedHomeworks;
 

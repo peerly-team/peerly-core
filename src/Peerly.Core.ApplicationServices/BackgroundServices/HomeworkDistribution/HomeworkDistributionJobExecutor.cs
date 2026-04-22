@@ -13,6 +13,7 @@ using Peerly.Core.Models.BackgroundService;
 using Peerly.Core.Models.BackgroundService.HomeworkDistributions;
 using Peerly.Core.Models.BackgroundService.ReviewCompletions;
 using Peerly.Core.Models.Homeworks;
+using Peerly.Core.Models.Submissions;
 
 namespace Peerly.Core.ApplicationServices.BackgroundServices.HomeworkDistribution;
 

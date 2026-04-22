@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Peerly.Core.Models.Homeworks;
+using Peerly.Core.Models.Submissions;
 
 namespace Peerly.Core.ApplicationServices.BackgroundServices.HomeworkDistribution.Abstractions;
 

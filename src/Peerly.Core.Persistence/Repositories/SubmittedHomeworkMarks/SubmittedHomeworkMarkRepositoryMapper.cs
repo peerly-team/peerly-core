@@ -1,3 +1,4 @@
+using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Submissions;
 using Peerly.Core.Persistence.Repositories.SubmittedHomeworkMarks.Models;
 
@@ -9,6 +10,7 @@ internal static class SubmittedHomeworkMarkRepositoryMapper
     {
         return new SubmittedHomeworkMark
         {
+            SubmittedHomeworkId = new SubmittedHomeworkId(db.SubmittedHomeworkId),
             ReviewersMark = db.ReviewersMark,
             TeacherMark = db.TeacherMark,
             HasDiscrepancy = db.HasDiscrepancy

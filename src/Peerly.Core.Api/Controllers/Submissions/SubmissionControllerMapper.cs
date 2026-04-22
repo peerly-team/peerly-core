@@ -10,11 +10,13 @@ using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetAssignedReview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetSubmittedReview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.ListAssignedReviews;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.ListSubmittedHomeworkOverview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedReview;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Files;
+using Peerly.Core.Models.Students;
 using Peerly.Core.Models.Submissions;
 using Peerly.Core.Tools;
 using Proto = Peerly.Core.V1;
@@ -229,6 +231,53 @@ internal static class SubmissionControllerMapper
             SubmittedHomeworkId = (long)item.SubmittedHomeworkId,
             HomeworkName = item.HomeworkName,
             IsReviewed = item.IsReviewed
+        };
+    }
+
+    public static ListSubmittedHomeworkOverviewQuery ToListSubmittedHomeworkOverviewQuery(this Proto.V1ListSubmittedHomeworkOverviewRequest request)
+    {
+        return new ListSubmittedHomeworkOverviewQuery
+        {
+            HomeworkId = new HomeworkId(request.HomeworkId),
+            TeacherId = new TeacherId(request.TeacherId)
+        };
+    }
+
+    public static Proto.V1ListSubmittedHomeworkOverviewResponse ToV1ListSubmittedHomeworkOverviewResponse(
+        this ListSubmittedHomeworkOverviewQueryResponse queryResponse)
+    {
+        return new Proto.V1ListSubmittedHomeworkOverviewResponse
+        {
+            SubmittedHomeworkResults = { queryResponse.SubmittedHomeworkOverviews.ToArrayBy(overview => overview.ToProto()) }
+        };
+    }
+
+    private static Proto.V1ListSubmittedHomeworkOverviewResponse.Types.SubmittedHomeworkOverview ToProto(this SubmittedHomeworkOverview overview)
+    {
+        var proto = new Proto.V1ListSubmittedHomeworkOverviewResponse.Types.SubmittedHomeworkOverview
+        {
+            Id = (long)overview.SubmittedHomeworkId,
+            Student = overview.Student.ToProto(),
+            ReviewCount = overview.ReviewCount,
+            ReviewersMark = overview.ReviewersMark,
+            HasDiscrepancy = overview.HasDiscrepancy
+        };
+
+        if (overview.TeacherMark is { } teacherMark)
+        {
+            proto.TeacherMark = teacherMark;
+        }
+
+        return proto;
+    }
+
+    private static Proto.StudentInfo ToProto(this Student student)
+    {
+        return new Proto.StudentInfo
+        {
+            StudentId = (long)student.Id,
+            Email = student.Email,
+            Name = student.Name ?? string.Empty
         };
     }
 
