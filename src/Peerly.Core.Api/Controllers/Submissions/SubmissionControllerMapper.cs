@@ -168,7 +168,7 @@ internal static class SubmissionControllerMapper
     {
         var response = new Proto.V1GetSubmittedHomeworkResponse
         {
-            SubmittedHomework = new Proto.V1GetSubmittedHomeworkResponse.Types.SubmittedHomeworkInfo
+            SubmittedHomework = new Proto.SubmittedHomeworkInfo
             {
                 Id = (long)queryResponse.SubmittedHomework.Id,
                 Comment = queryResponse.SubmittedHomework.Comment,

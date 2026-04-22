@@ -23,11 +23,9 @@ service SubmissionService {
   rpc V1DeleteSubmittedReview(V1DeleteSubmittedReviewRequest) returns (V1DeleteSubmittedReviewResponse);
   rpc V1GetSubmittedReview(V1GetSubmittedReviewRequest) returns (V1GetSubmittedReviewResponse);
 
-  rpc V1ListSubmissionResults(V1ListSubmissionResultsRequest) returns (V1ListSubmissionResultsResponse);
-  rpc V1GetTeacherSubmissionDetail(V1GetTeacherSubmissionDetailRequest) returns (V1GetTeacherSubmissionDetailResponse);
+  rpc V1ListSubmittedHomeworkOverview(V1ListSubmittedHomeworkOverviewRequest) returns (V1ListSubmittedHomeworkOverviewResponse);
+  rpc V1GetTeacherSubmittedHomework(V1GetTeacherSubmittedHomeworkRequest) returns (V1GetTeacherSubmittedHomeworkResponse);
   rpc V1CorrectSubmissionMark(V1CorrectSubmissionMarkRequest) returns (V1CorrectSubmissionMarkResponse);
-
-  rpc V1ListSubmittedHomeworks(V1ListSubmittedHomeworksRequest) returns (V1ListSubmittedHomeworksResponse);
 }
 
 message V1CreateSubmittedHomeworkRequest {
@@ -124,12 +122,6 @@ message V1GetSubmittedHomeworkResponse {
   SubmittedHomeworkInfo submitted_homework = 1;
   repeated SubmittedReviewInfo submitted_reviews = 2;
   optional int32 final_mark = 3;
-
-  message SubmittedHomeworkInfo {
-    int64 id = 1;
-    string comment = 2;
-    repeated File files = 3;
-  }
 }
 
 message V1ListAssignedReviewsRequest {
@@ -225,40 +217,35 @@ message V1GetSubmittedReviewResponse {
   SubmittedReviewInfo submitted_review = 1;
 }
 
-message V1ListSubmissionResultsRequest {
+message V1ListSubmittedHomeworkOverviewRequest {
   int64 homework_id = 1;
   int64 teacher_id = 2;
 }
 
-message V1ListSubmissionResultsResponse {
-  repeated SubmissionResult submission_results = 1;
+message V1ListSubmittedHomeworkOverviewResponse {
+  repeated SubmittedHomeworkOverview submitted_homework_results = 1;
 
-  message SubmissionResult {
-    int64 submitted_homework_id = 1;
+  message SubmittedHomeworkOverview {
+    int64 id = 1;
     StudentInfo student = 2;
-    repeated TeacherReview reviews = 3;
-    google.protobuf.Int32Value average_mark = 4;
-    google.protobuf.Int32Value final_mark = 5;
-    bool has_discrepancy = 6;
+    int32 review_count = 3;
+    int32 reviewers_mark = 4;
+    bool has_discrepancy = 5;
+    google.protobuf.Int32Value teacher_mark = 6;
   }
 }
 
-message V1GetTeacherSubmissionDetailRequest {
+message V1GetTeacherSubmittedHomeworkRequest {
   int64 submitted_homework_id = 1;
   int64 teacher_id = 2;
 }
 
-message V1GetTeacherSubmissionDetailResponse {
-  TeacherSubmissionDetail submission = 1;
-
-  message TeacherSubmissionDetail {
-    int64 submitted_homework_id = 1;
-    StudentInfo student = 2;
-    string comment = 3;
-    repeated File files = 4;
-    repeated TeacherReview reviews = 5;
-    google.protobuf.Int32Value final_mark = 6;
-  }
+message V1GetTeacherSubmittedHomeworkResponse {
+  SubmittedHomeworkInfo submitted_homework = 1;
+  StudentInfo student = 2;
+  repeated TeacherSubmittedReviewInfo submitted_reviews = 3;
+  int32 reviewers_mark = 4;
+  google.protobuf.Int32Value teacher_mark = 5;
 }
 
 message V1CorrectSubmissionMarkRequest {
@@ -275,21 +262,4 @@ message V1CorrectSubmissionMarkResponse {
   }
 
   message Success {}
-}
-
-message V1ListSubmittedHomeworksRequest {
-  int64 homework_id = 1;
-  int64 teacher_id = 2;
-}
-
-message V1ListSubmittedHomeworksResponse {
-  repeated SubmittedHomeworkOverview submitted_homeworks = 1;
-
-  message SubmittedHomeworkOverview {
-    int64 id = 1;
-    StudentInfo student = 2;
-    int32 final_mark = 3;
-    int32 review_count = 4;
-    bool has_discrepancy = 5;
-  }
 }
