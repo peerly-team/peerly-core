@@ -155,10 +155,12 @@ jobs:
           revision-service-account-id: ${{ secrets.RUNTIME_SA_ID_STAGE }}
           revision-memory: 256Mb
           revision-execution-timeout: 30
+          revision-network-id: enp52gi9aekt8lq1ptmr
           revision-env: |
             ASPNETCORE_ENVIRONMENT=Staging
             ConnectionFactoryOptions__MasterHost=${{ secrets.PG_HOST_STAGE }}
             CephOptions__BucketName=peerly-files-stage
+            KafkaConsumer__BootstrapServers=10.20.0.11:9092
           revision-secrets: |
             ConnectionFactoryOptions__Password=${{ secrets.SECRETS_STORE_ID_STAGE }}/${{ steps.lockbox.outputs.version }}/db_password
             Ceph__AccessKey=${{ secrets.SECRETS_STORE_ID_STAGE }}/${{ steps.lockbox.outputs.version }}/s3_access_key
@@ -217,10 +219,12 @@ jobs:
           revision-service-account-id: ${{ secrets.RUNTIME_SA_ID }}
           revision-memory: 256Mb
           revision-execution-timeout: 30
+          revision-network-id: enpv2cm80vb02lp76dmi
           revision-env: |
             ASPNETCORE_ENVIRONMENT=Production
             ConnectionFactoryOptions__MasterHost=${{ secrets.PG_HOST }}
             CephOptions__BucketName=peerly-files-prod
+            KafkaConsumer__BootstrapServers=10.10.0.10:9092
           revision-secrets: |
             ConnectionFactoryOptions__Password=${{ secrets.SECRETS_STORE_ID }}/${{ steps.lockbox.outputs.version }}/db_password
             Ceph__AccessKey=${{ secrets.SECRETS_STORE_ID }}/${{ steps.lockbox.outputs.version }}/s3_access_key
