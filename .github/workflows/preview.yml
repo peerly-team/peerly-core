@@ -137,9 +137,11 @@ jobs:
           revision-service-account-id: ${{ secrets.RUNTIME_SA_ID_STAGE }}
           revision-memory: 256Mb
           revision-execution-timeout: 30
+          revision-network-id: enp52gi9aekt8lq1ptmr
           revision-env: |
             ASPNETCORE_ENVIRONMENT=Staging
             ConnectionFactoryOptions__MasterHost=${{ secrets.PG_HOST_STAGE }}
+            KafkaConsumer__BootstrapServers=10.20.0.11:9092
           revision-secrets: |
             ConnectionFactoryOptions__Password=${{ secrets.SECRETS_STORE_ID_STAGE }}/${{ steps.lockbox.outputs.version }}/db_password
 

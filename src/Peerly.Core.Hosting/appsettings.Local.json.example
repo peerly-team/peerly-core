@@ -13,5 +13,8 @@
     "UserName": "peerly-core-user",
     "Password": "pwd",
     "SslMode": "Disable"
+  },
+  "KafkaConsumer": {
+    "BootstrapServers": "localhost:9092"
   }
 }
