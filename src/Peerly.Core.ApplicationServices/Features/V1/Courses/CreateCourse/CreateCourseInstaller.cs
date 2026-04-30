@@ -10,6 +10,6 @@ internal sealed class CreateCourseInstaller : IInstaller
 {
     public void InstallServices(IServiceCollection services)
     {
-        services.AddScoped<ICommandValidator<CreateCourseCommand>, CreateCourseValidator>();
+        services.AddScoped<ICommandValidator<CreateCourseCommand>, CreateCourseCommandValidator>();
     }
 }

@@ -7,11 +7,11 @@ using Peerly.Core.ApplicationServices.Models.Common;
 
 namespace Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourse;
 
-internal sealed class CreateCourseValidator : ICommandValidator<CreateCourseCommand>
+internal sealed class CreateCourseCommandValidator : ICommandValidator<CreateCourseCommand>
 {
     private readonly ICommonUnitOfWorkFactory _unitOfWorkFactory;
 
-    public CreateCourseValidator(ICommonUnitOfWorkFactory unitOfWorkFactory)
+    public CreateCourseCommandValidator(ICommonUnitOfWorkFactory unitOfWorkFactory)
     {
         _unitOfWorkFactory = unitOfWorkFactory;
     }
