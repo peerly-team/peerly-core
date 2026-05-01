@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peerly.Core.Tools", "src\Pe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peerly.Core.Messaging", "src\Peerly.Core.Messaging\Peerly.Core.Messaging.csproj", "{8A34D9DB-9618-47FE-9F5A-776270238B06}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peerly.Core.IntegrationTests", "tests\Peerly.Core.IntegrationTests\Peerly.Core.IntegrationTests.csproj", "{8EC3CDF8-CB54-4EA4-B73A-F08AC5812D08}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -151,6 +153,18 @@ Global
 		{8A34D9DB-9618-47FE-9F5A-776270238B06}.Release|x64.Build.0 = Release|Any CPU
 		{8A34D9DB-9618-47FE-9F5A-776270238B06}.Release|x86.ActiveCfg = Release|Any CPU
 		{8A34D9DB-9618-47FE-9F5A-776270238B06}.Release|x86.Build.0 = Release|Any CPU
+		{8EC3CDF8-CB54-4EA4-B73A-F08AC5812D08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EC3CDF8-CB54-4EA4-B73A-F08AC5812D08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EC3CDF8-CB54-4EA4-B73A-F08AC5812D08}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8EC3CDF8-CB54-4EA4-B73A-F08AC5812D08}.Debug|x64.Build.0 = Debug|Any CPU
+		{8EC3CDF8-CB54-4EA4-B73A-F08AC5812D08}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8EC3CDF8-CB54-4EA4-B73A-F08AC5812D08}.Debug|x86.Build.0 = Debug|Any CPU
+		{8EC3CDF8-CB54-4EA4-B73A-F08AC5812D08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EC3CDF8-CB54-4EA4-B73A-F08AC5812D08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EC3CDF8-CB54-4EA4-B73A-F08AC5812D08}.Release|x64.ActiveCfg = Release|Any CPU
+		{8EC3CDF8-CB54-4EA4-B73A-F08AC5812D08}.Release|x64.Build.0 = Release|Any CPU
+		{8EC3CDF8-CB54-4EA4-B73A-F08AC5812D08}.Release|x86.ActiveCfg = Release|Any CPU
+		{8EC3CDF8-CB54-4EA4-B73A-F08AC5812D08}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -165,5 +179,6 @@ Global
 		{74BCC7AE-E930-41F2-B28E-115A462F6CF0} = {CBB1784E-116B-4038-A9D9-6130DADD9966}
 		{7DFB7605-0306-420B-ADD6-DC98BC097906} = {CBB1784E-116B-4038-A9D9-6130DADD9966}
 		{8A34D9DB-9618-47FE-9F5A-776270238B06} = {CBB1784E-116B-4038-A9D9-6130DADD9966}
+		{8EC3CDF8-CB54-4EA4-B73A-F08AC5812D08} = {C28C0360-217F-4764-9465-EA56F3BA0B3B}
 	EndGlobalSection
 EndGlobal
