@@ -1,37 +1,38 @@
-using Peerly.Core.Abstractions.ApplicationServices;
-using Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourse.Abstractions;
+using System;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Courses;
+using Peerly.Core.Models.Teachers;
 
 namespace Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourse;
 
-internal sealed class CreateCourseHandlerMapper : ICreateCourseHandlerMapper
+internal static class CreateCourseHandlerMapper
 {
-    private readonly IClock _clock;
-
-    public CreateCourseHandlerMapper(IClock clock)
-    {
-        _clock = clock;
-    }
-
-    public CourseTeacherAddItem ToCourseTeacherAddItem(CreateCourseCommand command, CourseId courseId)
+    public static CourseTeacherAddItem ToCourseTeacherAddItem(this CreateCourseCommand command, CourseId courseId, DateTimeOffset creationTime)
     {
         return new CourseTeacherAddItem
         {
             CourseId = courseId,
             TeacherId = command.TeacherId,
-            CreationTime = _clock.GetCurrentTime()
+            CreationTime = creationTime
         };
     }
 
-    public CourseAddItem ToCourseAddItem(CreateCourseCommand command)
+    public static CourseAddItem ToCourseAddItem(this CreateCourseCommand command, DateTimeOffset creationTime)
     {
         return new CourseAddItem
         {
             Name = command.Name,
             Description = command.Description,
             Status = CourseStatus.Draft,
-            CreationTime = _clock.GetCurrentTime()
+            CreationTime = creationTime
+        };
+    }
+
+    public static TeacherFilter ToTeacherFilter(this CreateCourseCommand command)
+    {
+        return new TeacherFilter
+        {
+            TeacherIds = [command.TeacherId]
         };
     }
 }
