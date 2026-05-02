@@ -53,7 +53,7 @@ jobs:
           docker build -t "$IMAGE" .
 
       - name: Scan image for vulnerabilities
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.36.0
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           severity: CRITICAL,HIGH
@@ -82,7 +82,7 @@ jobs:
           docker build -t "$IMAGE" -f Dockerfile.migrations .
 
       - name: Scan migrations image for vulnerabilities
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.36.0
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-migrations:${{ github.sha }}
           severity: CRITICAL,HIGH
@@ -106,6 +106,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: peerly-team/peerly-manifests
+          ref: main
+          fetch-depth: 0
           token: ${{ secrets.MANIFESTS_PAT }}
           path: manifests
 
@@ -123,13 +125,15 @@ jobs:
           fi
 
   deploy-k3s-prod:
-    needs: [build-push, build-push-migrations]
+    needs: deploy-k3s-stage
     runs-on: ubuntu-latest
     steps:
       - name: Checkout peerly-manifests
         uses: actions/checkout@v4
         with:
           repository: peerly-team/peerly-manifests
+          ref: main
+          fetch-depth: 0
           token: ${{ secrets.MANIFESTS_PAT }}
           path: manifests
 
