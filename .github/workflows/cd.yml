@@ -117,12 +117,18 @@ jobs:
           sed -i "s|^  tag: .*|  tag: ${{ github.sha }}|" values/core-stage.yaml
           git config user.email "ci-bot@peerly.local"
           git config user.name "peerly-ci-bot"
-          git add values/core-stage.yaml
-          if ! git diff --staged --quiet; then
-            git pull --rebase
-            git commit -m "stage(core): bump image to ${{ github.sha }}"
-            git push
+          if git diff --quiet values/core-stage.yaml; then
+            echo "no change"
+            exit 0
           fi
+          git add values/core-stage.yaml
+          git commit -m "stage(core): bump image to ${{ github.sha }}"
+          for i in 1 2 3; do
+            git pull --rebase && git push && exit 0
+            sleep 5
+          done
+          echo "::error::failed to push after 3 attempts"
+          exit 1
 
   deploy-k3s-prod:
     needs: deploy-k3s-stage
@@ -143,9 +149,15 @@ jobs:
           sed -i "s|^  tag: .*|  tag: ${{ github.sha }}|" values/core-prod.yaml
           git config user.email "ci-bot@peerly.local"
           git config user.name "peerly-ci-bot"
-          git add values/core-prod.yaml
-          if ! git diff --staged --quiet; then
-            git pull --rebase
-            git commit -m "prod(core): bump image to ${{ github.sha }}"
-            git push
+          if git diff --quiet values/core-prod.yaml; then
+            echo "no change"
+            exit 0
           fi
+          git add values/core-prod.yaml
+          git commit -m "prod(core): bump image to ${{ github.sha }}"
+          for i in 1 2 3; do
+            git pull --rebase && git push && exit 0
+            sleep 5
+          done
+          echo "::error::failed to push after 3 attempts"
+          exit 1
