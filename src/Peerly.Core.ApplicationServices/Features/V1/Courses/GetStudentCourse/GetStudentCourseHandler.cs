@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Abstractions;
-using Peerly.Core.ApplicationServices.Features.V1.Courses.Shared.SearchCourses;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Groups;
 
@@ -34,12 +33,9 @@ internal sealed class GetStudentCourseHandler : IQueryHandler<GetStudentCourseQu
 
         return new GetStudentCourseQueryResponse
         {
-            CourseInfo = new CourseQueryResponseItem
-            {
-                Course = course!,
-                StudentCount = studentCount,
-                HomeworkCount = homeworkCount
-            }
+            Course = course!,
+            StudentCount = studentCount,
+            HomeworkCount = homeworkCount
         };
     }
 

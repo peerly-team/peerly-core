@@ -4,7 +4,6 @@ using Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.DeleteCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.GetStudentCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.GetTeacherCourse;
-using Peerly.Core.ApplicationServices.Features.V1.Courses.SearchCourses;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.SearchStudentCourses;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.SearchTeacherCourses;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.Shared.SearchCourses;
@@ -33,7 +32,9 @@ internal static class CourseMappingMapper
     {
         return new Proto.V1GetTeacherCourseResponse
         {
-            CourseInfo = queryResponse.CourseInfo.ToProto()
+            CourseInfo = queryResponse.Course.ToProto(),
+            StudentCount = queryResponse.StudentCount,
+            HomeworkCount = queryResponse.HomeworkCount
         };
     }
 
@@ -50,7 +51,9 @@ internal static class CourseMappingMapper
     {
         return new Proto.V1GetStudentCourseResponse
         {
-            CourseInfo = queryResponse.CourseInfo.ToProto()
+            CourseInfo = queryResponse.Course.ToProto(),
+            StudentCount = queryResponse.StudentCount,
+            HomeworkCount = queryResponse.HomeworkCount
         };
     }
 
@@ -124,23 +127,6 @@ internal static class CourseMappingMapper
             otherError => new Proto.V1UpdateCourseResponse { OtherError = otherError.ToProto() });
     }
 
-    public static SearchCoursesQuery ToSearchCoursesQuery(this Proto.V1SearchCoursesRequest request)
-    {
-        return new SearchCoursesQuery
-        {
-            Filter = request.Filter.ToFilter(),
-            PaginationInfo = request.PaginationInfo.ToPaginationInfo()
-        };
-    }
-
-    public static Proto.V1SearchCoursesResponse ToV1SearchCoursesResponse(this SearchCoursesQueryResponse queryResponse)
-    {
-        return new Proto.V1SearchCoursesResponse
-        {
-            CourseInfos = { queryResponse.CourseInfos.ToArrayBy(courseInfo => courseInfo.ToProto()) }
-        };
-    }
-
     public static SearchStudentCoursesQuery ToSearchStudentCoursesQuery(this Proto.V1SearchStudentCoursesRequest request)
     {
         return new SearchStudentCoursesQuery
@@ -156,7 +142,7 @@ internal static class CourseMappingMapper
     {
         return new Proto.V1SearchStudentCoursesResponse
         {
-            CourseInfos = { queryResponse.CourseInfos.ToArrayBy(courseInfo => courseInfo.ToProto()) }
+            CourseInfos = { queryResponse.Courses.ToArrayBy(course => course.ToProto()) }
         };
     }
 
@@ -175,22 +161,18 @@ internal static class CourseMappingMapper
     {
         return new Proto.V1SearchTeacherCoursesResponse
         {
-            CourseInfos = { queryResponse.CourseInfos.ToArrayBy(courseInfo => courseInfo.ToProto()) }
+            CourseInfos = { queryResponse.Courses.ToArrayBy(courseInfo => courseInfo.ToProto()) }
         };
     }
 
-    private static Proto.CourseInfo ToProto(this CourseQueryResponseItem queryResponseItem)
+    private static Proto.CourseInfo ToProto(this Course course)
     {
-        var course = queryResponseItem.Course;
-
         return new Proto.CourseInfo
         {
             Id = (long)course.Id,
             Name = course.Name,
             Description = course.Description,
-            Status = course.Status.ToProto(),
-            StudentCount = queryResponseItem.StudentCount,
-            HomeworkCount = queryResponseItem.HomeworkCount
+            Status = course.Status.ToProto()
         };
     }
 

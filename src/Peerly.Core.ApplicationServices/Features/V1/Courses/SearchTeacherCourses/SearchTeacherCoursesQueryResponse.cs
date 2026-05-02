@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using Peerly.Core.ApplicationServices.Features.V1.Courses.Shared.SearchCourses;
+using Peerly.Core.Models.Courses;
 
 namespace Peerly.Core.ApplicationServices.Features.V1.Courses.SearchTeacherCourses;
 
 public sealed record SearchTeacherCoursesQueryResponse
 {
-    public required IReadOnlyCollection<CourseQueryResponseItem> CourseInfos { get; init; }
+    public required IReadOnlyCollection<Course> Courses { get; init; }
 }
