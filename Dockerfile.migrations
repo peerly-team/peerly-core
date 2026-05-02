@@ -1,0 +1,16 @@
+FROM alpine:3.20
+
+ARG GOOSE_VERSION=3.22.1
+
+RUN apk add --no-cache ca-certificates wget && \
+    wget -O /usr/local/bin/goose \
+      "https://github.com/pressly/goose/releases/download/v${GOOSE_VERSION}/goose_linux_x86_64" && \
+    chmod +x /usr/local/bin/goose && \
+    apk del wget && \
+    addgroup -g 999 goose && \
+    adduser -u 999 -G goose -s /sbin/nologin -D goose
+
+COPY --chown=999:999 src/Peerly.Core.Persistence/Migrations /migrations
+
+USER 999:999
+ENTRYPOINT ["/usr/local/bin/goose"]

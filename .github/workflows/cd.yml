@@ -31,52 +31,6 @@ jobs:
       - name: Test
         run: dotnet test --no-build --configuration Release
 
-  migrate-stage:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-toolchain
-        with:
-          install-goose: "true"
-
-      - name: Download DB CA certificate
-        run: curl -fsSL "${{ vars.DB_CA_URL }}" -o /tmp/db-ca.crt
-
-      - name: Apply migrations to stage DB
-        env:
-          PGHOST: ${{ secrets.PG_HOST_STAGE }}
-          PGPORT: ${{ vars.PG_PORT }}
-          PGDATABASE: ${{ vars.PG_DATABASE }}
-          PGUSER: ${{ vars.PG_USER }}
-          PGPASSWORD: ${{ secrets.PG_PASSWORD_STAGE }}
-        run: |
-          CONN="host=$PGHOST port=$PGPORT dbname=$PGDATABASE user=$PGUSER password=$PGPASSWORD sslmode=verify-full sslrootcert=/tmp/db-ca.crt"
-          goose -dir src/Peerly.Core.Persistence/Migrations postgres "$CONN" up
-
-  migrate-prod:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-toolchain
-        with:
-          install-goose: "true"
-
-      - name: Download DB CA certificate
-        run: curl -fsSL "${{ vars.DB_CA_URL }}" -o /tmp/db-ca.crt
-
-      - name: Apply migrations to prod DB
-        env:
-          PGHOST: ${{ secrets.PG_HOST }}
-          PGPORT: ${{ vars.PG_PORT }}
-          PGDATABASE: ${{ vars.PG_DATABASE }}
-          PGUSER: ${{ vars.PG_USER }}
-          PGPASSWORD: ${{ secrets.PG_PASSWORD }}
-        run: |
-          CONN="host=$PGHOST port=$PGPORT dbname=$PGDATABASE user=$PGUSER password=$PGPASSWORD sslmode=verify-full sslrootcert=/tmp/db-ca.crt"
-          goose -dir src/Peerly.Core.Persistence/Migrations postgres "$CONN" up
-
   build-push:
     needs: build-and-test
     runs-on: ubuntu-latest
@@ -113,11 +67,44 @@ jobs:
           echo "$REGISTRY_PASSWORD" | docker login "$REGISTRY" -u "$REGISTRY_USERNAME" --password-stdin
           docker push "$IMAGE"
 
-  # =========================================================================
-  # K3S — bump image tag in peerly-manifests; Argo CD picks up and syncs.
-  # =========================================================================
+  build-push-migrations:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build migrations image
+        env:
+          REGISTRY: ${{ secrets.REGISTRY }}
+        run: |
+          if [ -z "$REGISTRY" ]; then
+            echo "::error::REGISTRY secret is not set"
+            exit 1
+          fi
+          IMAGE="$REGISTRY/${{ env.IMAGE_NAME }}-migrations:${{ github.sha }}"
+          docker build -t "$IMAGE" -f Dockerfile.migrations .
+
+      - name: Scan migrations image for vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ secrets.REGISTRY }}/${{ env.IMAGE_NAME }}-migrations:${{ github.sha }}
+          severity: CRITICAL,HIGH
+          exit-code: 1
+          ignore-unfixed: true
+          vuln-type: os,library
+
+      - name: Push migrations image
+        env:
+          REGISTRY: ${{ secrets.REGISTRY }}
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+        run: |
+          IMAGE="$REGISTRY/${{ env.IMAGE_NAME }}-migrations:${{ github.sha }}"
+          echo "$REGISTRY_PASSWORD" | docker login "$REGISTRY" -u "$REGISTRY_USERNAME" --password-stdin
+          docker push "$IMAGE"
+
   deploy-k3s-stage:
-    needs: [migrate-stage, build-push]
+    needs: [build-push, build-push-migrations]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout peerly-manifests
@@ -141,7 +128,7 @@ jobs:
           fi
 
   deploy-k3s-prod:
-    needs: [migrate-prod, build-push]
+    needs: [build-push, build-push-migrations]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout peerly-manifests
