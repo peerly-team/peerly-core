@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Peerly.Core.Abstractions.Repositories;
 using Peerly.Core.Identifiers;
+using Peerly.Core.Models.Courses;
 using Peerly.Core.Models.Groups;
 using Peerly.Core.Persistence.Repositories.GroupStudents.Models;
 using Peerly.Core.Persistence.UnitOfWork;
@@ -64,6 +65,33 @@ internal sealed class GroupStudentRepository : IGroupStudentRepository
                              from {GroupStudentTable.TableName}
                             where {GroupStudentTable.GroupId} = @{nameof(queryParams.GroupId)}
                               and {GroupStudentTable.StudentId} = @{nameof(queryParams.StudentId)});
+             """;
+
+        var command = new CommandDefinition(
+            Query,
+            queryParams,
+            _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+
+        return await _connectionContext.Connection.ExecuteScalarAsync<bool>(command);
+    }
+
+    public async Task<bool> ExistsAsync(CourseStudent courseStudent, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            CourseId = (long)courseStudent.CourseId,
+            StudentId = (long)courseStudent.StudentId
+        };
+
+        const string Query =
+            $"""
+             select exists (
+                 select
+                   from {GroupStudentTable.TableName} gs
+                   join {GroupTable.TableName} g on g.{GroupTable.Id} = gs.{GroupStudentTable.GroupId}
+                  where g.{GroupTable.CourseId} = @CourseId
+                    and gs.{GroupStudentTable.StudentId} = @StudentId);
              """;
 
         var command = new CommandDefinition(

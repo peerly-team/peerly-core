@@ -172,4 +172,27 @@ internal sealed class CourseRepository : ICourseRepository
 
         return courseDbs.ToCourses();
     }
+
+    public async Task<bool> ExistsAsync(CourseId courseId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            CourseId = (long)courseId
+        };
+
+        const string Query =
+            $"""
+             select exists(select
+                             from {CourseTable.TableName}
+                            where {CourseTable.Id} = @{nameof(queryParams.CourseId)});
+             """;
+
+        var command = new CommandDefinition(
+            Query,
+            queryParams,
+            _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+
+        return await _connectionContext.Connection.ExecuteScalarAsync<bool>(command);
+    }
 }
