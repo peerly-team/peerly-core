@@ -6,34 +6,34 @@ using FluentAssertions;
 using Moq;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Abstractions;
-using Peerly.Core.ApplicationServices.Features.V1.Courses.GetStudentCourse;
+using Peerly.Core.ApplicationServices.Features.V1.Courses.GetTeacherCourse;
 using Peerly.Core.Exceptions;
 using Peerly.Core.Models.Courses;
 using Peerly.Core.Models.Groups;
 using Xunit;
 
-namespace Peerly.Core.Tests.Features.V1.Courses.GetStudentCourse;
+namespace Peerly.Core.Tests.Features.V1.Courses.GetTeacherCourse;
 
-public sealed class GetStudentCourseHandlerTests
+public sealed class GetTeacherCourseHandlerTests
 {
     private readonly Mock<ICommonUnitOfWorkFactory> _unitOfWorkFactoryMock = new();
     private readonly Mock<ICommonReadOnlyUnitOfWork> _unitOfWorkMock = new();
-    private readonly Mock<IQueryValidator<GetStudentCourseQuery, GetStudentCourseQueryResponse>> _validatorMock = new();
+    private readonly Mock<IQueryValidator<GetTeacherCourseQuery, GetTeacherCourseQueryResponse>> _validatorMock = new();
 
     private readonly Fixture _fixture = new();
-    private readonly GetStudentCourseHandler _handler;
+    private readonly GetTeacherCourseHandler _handler;
 
-    public GetStudentCourseHandlerTests()
+    public GetTeacherCourseHandlerTests()
     {
         SetupUnitOfWorkFactory();
-        _handler = new GetStudentCourseHandler(_unitOfWorkFactoryMock.Object, _validatorMock.Object);
+        _handler = new GetTeacherCourseHandler(_unitOfWorkFactoryMock.Object, _validatorMock.Object);
     }
 
     [Fact]
     public async Task ExecuteAsync_ValidationSuccess_ShouldReturnCourseInfo()
     {
         // Arrange
-        var query = _fixture.Create<GetStudentCourseQuery>();
+        var query = _fixture.Create<GetTeacherCourseQuery>();
 
         var course = _fixture.Build<Course>()
             .With(result => result.Id, query.CourseId)
@@ -92,7 +92,7 @@ public sealed class GetStudentCourseHandlerTests
     public async Task ExecuteAsync_ValidationFailed_ShouldThrowNotFoundException()
     {
         // Arrange
-        var query = _fixture.Create<GetStudentCourseQuery>();
+        var query = _fixture.Create<GetTeacherCourseQuery>();
 
         _validatorMock
             .Setup(validator => validator.ValidateAsync(query, It.IsAny<CancellationToken>()))

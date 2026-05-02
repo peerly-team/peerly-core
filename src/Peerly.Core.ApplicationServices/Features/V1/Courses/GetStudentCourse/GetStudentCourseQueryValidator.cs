@@ -6,7 +6,7 @@ using Peerly.Core.Exceptions;
 
 namespace Peerly.Core.ApplicationServices.Features.V1.Courses.GetStudentCourse;
 
-internal sealed class GetStudentCourseQueryValidator : IQueryValidator<GetStudentCourseQuery>
+internal sealed class GetStudentCourseQueryValidator : IQueryValidator<GetStudentCourseQuery, GetStudentCourseQueryResponse>
 {
     private readonly ICommonUnitOfWorkFactory _unitOfWorkFactory;
 
