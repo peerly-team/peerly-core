@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Peerly.Core.Abstractions.Repositories;
 using Peerly.Core.Identifiers;
+using Peerly.Core.Models.Courses;
 using Peerly.Core.Models.Groups;
 using Peerly.Core.Persistence.Repositories.GroupTeachers.Models;
 using Peerly.Core.Persistence.UnitOfWork;
@@ -94,6 +95,33 @@ internal sealed class GroupTeacherRepository : IGroupTeacherRepository
             commandText: Query,
             parameters: queryParams,
             transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+
+        return await _connectionContext.Connection.ExecuteScalarAsync<bool>(command);
+    }
+
+    public async Task<bool> ExistsAsync(CourseTeacher courseTeacher, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            CourseId = (long)courseTeacher.CourseId,
+            TeacherId = (long)courseTeacher.TeacherId
+        };
+
+        const string Query =
+            $"""
+             select exists (
+                 select
+                   from {GroupTeacherTable.TableName} gt
+                   join {GroupTable.TableName} g on g.{GroupTable.Id} = gt.{GroupTeacherTable.GroupId}
+                  where g.{GroupTable.CourseId} = @{nameof(queryParams.CourseId)}
+                    and gt.{GroupTeacherTable.TeacherId} = @{nameof(queryParams.TeacherId)});
+             """;
+
+        var command = new CommandDefinition(
+            Query,
+            queryParams,
+            _connectionContext.Transaction,
             cancellationToken: cancellationToken);
 
         return await _connectionContext.Connection.ExecuteScalarAsync<bool>(command);

@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.Shared.SearchCourses;
-using Peerly.Core.Exceptions;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Groups;
 
@@ -13,28 +12,21 @@ namespace Peerly.Core.ApplicationServices.Features.V1.Courses.GetTeacherCourse;
 internal sealed class GetTeacherCourseHandler : IQueryHandler<GetTeacherCourseQuery, GetTeacherCourseQueryResponse>
 {
     private readonly ICommonUnitOfWorkFactory _commonUnitOfWorkFactory;
+    private readonly IQueryValidator<GetTeacherCourseQuery, GetTeacherCourseQueryResponse> _validator;
 
-    public GetTeacherCourseHandler(ICommonUnitOfWorkFactory commonUnitOfWorkFactory)
+    public GetTeacherCourseHandler(ICommonUnitOfWorkFactory commonUnitOfWorkFactory, IQueryValidator<GetTeacherCourseQuery, GetTeacherCourseQueryResponse> validator)
     {
         _commonUnitOfWorkFactory = commonUnitOfWorkFactory;
+        _validator = validator;
     }
 
     public async Task<GetTeacherCourseQueryResponse> ExecuteAsync(GetTeacherCourseQuery query, CancellationToken cancellationToken)
     {
+        await _validator.ValidateAsync(query, cancellationToken);
+
         await using var unitOfWork = await _commonUnitOfWorkFactory.CreateReadOnlyAsync(cancellationToken);
 
-        var courseTeacher = query.ToCourseTeacher();
-        if (!await unitOfWork.ReadOnlyCourseTeacherRepository.ExistsAsync(courseTeacher, cancellationToken))
-        {
-            throw new NotFoundException();
-        }
-
         var course = await unitOfWork.ReadOnlyCourseRepository.GetAsync(query.CourseId, cancellationToken);
-        if (course is null)
-        {
-            throw new NotFoundException();
-        }
-
         var homeworkCount = await unitOfWork.ReadOnlyHomeworkRepository.GetHomeworkCountAsync(query.CourseId, cancellationToken);
         var studentCount = await GetStudentCountAsync(query.CourseId, unitOfWork, cancellationToken);
 
@@ -42,7 +34,7 @@ internal sealed class GetTeacherCourseHandler : IQueryHandler<GetTeacherCourseQu
         {
             CourseInfo = new CourseQueryResponseItem
             {
-                Course = course,
+                Course = course!,
                 StudentCount = studentCount,
                 HomeworkCount = homeworkCount
             }

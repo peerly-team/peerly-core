@@ -90,8 +90,8 @@ internal sealed class GroupStudentRepository : IGroupStudentRepository
                  select
                    from {GroupStudentTable.TableName} gs
                    join {GroupTable.TableName} g on g.{GroupTable.Id} = gs.{GroupStudentTable.GroupId}
-                  where g.{GroupTable.CourseId} = @CourseId
-                    and gs.{GroupStudentTable.StudentId} = @StudentId);
+                  where g.{GroupTable.CourseId} = @{nameof(queryParams.CourseId)}
+                    and gs.{GroupStudentTable.StudentId} = @{nameof(queryParams.StudentId)});
              """;
 
         var command = new CommandDefinition(
