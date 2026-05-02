@@ -22,4 +22,5 @@ public interface IReadOnlyCourseRepository
 {
     Task<Course?> GetAsync(CourseId courseId, CancellationToken cancellationToken);
     Task<IReadOnlyCollection<Course>> ListAsync(CourseFilter filter, PaginationInfo paginationInfo, CancellationToken cancellationToken);
+    Task<bool> ExistsAsync(CourseId courseId, CancellationToken cancellationToken);
 }
