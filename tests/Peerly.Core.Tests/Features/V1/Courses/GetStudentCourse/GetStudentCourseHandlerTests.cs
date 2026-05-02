@@ -18,7 +18,7 @@ public sealed class GetStudentCourseHandlerTests
 {
     private readonly Mock<ICommonUnitOfWorkFactory> _unitOfWorkFactoryMock = new();
     private readonly Mock<ICommonReadOnlyUnitOfWork> _unitOfWorkMock = new();
-    private readonly Mock<IQueryValidator<GetStudentCourseQuery>> _validatorMock = new();
+    private readonly Mock<IQueryValidator<GetStudentCourseQuery, GetStudentCourseQueryResponse>> _validatorMock = new();
 
     private readonly Fixture _fixture = new();
     private readonly GetStudentCourseHandler _handler;

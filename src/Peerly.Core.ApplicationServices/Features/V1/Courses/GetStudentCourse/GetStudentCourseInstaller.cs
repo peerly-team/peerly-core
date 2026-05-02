@@ -10,6 +10,6 @@ internal sealed class GetStudentCourseInstaller : IInstaller
 {
     public void InstallServices(IServiceCollection services)
     {
-        services.AddScoped<IQueryValidator<GetStudentCourseQuery>, GetStudentCourseQueryValidator>();
+        services.AddScoped<IQueryValidator<GetStudentCourseQuery, GetStudentCourseQueryResponse>, GetStudentCourseQueryValidator>();
     }
 }

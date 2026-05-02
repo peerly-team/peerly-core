@@ -12,9 +12,11 @@ namespace Peerly.Core.ApplicationServices.Features.V1.Courses.GetStudentCourse;
 internal sealed class GetStudentCourseHandler : IQueryHandler<GetStudentCourseQuery, GetStudentCourseQueryResponse>
 {
     private readonly ICommonUnitOfWorkFactory _commonUnitOfWorkFactory;
-    private readonly IQueryValidator<GetStudentCourseQuery> _validator;
+    private readonly IQueryValidator<GetStudentCourseQuery, GetStudentCourseQueryResponse> _validator;
 
-    public GetStudentCourseHandler(ICommonUnitOfWorkFactory commonUnitOfWorkFactory, IQueryValidator<GetStudentCourseQuery> validator)
+    public GetStudentCourseHandler(
+        ICommonUnitOfWorkFactory commonUnitOfWorkFactory,
+        IQueryValidator<GetStudentCourseQuery, GetStudentCourseQueryResponse> validator)
     {
         _commonUnitOfWorkFactory = commonUnitOfWorkFactory;
         _validator = validator;
