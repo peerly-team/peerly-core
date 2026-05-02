@@ -3,9 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Abstractions;
-using Peerly.Core.ApplicationServices.Checkers.CourseAccess.Abstractions;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.Shared.SearchCourses;
-using Peerly.Core.Exceptions;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Groups;
 
@@ -14,30 +12,21 @@ namespace Peerly.Core.ApplicationServices.Features.V1.Courses.GetStudentCourse;
 internal sealed class GetStudentCourseHandler : IQueryHandler<GetStudentCourseQuery, GetStudentCourseQueryResponse>
 {
     private readonly ICommonUnitOfWorkFactory _commonUnitOfWorkFactory;
-    private readonly IStudentCourseAccessChecker _studentCourseAccessChecker;
+    private readonly IQueryValidator<GetStudentCourseQuery> _validator;
 
-    public GetStudentCourseHandler(ICommonUnitOfWorkFactory commonUnitOfWorkFactory, IStudentCourseAccessChecker studentCourseAccessChecker)
+    public GetStudentCourseHandler(ICommonUnitOfWorkFactory commonUnitOfWorkFactory, IQueryValidator<GetStudentCourseQuery> validator)
     {
         _commonUnitOfWorkFactory = commonUnitOfWorkFactory;
-        _studentCourseAccessChecker = studentCourseAccessChecker;
+        _validator = validator;
     }
 
     public async Task<GetStudentCourseQueryResponse> ExecuteAsync(GetStudentCourseQuery query, CancellationToken cancellationToken)
     {
+        await _validator.ValidateAsync(query, cancellationToken);
+
         await using var unitOfWork = await _commonUnitOfWorkFactory.CreateReadOnlyAsync(cancellationToken);
 
-        var courseStudent = query.ToCourseStudent();
-        if (!await _studentCourseAccessChecker.RunAsync(courseStudent, cancellationToken))
-        {
-            throw new NotFoundException();
-        }
-
         var course = await unitOfWork.ReadOnlyCourseRepository.GetAsync(query.CourseId, cancellationToken);
-        if (course is null)
-        {
-            throw new NotFoundException();
-        }
-
         var homeworkCount = await unitOfWork.ReadOnlyHomeworkRepository.GetHomeworkCountAsync(query.CourseId, cancellationToken);
         var studentCount = await GetStudentCountAsync(query.CourseId, unitOfWork, cancellationToken);
 
@@ -45,7 +34,7 @@ internal sealed class GetStudentCourseHandler : IQueryHandler<GetStudentCourseQu
         {
             CourseInfo = new CourseQueryResponseItem
             {
-                Course = course,
+                Course = course!,
                 StudentCount = studentCount,
                 HomeworkCount = homeworkCount
             }
