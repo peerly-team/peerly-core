@@ -53,7 +53,7 @@ jobs:
           docker build -t "$IMAGE" .
 
       - name: Scan image for vulnerabilities
-        uses: aquasecurity/trivy-action@0.36.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           severity: CRITICAL,HIGH
@@ -82,7 +82,7 @@ jobs:
           docker build -t "$IMAGE" -f Dockerfile.migrations .
 
       - name: Scan migrations image for vulnerabilities
-        uses: aquasecurity/trivy-action@0.36.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-migrations:${{ github.sha }}
           severity: CRITICAL,HIGH
