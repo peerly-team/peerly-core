@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Npgsql;
 using Peerly.Core.IntegrationTests.Features.V1.Courses.CreateCourse.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Courses.GetStudentCourse.Infrastructure;
 using Respawn;
 using Testcontainers.PostgreSql;
 using Xunit;
@@ -27,6 +28,7 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
     public NpgsqlDataSource DataSource => _dataSource ?? throw new InvalidOperationException("Integration fixture is not initialized.");
 
     public CreateCourseGrpcClient CreateCourseClient => ApplicationFactory.CreateCourseClient();
+    public GetStudentCourseGrpcClient GetStudentCourseClient => ApplicationFactory.GetStudentCourseClient();
 
     public async Task InitializeAsync()
     {
