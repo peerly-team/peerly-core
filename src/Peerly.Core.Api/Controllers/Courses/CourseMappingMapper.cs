@@ -4,6 +4,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.DeleteCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.GetStudentCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.GetTeacherCourse;
+using Peerly.Core.ApplicationServices.Features.V1.Courses.PublishCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.SearchStudentCourses;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.SearchTeacherCourses;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.Shared.SearchCourses;
@@ -124,6 +125,26 @@ internal static class CourseMappingMapper
                 ValidationError = validationError.ToProto<UpdateCourseCommand, Proto.V1UpdateCourseRequest>()
             },
             otherError => new Proto.V1UpdateCourseResponse { OtherError = otherError.ToProto() });
+    }
+
+    public static PublishCourseCommand ToPublishCourseCommand(this Proto.V1PublishCourseRequest request)
+    {
+        return new PublishCourseCommand
+        {
+            CourseId = new CourseId(request.CourseId),
+            TeacherId = new TeacherId(request.TeacherId)
+        };
+    }
+
+    public static Proto.V1PublishCourseResponse ToV1PublishCourseResponse(this CommandResponse<Success> commandResponse)
+    {
+        return commandResponse.Match(
+            _ => new Proto.V1PublishCourseResponse { SuccessResponse = new Proto.V1PublishCourseResponse.Types.Success() },
+            validationError => new Proto.V1PublishCourseResponse
+            {
+                ValidationError = validationError.ToProto<PublishCourseCommand, Proto.V1PublishCourseRequest>()
+            },
+            otherError => new Proto.V1PublishCourseResponse { OtherError = otherError.ToProto() });
     }
 
     public static SearchStudentCoursesQuery ToSearchStudentCoursesQuery(this Proto.V1SearchStudentCoursesRequest request)
