@@ -68,7 +68,7 @@ public sealed class SearchTeacherCoursesHandlerTests
     {
         // Arrange
         var searchCoursesQueryFilter = _fixture.Build<SearchCoursesQueryFilter>()
-            .With(result => result.CourseStatuses, [CourseStatus.InProgress, CourseStatus.Finished, CourseStatus.Deleted])
+            .With(result => result.CourseStatuses, [])
             .Create();
         var query = _fixture.Build<SearchTeacherCoursesQuery>()
             .With(query => query.Filter, searchCoursesQueryFilter)
