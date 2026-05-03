@@ -5,6 +5,7 @@ using Npgsql;
 using Peerly.Core.Abstractions.Repositories;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.Persistence.Extensions;
+using Peerly.Core.Persistence.Repositories.CourseFiles;
 using Peerly.Core.Persistence.Repositories.Courses;
 using Peerly.Core.Persistence.Repositories.CourseTeachers;
 using Peerly.Core.Persistence.Repositories.DistributionReviewers;
@@ -46,6 +47,7 @@ public class UnitOfWorkInstaller : IInstaller
         services.AddRepositoryFactory<IGroupTeacherRepository, GroupTeacherRepository>();
         services.AddRepositoryFactory<ISubmittedHomeworkRepository, SubmittedHomeworkRepository>();
         services.AddRepositoryFactory<IFileRepository, FileRepository>();
+        services.AddRepositoryFactory<ICourseFileRepository, CourseFileRepository>();
         services.AddRepositoryFactory<IHomeworkFileRepository, HomeworkFileRepository>();
         services.AddRepositoryFactory<ISubmittedHomeworkFileRepository, SubmittedHomeworkFileRepository>();
         services.AddRepositoryFactory<IHomeworkDistributionRepository, HomeworkDistributionRepository>();

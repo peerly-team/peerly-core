@@ -4,6 +4,7 @@ using Grpc.Core;
 using OneOf.Types;
 using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourse;
+using Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourseFile;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.DeleteCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.GetStudentCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.GetTeacherCourse;
@@ -21,6 +22,7 @@ public sealed class CourseController : CourseService.CourseServiceBase
     private readonly IQueryHandler<SearchStudentCoursesQuery, SearchStudentCoursesQueryResponse> _searchStudentCoursesHandler;
     private readonly IQueryHandler<SearchTeacherCoursesQuery, SearchTeacherCoursesQueryResponse> _searchTeacherCoursesHandler;
     private readonly ICommandHandler<CreateCourseCommand, CreateCourseCommandResponse> _createCourseHandler;
+    private readonly ICommandHandler<CreateCourseFileCommand, CreateCourseFileCommandResponse> _createCourseFileHandler;
     private readonly ICommandHandler<DeleteCourseCommand, Success> _deleteCourseHandler;
     private readonly ICommandHandler<UpdateCourseCommand, Success> _updateCourseHandler;
     private readonly ICommandHandler<PublishCourseCommand, Success> _publishCourseHandler;
@@ -31,6 +33,7 @@ public sealed class CourseController : CourseService.CourseServiceBase
         IQueryHandler<SearchStudentCoursesQuery, SearchStudentCoursesQueryResponse> searchStudentCoursesHandler,
         IQueryHandler<SearchTeacherCoursesQuery, SearchTeacherCoursesQueryResponse> searchTeacherCoursesHandler,
         ICommandHandler<CreateCourseCommand, CreateCourseCommandResponse> createCourseHandler,
+        ICommandHandler<CreateCourseFileCommand, CreateCourseFileCommandResponse> createCourseFileHandler,
         ICommandHandler<DeleteCourseCommand, Success> deleteCourseHandler,
         ICommandHandler<UpdateCourseCommand, Success> updateCourseHandler,
         ICommandHandler<PublishCourseCommand, Success> publishCourseHandler,
@@ -40,6 +43,7 @@ public sealed class CourseController : CourseService.CourseServiceBase
         _searchStudentCoursesHandler = searchStudentCoursesHandler;
         _searchTeacherCoursesHandler = searchTeacherCoursesHandler;
         _createCourseHandler = createCourseHandler;
+        _createCourseFileHandler = createCourseFileHandler;
         _deleteCourseHandler = deleteCourseHandler;
         _updateCourseHandler = updateCourseHandler;
         _publishCourseHandler = publishCourseHandler;
@@ -66,6 +70,13 @@ public sealed class CourseController : CourseService.CourseServiceBase
         var command = request.ToCreateCourseCommand();
         var commandResponse = await _createCourseHandler.ExecuteAsync(command, context.CancellationToken);
         return commandResponse.ToV1CreateCourseResponse();
+    }
+
+    public override async Task<V1CreateCourseFileResponse> V1CreateCourseFile(V1CreateCourseFileRequest request, ServerCallContext context)
+    {
+        var command = request.ToCreateCourseFileCommand();
+        var commandResponse = await _createCourseFileHandler.ExecuteAsync(command, context.CancellationToken);
+        return commandResponse.ToV1CreateCourseFileResponse();
     }
 
     public override async Task<V1SearchStudentCoursesResponse> V1SearchStudentCourses(

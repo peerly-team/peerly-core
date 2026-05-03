@@ -1,4 +1,5 @@
 using Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourse;
+using Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourseFile;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.DeleteCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.PublishCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.UpdateCourse;
@@ -48,6 +49,10 @@ public static class ValidationPropertyMappingConfiguration
     {
         ValidationPropertyMapping
             .AddMapping<CreateCourseCommand, V1CreateCourseRequest>()
+            .Build();
+
+        ValidationPropertyMapping
+            .AddMapping<CreateCourseFileCommand, V1CreateCourseFileRequest>()
             .Build();
 
         ValidationPropertyMapping

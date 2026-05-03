@@ -30,12 +30,14 @@ internal sealed class GetStudentCourseHandler : IQueryHandler<GetStudentCourseQu
         var course = await unitOfWork.ReadOnlyCourseRepository.GetAsync(query.CourseId, cancellationToken);
         var homeworkCount = await unitOfWork.ReadOnlyHomeworkRepository.GetHomeworkCountAsync(query.CourseId, cancellationToken);
         var studentCount = await GetStudentCountAsync(query.CourseId, unitOfWork, cancellationToken);
+        var files = await unitOfWork.ReadOnlyCourseFileRepository.ListFilesAsync(query.CourseId, cancellationToken);
 
         return new GetStudentCourseQueryResponse
         {
             Course = course!,
             StudentCount = studentCount,
-            HomeworkCount = homeworkCount
+            HomeworkCount = homeworkCount,
+            Files = files
         };
     }
 
