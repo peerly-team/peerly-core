@@ -42,8 +42,8 @@ public sealed class GetTeacherCourseIntegrationTests : GetTeacherCourseIntegrati
         response.CourseInfo.Name.Should().Be(courseName);
         response.CourseInfo.Description.Should().Be(courseDescription);
         response.CourseInfo.Status.Should().Be(ProtoCourseStatus.Draft);
-        response.CourseInfo.StudentCount.Should().Be(0);
-        response.CourseInfo.HomeworkCount.Should().Be(0);
+        response.StudentCount.Should().Be(0);
+        response.HomeworkCount.Should().Be(0);
     }
 
     [Fact]
@@ -92,8 +92,8 @@ public sealed class GetTeacherCourseIntegrationTests : GetTeacherCourseIntegrati
         response.CourseInfo.Name.Should().Be(courseName);
         response.CourseInfo.Description.Should().Be(courseDescription);
         response.CourseInfo.Status.Should().Be(ProtoCourseStatus.Draft);
-        response.CourseInfo.StudentCount.Should().Be(3);
-        response.CourseInfo.HomeworkCount.Should().Be(2);
+        response.StudentCount.Should().Be(3);
+        response.HomeworkCount.Should().Be(2);
     }
 
     [Fact]

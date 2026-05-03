@@ -52,8 +52,6 @@ message CourseInfo {
   string name = 2;
   google.protobuf.StringValue description = 3;
   CourseStatus status = 4;
-  int64 student_count = 5;
-  int64 homework_count = 6;
 }
 
 message GroupInfo {
