@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
+using Grpc.Core;
 using Peerly.Core.IntegrationTests.Infrastructure;
 using Peerly.Core.V1;
 using Xunit;
@@ -181,5 +182,79 @@ public sealed class SearchStudentCoursesIntegrationTests : SearchStudentCoursesI
 
         // Assert
         response.CourseInfos.Should().BeEmpty();
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public async Task V1SearchStudentCourses_NotPositiveStudentId_ShouldReturnInvalidArgument(long studentId)
+    {
+        // Arrange
+        var request = new V1SearchStudentCoursesRequest
+        {
+            StudentId = studentId,
+            Filter = new SearchCoursesFilter(),
+            PaginationInfo = new PaginationInfo
+            {
+                Offset = 0,
+                PageSize = 10
+            }
+        };
+
+        // Act
+        var act = async () => await SearchStudentCoursesClient.V1SearchStudentCoursesAsync(request);
+
+        // Assert
+        var exception = await act.Should().ThrowAsync<RpcException>();
+        exception.Which.StatusCode.Should().Be(StatusCode.InvalidArgument);
+        exception.Which.Message.Should().Contain(nameof(request.StudentId));
+    }
+
+    [Fact]
+    public async Task V1SearchStudentCourses_NegativeOffset_ShouldReturnInvalidArgument()
+    {
+        // Arrange
+        var request = new V1SearchStudentCoursesRequest
+        {
+            StudentId = _fixture.Create<long>(),
+            Filter = new SearchCoursesFilter(),
+            PaginationInfo = new PaginationInfo
+            {
+                Offset = -1,
+                PageSize = 10
+            }
+        };
+
+        // Act
+        var act = async () => await SearchStudentCoursesClient.V1SearchStudentCoursesAsync(request);
+
+        // Assert
+        var exception = await act.Should().ThrowAsync<RpcException>();
+        exception.Which.StatusCode.Should().Be(StatusCode.InvalidArgument);
+        exception.Which.Message.Should().Contain(nameof(request.PaginationInfo.Offset));
+    }
+
+    [Fact]
+    public async Task V1SearchStudentCourses_NegativePageSize_ShouldReturnInvalidArgument()
+    {
+        // Arrange
+        var request = new V1SearchStudentCoursesRequest
+        {
+            StudentId = _fixture.Create<long>(),
+            Filter = new SearchCoursesFilter(),
+            PaginationInfo = new PaginationInfo
+            {
+                Offset = 0,
+                PageSize = -1
+            }
+        };
+
+        // Act
+        var act = async () => await SearchStudentCoursesClient.V1SearchStudentCoursesAsync(request);
+
+        // Assert
+        var exception = await act.Should().ThrowAsync<RpcException>();
+        exception.Which.StatusCode.Should().Be(StatusCode.InvalidArgument);
+        exception.Which.Message.Should().Contain(nameof(request.PaginationInfo.PageSize));
     }
 }

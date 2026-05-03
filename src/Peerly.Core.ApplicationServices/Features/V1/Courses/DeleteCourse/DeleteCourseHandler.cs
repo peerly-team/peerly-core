@@ -11,9 +11,9 @@ namespace Peerly.Core.ApplicationServices.Features.V1.Courses.DeleteCourse;
 internal sealed class DeleteCourseHandler : ICommandHandler<DeleteCourseCommand, Success>
 {
     private readonly ICommonUnitOfWorkFactory _commonUnitOfWorkFactory;
-    private readonly ICommandValidator<DeleteCourseCommand> _validator;
+    private readonly ICommandValidator<DeleteCourseCommand, Success> _validator;
 
-    public DeleteCourseHandler(ICommonUnitOfWorkFactory commonUnitOfWorkFactory, ICommandValidator<DeleteCourseCommand> validator)
+    public DeleteCourseHandler(ICommonUnitOfWorkFactory commonUnitOfWorkFactory, ICommandValidator<DeleteCourseCommand, Success> validator)
     {
         _commonUnitOfWorkFactory = commonUnitOfWorkFactory;
         _validator = validator;

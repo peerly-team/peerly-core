@@ -3,54 +3,36 @@ using System.Threading.Tasks;
 using OneOf.Types;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Abstractions;
-using Peerly.Core.ApplicationServices.Features.Validations;
 using Peerly.Core.ApplicationServices.Models.Common;
-using Peerly.Core.Models.Courses;
 
 namespace Peerly.Core.ApplicationServices.Features.V1.Courses.UpdateCourse;
 
 internal sealed class UpdateCourseHandler : ICommandHandler<UpdateCourseCommand, Success>
 {
     private readonly ICommonUnitOfWorkFactory _commonUnitOfWorkFactory;
+    private readonly ICommandValidator<UpdateCourseCommand, Success> _validator;
 
-    public UpdateCourseHandler(ICommonUnitOfWorkFactory commonUnitOfWorkFactory)
+    public UpdateCourseHandler(ICommonUnitOfWorkFactory commonUnitOfWorkFactory, ICommandValidator<UpdateCourseCommand, Success> validator)
     {
         _commonUnitOfWorkFactory = commonUnitOfWorkFactory;
+        _validator = validator;
     }
 
     public async Task<CommandResponse<Success>> ExecuteAsync(UpdateCourseCommand command, CancellationToken cancellationToken)
     {
-        if (command.Status is CourseStatus.Deleted)
+        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
+        if (validationResult.TryPickError(out var error))
         {
-            return ValidationError.From(CourseErrors.ForbiddenUpdateCourseStatusToDelete);
+            return error;
         }
 
         await using var unitOfWork = await _commonUnitOfWorkFactory.CreateAsync(cancellationToken);
-
-        var courseTeacher = command.ToCourseTeacher();
-        if (!await unitOfWork.CourseTeacherRepository.ExistsAsync(courseTeacher, cancellationToken))
-        {
-            return OtherError.PermissionDenied();
-        }
-
-        var course = await unitOfWork.CourseRepository.GetAsync(command.CourseId, cancellationToken);
-        if (course is null)
-        {
-            return OtherError.NotFound(CourseErrors.CourseNotFound);
-        }
-
-        if (course.Status is not (CourseStatus.Draft or CourseStatus.InProgress))
-        {
-            return ValidationError.From(CourseErrors.IncorrectCourseStatusForUpdate);
-        }
-
 
         _ = await unitOfWork.CourseRepository.UpdateAsync(
             command.CourseId,
             builder => builder
                 .Set(item => item.Name, command.Name)
-                .Set(item => item.Description, command.Description)
-                .Set(item => item.Status, command.Status),
+                .Set(item => item.Description, command.Description),
             cancellationToken);
 
         return new Success();
