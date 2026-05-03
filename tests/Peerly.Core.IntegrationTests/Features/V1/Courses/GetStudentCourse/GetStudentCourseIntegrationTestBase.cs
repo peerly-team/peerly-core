@@ -99,6 +99,49 @@ public abstract class GetStudentCourseIntegrationTestBase : IAsyncLifetime
             });
     }
 
+    protected async Task<(long Id, string Name, int Size)> AddCourseFileInDbAsync(
+        long courseId,
+        long teacherId,
+        string name,
+        int size)
+    {
+        await using var connection = await Fixture.DataSource.OpenConnectionAsync();
+
+        const string AddFileQuery =
+            """
+            insert into files (storage_id, name, size, creation_time)
+            values (@storageId, @name, @size, @creationTime)
+            returning id;
+            """;
+
+        var fileId = await connection.QuerySingleAsync<long>(
+            AddFileQuery,
+            new
+            {
+                storageId = Guid.NewGuid(),
+                name,
+                size,
+                creationTime = DateTimeOffset.UtcNow
+            });
+
+        const string AddCourseFileQuery =
+            """
+            insert into course_files (course_id, file_id, teacher_id)
+            values (@courseId, @fileId, @teacherId);
+            """;
+
+        await connection.ExecuteAsync(
+            AddCourseFileQuery,
+            new
+            {
+                courseId,
+                fileId,
+                teacherId
+            });
+
+        return (fileId, name, size);
+    }
+
     protected async Task AddGroupStudentInDbAsync(long groupId, long studentId)
     {
         await using var connection = await Fixture.DataSource.OpenConnectionAsync();

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,7 +9,9 @@ using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.GetStudentCourse;
 using Peerly.Core.Exceptions;
+using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Courses;
+using Peerly.Core.Models.Files;
 using Peerly.Core.Models.Groups;
 using Xunit;
 
@@ -65,6 +68,19 @@ public sealed class GetStudentCourseHandlerTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(groups);
 
+        var files = new[]
+        {
+            _fixture.Build<File>()
+                .With(result => result.StorageId, (StorageId)Guid.NewGuid())
+                .Create(),
+            _fixture.Build<File>()
+                .With(result => result.StorageId, (StorageId)Guid.NewGuid())
+                .Create()
+        };
+        _unitOfWorkMock
+            .Setup(unitOfWork => unitOfWork.ReadOnlyCourseFileRepository.ListFilesAsync(query.CourseId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(files);
+
         // Act
         var queryResponse = await _handler.ExecuteAsync(query, CancellationToken.None);
 
@@ -72,6 +88,7 @@ public sealed class GetStudentCourseHandlerTests
         queryResponse.Course.Should().BeEquivalentTo(course);
         queryResponse.HomeworkCount.Should().Be(homeworkCount);
         queryResponse.StudentCount.Should().Be(groups.Sum(group => group.StudentCount));
+        queryResponse.Files.Should().BeEquivalentTo(files);
         _validatorMock.Verify(
             validator => validator.ValidateAsync(query, It.IsAny<CancellationToken>()),
             Times.Once);
@@ -85,6 +102,9 @@ public sealed class GetStudentCourseHandlerTests
             unitOfWork => unitOfWork.ReadOnlyGroupRepository.ListAsync(
                 It.Is<GroupFilter>(parameter => !(parameter.CourseIds.Except(groupFilter.CourseIds).Any() || parameter.GroupIds.Except(groupFilter.GroupIds).Any())),
                 It.IsAny<CancellationToken>()),
+            Times.Once);
+        _unitOfWorkMock.Verify(
+            unitOfWork => unitOfWork.ReadOnlyCourseFileRepository.ListFilesAsync(query.CourseId, It.IsAny<CancellationToken>()),
             Times.Once);
     }
 

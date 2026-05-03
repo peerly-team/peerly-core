@@ -13,6 +13,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Courses.UpdateCourse;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Courses;
+using Peerly.Core.Models.Files;
 using Peerly.Core.Pagination;
 using Peerly.Core.Tools;
 using Proto = Peerly.Core.V1;
@@ -36,7 +37,8 @@ internal static class CourseMappingMapper
         {
             CourseInfo = queryResponse.Course.ToProto(),
             StudentCount = queryResponse.StudentCount,
-            HomeworkCount = queryResponse.HomeworkCount
+            HomeworkCount = queryResponse.HomeworkCount,
+            Files = { queryResponse.Files.ToArrayBy(file => file.ToProto()) }
         };
     }
 
@@ -55,7 +57,8 @@ internal static class CourseMappingMapper
         {
             CourseInfo = queryResponse.Course.ToProto(),
             StudentCount = queryResponse.StudentCount,
-            HomeworkCount = queryResponse.HomeworkCount
+            HomeworkCount = queryResponse.HomeworkCount,
+            Files = { queryResponse.Files.ToArrayBy(file => file.ToProto()) }
         };
     }
 
@@ -224,6 +227,16 @@ internal static class CourseMappingMapper
             Name = course.Name,
             Description = course.Description,
             Status = course.Status.ToProto()
+        };
+    }
+
+    private static Proto.File ToProto(this File file)
+    {
+        return new Proto.File
+        {
+            Id = (long)file.Id,
+            Name = file.Name,
+            Size = file.Size
         };
     }
 

@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
@@ -46,6 +47,9 @@ public sealed class GetStudentCourseIntegrationTests : GetStudentCourseIntegrati
         await AddHomeworkInDbAsync(courseId, teacherId, _fixture.Create<string>());
         await AddHomeworkInDbAsync(courseId, teacherId, _fixture.Create<string>());
         await AddHomeworkInDbAsync(otherCourseId, teacherId, _fixture.Create<string>());
+        var firstFile = await AddCourseFileInDbAsync(courseId, teacherId, _fixture.Create<string>(), 1024);
+        var secondFile = await AddCourseFileInDbAsync(courseId, teacherId, _fixture.Create<string>(), 2048);
+        await AddCourseFileInDbAsync(otherCourseId, teacherId, _fixture.Create<string>(), 4096);
 
         var request = _fixture.Build<V1GetStudentCourseRequest>()
             .With(result => result.CourseId, courseId)
@@ -62,6 +66,14 @@ public sealed class GetStudentCourseIntegrationTests : GetStudentCourseIntegrati
         response.CourseInfo.Status.Should().Be(ProtoCourseStatus.Draft);
         response.StudentCount.Should().Be(3);
         response.HomeworkCount.Should().Be(2);
+        response.Files
+            .Select(file => new { file.Id, file.Name, file.Size })
+            .Should()
+            .BeEquivalentTo(
+            [
+                new { firstFile.Id, firstFile.Name, firstFile.Size },
+                new { secondFile.Id, secondFile.Name, secondFile.Size }
+            ]);
     }
 
     [Fact]
