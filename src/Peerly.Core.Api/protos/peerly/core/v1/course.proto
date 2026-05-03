@@ -11,6 +11,7 @@ service CourseService {
   rpc V1GetTeacherCourse(V1GetTeacherCourseRequest) returns (V1GetTeacherCourseResponse);
   rpc V1GetStudentCourse(V1GetStudentCourseRequest) returns (V1GetStudentCourseResponse);
   rpc V1CreateCourse(V1CreateCourseRequest) returns (V1CreateCourseResponse);
+  rpc V1CreateCourseFile(V1CreateCourseFileRequest) returns (V1CreateCourseFileResponse);
   rpc V1SearchStudentCourses(V1SearchStudentCoursesRequest) returns (V1SearchStudentCoursesResponse);
   rpc V1SearchTeacherCourses(V1SearchTeacherCoursesRequest) returns (V1SearchTeacherCoursesResponse);
   rpc V1UpdateCourse(V1UpdateCourseRequest) returns (V1UpdateCourseResponse);
@@ -123,4 +124,24 @@ message V1DeleteCourseResponse {
   }
 
   message Success {}
+}
+
+message V1CreateCourseFileRequest {
+  int64 course_id = 1;
+  string storage_id = 2;
+  string file_name = 3;
+  int32 file_size = 4;
+  int64 teacher_id = 5;
+}
+
+message V1CreateCourseFileResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {
+    int64 file_id = 1;
+  }
 }

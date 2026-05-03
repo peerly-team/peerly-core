@@ -16,6 +16,7 @@ internal sealed class CommonUnitOfWork : UnitOfWork, ICommonUnitOfWork, ICommonR
     private readonly Lazy<IGroupTeacherRepository> _groupTeacherRepository;
     private readonly Lazy<ISubmittedHomeworkRepository> _submittedHomeworkRepository;
     private readonly Lazy<IFileRepository> _fileRepository;
+    private readonly Lazy<ICourseFileRepository> _courseFileRepository;
     private readonly Lazy<IHomeworkFileRepository> _homeworkFileRepository;
     private readonly Lazy<ISubmittedHomeworkFileRepository> _submittedHomeworkFileRepository;
     private readonly Lazy<IHomeworkDistributionRepository> _homeworkDistributionRepository;
@@ -36,6 +37,7 @@ internal sealed class CommonUnitOfWork : UnitOfWork, ICommonUnitOfWork, ICommonR
         Func<IConnectionContext, IGroupTeacherRepository> groupTeacherRepositoryFactory,
         Func<IConnectionContext, ISubmittedHomeworkRepository> submittedHomeworkRepositoryFactory,
         Func<IConnectionContext, IFileRepository> fileRepositoryFactory,
+        Func<IConnectionContext, ICourseFileRepository> courseFileRepositoryFactory,
         Func<IConnectionContext, IHomeworkFileRepository> homeworkFileRepositoryFactory,
         Func<IConnectionContext, ISubmittedHomeworkFileRepository> submittedHomeworkFileRepositoryFactory,
         Func<IConnectionContext, IHomeworkDistributionRepository> homeworkDistributionRepositoryFactory,
@@ -54,6 +56,7 @@ internal sealed class CommonUnitOfWork : UnitOfWork, ICommonUnitOfWork, ICommonR
         _groupTeacherRepository = new Lazy<IGroupTeacherRepository>(() => groupTeacherRepositoryFactory(this));
         _submittedHomeworkRepository = new Lazy<ISubmittedHomeworkRepository>(() => submittedHomeworkRepositoryFactory(this));
         _fileRepository = new Lazy<IFileRepository>(() => fileRepositoryFactory(this));
+        _courseFileRepository = new Lazy<ICourseFileRepository>(() => courseFileRepositoryFactory(this));
         _homeworkFileRepository = new Lazy<IHomeworkFileRepository>(() => homeworkFileRepositoryFactory(this));
         _submittedHomeworkFileRepository = new Lazy<ISubmittedHomeworkFileRepository>(() => submittedHomeworkFileRepositoryFactory(this));
         _homeworkDistributionRepository = new Lazy<IHomeworkDistributionRepository>(() => homeworkDistributionRepositoryFactory(this));
@@ -73,6 +76,7 @@ internal sealed class CommonUnitOfWork : UnitOfWork, ICommonUnitOfWork, ICommonR
     public IGroupTeacherRepository GroupTeacherRepository => _groupTeacherRepository.Value;
     public ISubmittedHomeworkRepository SubmittedHomeworkRepository => _submittedHomeworkRepository.Value;
     public IFileRepository FileRepository => _fileRepository.Value;
+    public ICourseFileRepository CourseFileRepository => _courseFileRepository.Value;
     public IHomeworkFileRepository HomeworkFileRepository => _homeworkFileRepository.Value;
     public ISubmittedHomeworkFileRepository SubmittedHomeworkFileRepository => _submittedHomeworkFileRepository.Value;
     public IHomeworkDistributionRepository HomeworkDistributionRepository => _homeworkDistributionRepository.Value;
@@ -91,6 +95,7 @@ internal sealed class CommonUnitOfWork : UnitOfWork, ICommonUnitOfWork, ICommonR
     public IReadOnlyGroupTeacherRepository ReadOnlyGroupTeacherRepository => _groupTeacherRepository.Value;
     public IReadOnlySubmittedHomeworkRepository ReadOnlySubmittedHomeworkRepository => _submittedHomeworkRepository.Value;
     public IReadOnlyFileRepository ReadOnlyFileRepository => _fileRepository.Value;
+    public IReadOnlyCourseFileRepository ReadOnlyCourseFileRepository => _courseFileRepository.Value;
     public IReadOnlyHomeworkFileRepository ReadOnlyHomeworkFileRepository => _homeworkFileRepository.Value;
     public IReadOnlySubmittedHomeworkFileRepository ReadOnlySubmittedHomeworkFileRepository => _submittedHomeworkFileRepository.Value;
     public IReadOnlyHomeworkDistributionRepository ReadOnlyHomeworkDistributionRepository => _homeworkDistributionRepository.Value;

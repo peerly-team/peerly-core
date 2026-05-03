@@ -1,6 +1,7 @@
 using System;
 using OneOf.Types;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourse;
+using Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourseFile;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.DeleteCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.GetStudentCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.GetTeacherCourse;
@@ -83,6 +84,36 @@ internal static class CourseMappingMapper
                 ValidationError = validationError.ToProto<CreateCourseCommand, Proto.V1CreateCourseRequest>()
             },
             otherError => new Proto.V1CreateCourseResponse { OtherError = otherError.ToProto() });
+    }
+
+    public static CreateCourseFileCommand ToCreateCourseFileCommand(this Proto.V1CreateCourseFileRequest request)
+    {
+        return new CreateCourseFileCommand
+        {
+            CourseId = new CourseId(request.CourseId),
+            StorageId = (StorageId)Guid.Parse(request.StorageId),
+            FileName = request.FileName,
+            FileSize = request.FileSize,
+            TeacherId = new TeacherId(request.TeacherId)
+        };
+    }
+
+    public static Proto.V1CreateCourseFileResponse ToV1CreateCourseFileResponse(
+        this CommandResponse<CreateCourseFileCommandResponse> commandResponse)
+    {
+        return commandResponse.Match(
+            success => new Proto.V1CreateCourseFileResponse
+            {
+                SuccessResponse = new Proto.V1CreateCourseFileResponse.Types.Success
+                {
+                    FileId = (long)success.FileId
+                }
+            },
+            validationError => new Proto.V1CreateCourseFileResponse
+            {
+                ValidationError = validationError.ToProto<CreateCourseFileCommand, Proto.V1CreateCourseFileRequest>()
+            },
+            otherError => new Proto.V1CreateCourseFileResponse { OtherError = otherError.ToProto() });
     }
 
     public static DeleteCourseCommand ToDeleteCourseCommand(this Proto.V1DeleteCourseRequest request)
