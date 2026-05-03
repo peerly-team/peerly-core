@@ -7,7 +7,6 @@ using Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.DeleteCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.GetStudentCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.GetTeacherCourse;
-using Peerly.Core.ApplicationServices.Features.V1.Courses.SearchCourses;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.SearchStudentCourses;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.SearchTeacherCourses;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.UpdateCourse;
@@ -18,7 +17,6 @@ namespace Peerly.Core.Api.Controllers.Courses;
 [ExcludeFromCodeCoverage]
 public sealed class CourseController : CourseService.CourseServiceBase
 {
-    private readonly IQueryHandler<SearchCoursesQuery, SearchCoursesQueryResponse> _searchCoursesHandler;
     private readonly IQueryHandler<SearchStudentCoursesQuery, SearchStudentCoursesQueryResponse> _searchStudentCoursesHandler;
     private readonly IQueryHandler<SearchTeacherCoursesQuery, SearchTeacherCoursesQueryResponse> _searchTeacherCoursesHandler;
     private readonly ICommandHandler<CreateCourseCommand, CreateCourseCommandResponse> _createCourseHandler;
@@ -28,7 +26,6 @@ public sealed class CourseController : CourseService.CourseServiceBase
     private readonly IQueryHandler<GetStudentCourseQuery, GetStudentCourseQueryResponse> _getStudentCourseHandler;
 
     public CourseController(
-        IQueryHandler<SearchCoursesQuery, SearchCoursesQueryResponse> searchCoursesHandler,
         IQueryHandler<SearchStudentCoursesQuery, SearchStudentCoursesQueryResponse> searchStudentCoursesHandler,
         IQueryHandler<SearchTeacherCoursesQuery, SearchTeacherCoursesQueryResponse> searchTeacherCoursesHandler,
         ICommandHandler<CreateCourseCommand, CreateCourseCommandResponse> createCourseHandler,
@@ -37,7 +34,6 @@ public sealed class CourseController : CourseService.CourseServiceBase
         IQueryHandler<GetTeacherCourseQuery, GetTeacherCourseQueryResponse> getTeacherCourseHandler,
         IQueryHandler<GetStudentCourseQuery, GetStudentCourseQueryResponse> getStudentCourseHandler)
     {
-        _searchCoursesHandler = searchCoursesHandler;
         _searchStudentCoursesHandler = searchStudentCoursesHandler;
         _searchTeacherCoursesHandler = searchTeacherCoursesHandler;
         _createCourseHandler = createCourseHandler;
@@ -68,14 +64,6 @@ public sealed class CourseController : CourseService.CourseServiceBase
         return commandResponse.ToV1CreateCourseResponse();
     }
 
-    public override async Task<V1SearchCoursesResponse> V1SearchCourses(V1SearchCoursesRequest request, ServerCallContext context)
-    {
-        var query = request.ToSearchCoursesQuery();
-        var queryResponse = await _searchCoursesHandler.ExecuteAsync(query, context.CancellationToken);
-        return queryResponse.ToV1SearchCoursesResponse();
-    }
-
-    // todo: поправить ручку
     public override async Task<V1SearchStudentCoursesResponse> V1SearchStudentCourses(
         V1SearchStudentCoursesRequest request,
         ServerCallContext context)
@@ -85,7 +73,6 @@ public sealed class CourseController : CourseService.CourseServiceBase
         return queryResponse.ToV1SearchStudentCoursesResponse();
     }
 
-    // todo: поправить ручку
     public override async Task<V1SearchTeacherCoursesResponse> V1SearchTeacherCourses(
         V1SearchTeacherCoursesRequest request,
         ServerCallContext context)

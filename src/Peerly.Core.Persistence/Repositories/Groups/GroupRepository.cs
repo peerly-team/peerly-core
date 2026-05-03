@@ -105,6 +105,56 @@ internal sealed class GroupRepository : IGroupRepository
         return [.. await _connectionContext.Connection.QueryAsync<Group>(command)];
     }
 
+    public async Task<IReadOnlyCollection<CourseId>> ListCourseIdsAsync(StudentId studentId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            StudentId = (long)studentId
+        };
+
+        const string Query =
+            $"""
+             select {GroupTable.CourseId}
+               from {GroupTable.TableName} g
+               join {GroupStudentTable.TableName} gs on gs.{GroupStudentTable.GroupId} = g.{GroupTable.Id}
+              where gs.{GroupStudentTable.StudentId} = @{nameof(queryParams.StudentId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var courseIds = await _connectionContext.Connection.QueryAsync<long>(command);
+
+        return courseIds.ToArrayBy(courseId => new CourseId(courseId));
+    }
+
+    public async Task<IReadOnlyCollection<CourseId>> ListCourseIdAsync(TeacherId teacherId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            TeacherId = (long)teacherId
+        };
+
+        const string Query =
+            $"""
+             select {GroupTable.CourseId}
+               from {GroupTable.TableName} g
+               join {GroupTeacherTable.TableName} gt on gt.{GroupTeacherTable.GroupId} = g.{GroupTable.Id}
+              where gt.{GroupTeacherTable.TeacherId} = @{nameof(queryParams.TeacherId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var courseIds = await _connectionContext.Connection.QueryAsync<long>(command);
+
+        return courseIds.ToArrayBy(courseId => new CourseId(courseId));
+    }
+
     public async Task<GroupId> AddAsync(GroupAddItem item, CancellationToken cancellationToken)
     {
         var queryParams = new

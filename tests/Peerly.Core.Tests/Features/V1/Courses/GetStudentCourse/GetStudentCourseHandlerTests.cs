@@ -69,9 +69,9 @@ public sealed class GetStudentCourseHandlerTests
         var queryResponse = await _handler.ExecuteAsync(query, CancellationToken.None);
 
         // Assert
-        queryResponse.CourseInfo.Course.Should().BeEquivalentTo(course);
-        queryResponse.CourseInfo.HomeworkCount.Should().Be(homeworkCount);
-        queryResponse.CourseInfo.StudentCount.Should().Be(groups.Sum(group => group.StudentCount));
+        queryResponse.Course.Should().BeEquivalentTo(course);
+        queryResponse.HomeworkCount.Should().Be(homeworkCount);
+        queryResponse.StudentCount.Should().Be(groups.Sum(group => group.StudentCount));
         _validatorMock.Verify(
             validator => validator.ValidateAsync(query, It.IsAny<CancellationToken>()),
             Times.Once);

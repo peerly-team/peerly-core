@@ -15,8 +15,8 @@ public interface IGroupTeacherRepository : IReadOnlyGroupTeacherRepository
 
 public interface IReadOnlyGroupTeacherRepository
 {
-    Task<IReadOnlyCollection<TeacherId>> ListTeacherIdAsync(GroupId groupId, CancellationToken cancellationToken);
     Task<IReadOnlyCollection<GroupTeacher>> ListAsync(GroupTeacherFilter filter, CancellationToken cancellationToken);
+    Task<IReadOnlyCollection<TeacherId>> ListTeacherIdAsync(GroupId groupId, CancellationToken cancellationToken);
     Task<bool> ExistsAsync(GroupTeacher groupTeacher, CancellationToken cancellationToken);
     Task<bool> ExistsAsync(CourseTeacher courseTeacher, CancellationToken cancellationToken);
 }
