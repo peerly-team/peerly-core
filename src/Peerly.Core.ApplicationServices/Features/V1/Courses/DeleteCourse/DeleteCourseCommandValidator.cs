@@ -1,5 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
+using OneOf.Types;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.ApplicationServices.Features.Validations;
@@ -8,7 +9,7 @@ using Peerly.Core.Models.Courses;
 
 namespace Peerly.Core.ApplicationServices.Features.V1.Courses.DeleteCourse;
 
-internal sealed class DeleteCourseCommandValidator : ICommandValidator<DeleteCourseCommand>
+internal sealed class DeleteCourseCommandValidator : ICommandValidator<DeleteCourseCommand, Success>
 {
     private readonly ICommonUnitOfWorkFactory _unitOfWorkFactory;
 

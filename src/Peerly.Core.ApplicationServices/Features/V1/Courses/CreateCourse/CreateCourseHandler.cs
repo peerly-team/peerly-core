@@ -10,13 +10,13 @@ namespace Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourse;
 internal sealed class CreateCourseHandler : ICommandHandler<CreateCourseCommand, CreateCourseCommandResponse>
 {
     private readonly ICommonUnitOfWorkFactory _unitOfWorkFactory;
-    private readonly ICommandValidator<CreateCourseCommand> _validator;
+    private readonly ICommandValidator<CreateCourseCommand, CreateCourseCommandResponse> _validator;
     private readonly IClock _clock;
 
     public CreateCourseHandler(
         ICommonUnitOfWorkFactory unitOfWorkFactory,
         IClock clock,
-        ICommandValidator<CreateCourseCommand> validator)
+        ICommandValidator<CreateCourseCommand, CreateCourseCommandResponse> validator)
     {
         _unitOfWorkFactory = unitOfWorkFactory;
         _clock = clock;

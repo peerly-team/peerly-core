@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
 using Moq;
+using OneOf.Types;
 using Peerly.Core.Abstractions.Repositories;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Abstractions;
@@ -20,7 +21,7 @@ namespace Peerly.Core.Tests.Features.V1.Courses.DeleteCourse;
 public sealed class DeleteCourseHandlerTests
 {
     private readonly Mock<ICommonUnitOfWork> _unitOfWorkMock = new();
-    private readonly Mock<ICommandValidator<DeleteCourseCommand>> _validatorMock = new();
+    private readonly Mock<ICommandValidator<DeleteCourseCommand, Success>> _validatorMock = new();
 
     private readonly Fixture _fixture = new();
     private readonly DeleteCourseHandler _handler;

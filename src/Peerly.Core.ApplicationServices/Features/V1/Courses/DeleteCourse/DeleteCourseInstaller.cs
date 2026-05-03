@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
+using OneOf.Types;
 using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.Tools.Abstractions;
 
@@ -10,6 +11,6 @@ internal sealed class DeleteCourseInstaller : IInstaller
 {
     public void InstallServices(IServiceCollection services)
     {
-        services.AddScoped<ICommandValidator<DeleteCourseCommand>, DeleteCourseCommandValidator>();
+        services.AddScoped<ICommandValidator<DeleteCourseCommand, Success>, DeleteCourseCommandValidator>();
     }
 }

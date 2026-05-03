@@ -20,7 +20,7 @@ public sealed class CreateCourseHandlerTests
 {
     private readonly Mock<ICommonUnitOfWork> _unitOfWorkMock = new();
     private readonly Mock<IClock> _clockMock = new();
-    private readonly Mock<ICommandValidator<CreateCourseCommand>> _validatorMock = new();
+    private readonly Mock<ICommandValidator<CreateCourseCommand, CreateCourseCommandResponse>> _validatorMock = new();
 
     private readonly Fixture _fixture = new();
     private readonly CreateCourseHandler _handler;
