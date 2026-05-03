@@ -14,6 +14,7 @@ service CourseService {
   rpc V1SearchStudentCourses(V1SearchStudentCoursesRequest) returns (V1SearchStudentCoursesResponse);
   rpc V1SearchTeacherCourses(V1SearchTeacherCoursesRequest) returns (V1SearchTeacherCoursesResponse);
   rpc V1UpdateCourse(V1UpdateCourseRequest) returns (V1UpdateCourseResponse);
+  rpc V1PublishCourse(V1PublishCourseRequest) returns (V1PublishCourseResponse);
   rpc V1DeleteCourse(V1DeleteCourseRequest) returns (V1DeleteCourseResponse);
 }
 
@@ -85,6 +86,21 @@ message V1UpdateCourseRequest {
 }
 
 message V1UpdateCourseResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}
+
+message V1PublishCourseRequest {
+  int64 course_id = 1;
+  int64 teacher_id = 2;
+}
+
+message V1PublishCourseResponse {
   oneof response {
     Success success_response = 1;
     ValidationError validation_error = 2;
