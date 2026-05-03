@@ -111,8 +111,7 @@ internal static class CourseMappingMapper
             CourseId = new CourseId(request.CourseId),
             TeacherId = new TeacherId(request.TeacherId),
             Name = request.Name,
-            Description = request.Description,
-            Status = request.Status.ToModel()
+            Description = request.Description
         };
     }
 

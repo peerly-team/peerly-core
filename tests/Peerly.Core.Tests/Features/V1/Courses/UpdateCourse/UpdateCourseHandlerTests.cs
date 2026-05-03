@@ -9,37 +9,37 @@ using OneOf.Types;
 using Peerly.Core.Abstractions.Repositories;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Abstractions;
-using Peerly.Core.ApplicationServices.Features.V1.Courses.DeleteCourse;
+using Peerly.Core.ApplicationServices.Features.V1.Courses.UpdateCourse;
 using Peerly.Core.ApplicationServices.Features.Validations;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Courses;
 using Xunit;
 
-namespace Peerly.Core.Tests.Features.V1.Courses.DeleteCourse;
+namespace Peerly.Core.Tests.Features.V1.Courses.UpdateCourse;
 
-public sealed class DeleteCourseHandlerTests
+public sealed class UpdateCourseHandlerTests
 {
     private readonly Mock<ICommonUnitOfWork> _unitOfWorkMock = new();
-    private readonly Mock<ICommandValidator<DeleteCourseCommand, Success>> _validatorMock = new();
+    private readonly Mock<ICommandValidator<UpdateCourseCommand, Success>> _validatorMock = new();
 
     private readonly Fixture _fixture = new();
-    private readonly DeleteCourseHandler _handler;
+    private readonly UpdateCourseHandler _handler;
 
-    public DeleteCourseHandlerTests()
+    public UpdateCourseHandlerTests()
     {
         var unitOfWorkFactoryMock = SetupUnitOfWorkFactory();
 
-        _handler = new DeleteCourseHandler(
+        _handler = new UpdateCourseHandler(
             unitOfWorkFactoryMock,
             _validatorMock.Object);
     }
 
     [Fact]
-    public async Task ExecuteAsync_ValidationResultSuccess_ShouldDeleteCourse()
+    public async Task ExecuteAsync_ValidationResultSuccess_ShouldUpdateCourse()
     {
         // Arrange
-        var command = _fixture.Create<DeleteCourseCommand>();
+        var command = _fixture.Create<UpdateCourseCommand>();
 
         _validatorMock
             .Setup(validator => validator.ValidateAsync(command, It.IsAny<CancellationToken>()))
@@ -48,7 +48,13 @@ public sealed class DeleteCourseHandlerTests
         var updateBuilderMock = new Mock<IUpdateBuilder<CourseUpdateItem>>();
         updateBuilderMock
             .Setup(builder => builder.Set(
-                It.Is<Expression<Func<CourseUpdateItem, CourseStatus>>>(expression => IsStatusExpression(expression)), CourseStatus.Deleted))
+                It.Is<Expression<Func<CourseUpdateItem, string>>>(expression => IsNameExpression(expression)),
+                command.Name))
+            .Returns(updateBuilderMock.Object);
+        updateBuilderMock
+            .Setup(builder => builder.Set(
+                It.Is<Expression<Func<CourseUpdateItem, string?>>>(expression => IsDescriptionExpression(expression)),
+                command.Description))
             .Returns(updateBuilderMock.Object);
 
         _unitOfWorkMock
@@ -73,8 +79,13 @@ public sealed class DeleteCourseHandlerTests
             Times.Once);
         updateBuilderMock.Verify(
             builder => builder.Set(
-                It.Is<Expression<Func<CourseUpdateItem, CourseStatus>>>(expression => IsStatusExpression(expression)),
-                CourseStatus.Deleted),
+                It.Is<Expression<Func<CourseUpdateItem, string>>>(expression => IsNameExpression(expression)),
+                command.Name),
+            Times.Once);
+        updateBuilderMock.Verify(
+            builder => builder.Set(
+                It.Is<Expression<Func<CourseUpdateItem, string?>>>(expression => IsDescriptionExpression(expression)),
+                command.Description!),
             Times.Once);
     }
 
@@ -82,7 +93,7 @@ public sealed class DeleteCourseHandlerTests
     public async Task ExecuteAsync_ValidationResultOtherError_ShouldBeOtherError()
     {
         // Arrange
-        var command = _fixture.Create<DeleteCourseCommand>();
+        var command = _fixture.Create<UpdateCourseCommand>();
 
         _validatorMock
             .Setup(validator => validator.ValidateAsync(command, It.IsAny<CancellationToken>()))
@@ -107,18 +118,18 @@ public sealed class DeleteCourseHandlerTests
     public async Task ExecuteAsync_ValidationResultValidationError_ShouldBeValidationError()
     {
         // Arrange
-        var command = _fixture.Create<DeleteCourseCommand>();
+        var command = _fixture.Create<UpdateCourseCommand>();
 
         _validatorMock
             .Setup(validator => validator.ValidateAsync(command, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(ValidationError.From(CourseErrors.IncorrectCourseStatusForDelete));
+            .ReturnsAsync(ValidationError.From(CourseErrors.IncorrectCourseStatusForUpdate));
 
         // Act
         var commandResponse = await _handler.ExecuteAsync(command, CancellationToken.None);
 
         // Assert
         commandResponse.IsT1.Should().BeTrue();
-        commandResponse.AsT1.Errors.Should().NotBeNull().And.ContainSingle(CourseErrors.IncorrectCourseStatusForDelete.Value);
+        commandResponse.AsT1.Errors.Should().NotBeNull().And.ContainSingle(CourseErrors.IncorrectCourseStatusForUpdate.Value);
         _unitOfWorkMock.Verify(
             unitOfWork => unitOfWork.CourseRepository.UpdateAsync(
                 It.IsAny<CourseId>(),
@@ -137,8 +148,13 @@ public sealed class DeleteCourseHandlerTests
         return unitOfWorkFactoryMock.Object;
     }
 
-    private static bool IsStatusExpression(Expression<Func<CourseUpdateItem, CourseStatus>> expression)
+    private static bool IsNameExpression(Expression<Func<CourseUpdateItem, string>> expression)
     {
-        return expression.Body is MemberExpression { Member.Name: nameof(CourseUpdateItem.Status) };
+        return expression.Body is MemberExpression { Member.Name: nameof(CourseUpdateItem.Name) };
+    }
+
+    private static bool IsDescriptionExpression(Expression<Func<CourseUpdateItem, string?>> expression)
+    {
+        return expression.Body is MemberExpression { Member.Name: nameof(CourseUpdateItem.Description) };
     }
 }

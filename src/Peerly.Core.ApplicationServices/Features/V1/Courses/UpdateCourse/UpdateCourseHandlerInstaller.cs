@@ -4,13 +4,13 @@ using OneOf.Types;
 using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.Tools.Abstractions;
 
-namespace Peerly.Core.ApplicationServices.Features.V1.Courses.DeleteCourse;
+namespace Peerly.Core.ApplicationServices.Features.V1.Courses.UpdateCourse;
 
 [ExcludeFromCodeCoverage]
-internal sealed class DeleteCourseInstaller : IInstaller
+internal sealed class UpdateCourseHandlerInstaller : IInstaller
 {
     public void InstallServices(IServiceCollection services)
     {
-        services.AddScoped<ICommandValidator<DeleteCourseCommand, Success>, DeleteCourseCommandValidator>();
+        services.AddScoped<ICommandValidator<UpdateCourseCommand, Success>, UpdateCourseCommandValidator>();
     }
 }

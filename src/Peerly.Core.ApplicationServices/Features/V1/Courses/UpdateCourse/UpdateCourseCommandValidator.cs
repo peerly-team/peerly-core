@@ -7,20 +7,20 @@ using Peerly.Core.ApplicationServices.Features.Validations;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Models.Courses;
 
-namespace Peerly.Core.ApplicationServices.Features.V1.Courses.DeleteCourse;
+namespace Peerly.Core.ApplicationServices.Features.V1.Courses.UpdateCourse;
 
-internal sealed class DeleteCourseCommandValidator : ICommandValidator<DeleteCourseCommand, Success>
+internal sealed class UpdateCourseCommandValidator : ICommandValidator<UpdateCourseCommand, Success>
 {
-    private readonly ICommonUnitOfWorkFactory _unitOfWorkFactory;
+    private readonly ICommonUnitOfWorkFactory _commonUnitOfWorkFactory;
 
-    public DeleteCourseCommandValidator(ICommonUnitOfWorkFactory unitOfWorkFactory)
+    public UpdateCourseCommandValidator(ICommonUnitOfWorkFactory commonUnitOfWorkFactory)
     {
-        _unitOfWorkFactory = unitOfWorkFactory;
+        _commonUnitOfWorkFactory = commonUnitOfWorkFactory;
     }
 
-    public async Task<CommandValidationResult> ValidateAsync(DeleteCourseCommand command, CancellationToken cancellationToken)
+    public async Task<CommandValidationResult> ValidateAsync(UpdateCourseCommand command, CancellationToken cancellationToken)
     {
-        await using var unitOfWork = await _unitOfWorkFactory.CreateAsync(cancellationToken);
+        await using var unitOfWork = await _commonUnitOfWorkFactory.CreateAsync(cancellationToken);
 
         var courseTeacher = command.ToCourseTeacher();
         if (!await unitOfWork.CourseTeacherRepository.ExistsAsync(courseTeacher, cancellationToken))
@@ -34,9 +34,9 @@ internal sealed class DeleteCourseCommandValidator : ICommandValidator<DeleteCou
             return OtherError.NotFound(CourseErrors.CourseNotFound);
         }
 
-        if (course.Status is not CourseStatus.Draft)
+        if (course.Status is not (CourseStatus.Draft or CourseStatus.InProgress))
         {
-            return ValidationError.From(CourseErrors.IncorrectCourseStatusForDelete);
+            return ValidationError.From(CourseErrors.IncorrectCourseStatusForUpdate);
         }
 
         return CommandValidationResult.Ok();

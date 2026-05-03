@@ -7,6 +7,7 @@ using Peerly.Core.IntegrationTests.Features.V1.Courses.GetStudentCourse.Infrastr
 using Peerly.Core.IntegrationTests.Features.V1.Courses.GetTeacherCourse.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Courses.SearchStudentCourses.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Courses.SearchTeacherCourses.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Courses.UpdateCourse.Infrastructure;
 using Respawn;
 using Testcontainers.PostgreSql;
 using Xunit;
@@ -36,6 +37,7 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
     public GetTeacherCourseGrpcClient GetTeacherCourseClient => ApplicationFactory.GetTeacherCourseClient();
     public SearchStudentCoursesGrpcClient SearchStudentCoursesClient => ApplicationFactory.SearchStudentCoursesClient();
     public SearchTeacherCoursesGrpcClient SearchTeacherCoursesClient => ApplicationFactory.SearchTeacherCoursesClient();
+    public UpdateCourseGrpcClient UpdateCourseClient => ApplicationFactory.UpdateCourseClient();
     public DeleteCourseGrpcClient DeleteCourseClient => ApplicationFactory.DeleteCourseClient();
 
     public async Task InitializeAsync()
