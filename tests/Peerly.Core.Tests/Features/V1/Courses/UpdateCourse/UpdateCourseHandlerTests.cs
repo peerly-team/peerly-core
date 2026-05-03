@@ -1,0 +1,160 @@
+using System;
+using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
+using AutoFixture;
+using FluentAssertions;
+using Moq;
+using OneOf.Types;
+using Peerly.Core.Abstractions.Repositories;
+using Peerly.Core.Abstractions.UnitOfWork;
+using Peerly.Core.ApplicationServices.Abstractions;
+using Peerly.Core.ApplicationServices.Features.V1.Courses.UpdateCourse;
+using Peerly.Core.ApplicationServices.Features.Validations;
+using Peerly.Core.ApplicationServices.Models.Common;
+using Peerly.Core.Identifiers;
+using Peerly.Core.Models.Courses;
+using Xunit;
+
+namespace Peerly.Core.Tests.Features.V1.Courses.UpdateCourse;
+
+public sealed class UpdateCourseHandlerTests
+{
+    private readonly Mock<ICommonUnitOfWork> _unitOfWorkMock = new();
+    private readonly Mock<ICommandValidator<UpdateCourseCommand, Success>> _validatorMock = new();
+
+    private readonly Fixture _fixture = new();
+    private readonly UpdateCourseHandler _handler;
+
+    public UpdateCourseHandlerTests()
+    {
+        var unitOfWorkFactoryMock = SetupUnitOfWorkFactory();
+
+        _handler = new UpdateCourseHandler(
+            unitOfWorkFactoryMock,
+            _validatorMock.Object);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ValidationResultSuccess_ShouldUpdateCourse()
+    {
+        // Arrange
+        var command = _fixture.Create<UpdateCourseCommand>();
+
+        _validatorMock
+            .Setup(validator => validator.ValidateAsync(command, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(CommandValidationResult.Ok);
+
+        var updateBuilderMock = new Mock<IUpdateBuilder<CourseUpdateItem>>();
+        updateBuilderMock
+            .Setup(builder => builder.Set(
+                It.Is<Expression<Func<CourseUpdateItem, string>>>(expression => IsNameExpression(expression)),
+                command.Name))
+            .Returns(updateBuilderMock.Object);
+        updateBuilderMock
+            .Setup(builder => builder.Set(
+                It.Is<Expression<Func<CourseUpdateItem, string?>>>(expression => IsDescriptionExpression(expression)),
+                command.Description))
+            .Returns(updateBuilderMock.Object);
+
+        _unitOfWorkMock
+            .Setup(unitOfWork => unitOfWork.CourseRepository.UpdateAsync(
+                command.CourseId,
+                It.IsAny<Action<IUpdateBuilder<CourseUpdateItem>>>(),
+                It.IsAny<CancellationToken>()))
+            .Callback<CourseId, Action<IUpdateBuilder<CourseUpdateItem>>, CancellationToken>(
+                (_, configureUpdate, _) => configureUpdate(updateBuilderMock.Object))
+            .ReturnsAsync(_fixture.Create<bool>());
+
+        // Act
+        var commandResponse = await _handler.ExecuteAsync(command, CancellationToken.None);
+
+        // Assert
+        commandResponse.IsT0.Should().BeTrue();
+        _unitOfWorkMock.Verify(
+            unitOfWork => unitOfWork.CourseRepository.UpdateAsync(
+                command.CourseId,
+                It.IsAny<Action<IUpdateBuilder<CourseUpdateItem>>>(),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+        updateBuilderMock.Verify(
+            builder => builder.Set(
+                It.Is<Expression<Func<CourseUpdateItem, string>>>(expression => IsNameExpression(expression)),
+                command.Name),
+            Times.Once);
+        updateBuilderMock.Verify(
+            builder => builder.Set(
+                It.Is<Expression<Func<CourseUpdateItem, string?>>>(expression => IsDescriptionExpression(expression)),
+                command.Description!),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ValidationResultOtherError_ShouldBeOtherError()
+    {
+        // Arrange
+        var command = _fixture.Create<UpdateCourseCommand>();
+
+        _validatorMock
+            .Setup(validator => validator.ValidateAsync(command, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(OtherError.NotFound(CourseErrors.CourseNotFound));
+
+        // Act
+        var commandResponse = await _handler.ExecuteAsync(command, CancellationToken.None);
+
+        // Assert
+        commandResponse.IsT2.Should().BeTrue();
+        commandResponse.AsT2.Type.Should().Be(ErrorType.NotFound);
+        commandResponse.AsT2.Message.Should().Be(CourseErrors.CourseNotFound);
+        _unitOfWorkMock.Verify(
+            unitOfWork => unitOfWork.CourseRepository.UpdateAsync(
+                It.IsAny<CourseId>(),
+                It.IsAny<Action<IUpdateBuilder<CourseUpdateItem>>>(),
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ValidationResultValidationError_ShouldBeValidationError()
+    {
+        // Arrange
+        var command = _fixture.Create<UpdateCourseCommand>();
+
+        _validatorMock
+            .Setup(validator => validator.ValidateAsync(command, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ValidationError.From(CourseErrors.IncorrectCourseStatusForUpdate));
+
+        // Act
+        var commandResponse = await _handler.ExecuteAsync(command, CancellationToken.None);
+
+        // Assert
+        commandResponse.IsT1.Should().BeTrue();
+        commandResponse.AsT1.Errors.Should().NotBeNull().And.ContainSingle(CourseErrors.IncorrectCourseStatusForUpdate.Value);
+        _unitOfWorkMock.Verify(
+            unitOfWork => unitOfWork.CourseRepository.UpdateAsync(
+                It.IsAny<CourseId>(),
+                It.IsAny<Action<IUpdateBuilder<CourseUpdateItem>>>(),
+                It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    private ICommonUnitOfWorkFactory SetupUnitOfWorkFactory()
+    {
+        var unitOfWorkFactoryMock = new Mock<ICommonUnitOfWorkFactory>();
+        unitOfWorkFactoryMock
+            .Setup(factory => factory.CreateAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(_unitOfWorkMock.Object);
+
+        return unitOfWorkFactoryMock.Object;
+    }
+
+    private static bool IsNameExpression(Expression<Func<CourseUpdateItem, string>> expression)
+    {
+        return expression.Body is MemberExpression { Member.Name: nameof(CourseUpdateItem.Name) };
+    }
+
+    private static bool IsDescriptionExpression(Expression<Func<CourseUpdateItem, string?>> expression)
+    {
+        return expression.Body is MemberExpression { Member.Name: nameof(CourseUpdateItem.Description) };
+    }
+}

@@ -26,6 +26,7 @@ using Peerly.Core.IntegrationTests.Features.V1.Courses.GetStudentCourse.Infrastr
 using Peerly.Core.IntegrationTests.Features.V1.Courses.GetTeacherCourse.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Courses.SearchStudentCourses.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Courses.SearchTeacherCourses.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Courses.UpdateCourse.Infrastructure;
 using Peerly.Core.Messaging.Extensions;
 using Peerly.Core.Persistence.Extensions;
 
@@ -117,6 +118,19 @@ public sealed class WebApplicationFactory : IAsyncDisposable
             });
 
         return new SearchTeacherCoursesGrpcClient(channel);
+    }
+
+    public UpdateCourseGrpcClient UpdateCourseClient()
+    {
+        var handler = new GrpcWebHandler(GetTestServer().CreateHandler());
+        var channel = GrpcChannel.ForAddress(
+            "http://localhost",
+            new GrpcChannelOptions
+            {
+                HttpHandler = handler
+            });
+
+        return new UpdateCourseGrpcClient(channel);
     }
 
     public DeleteCourseGrpcClient DeleteCourseClient()
