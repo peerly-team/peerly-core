@@ -20,11 +20,14 @@ internal sealed class GetTeacherCourseQueryValidator : IQueryValidator<GetTeache
         await using var unitOfWork = await _unitOfWorkFactory.CreateReadOnlyAsync(cancellationToken);
 
         var courseTeacher = query.ToCourseTeacher();
-        var isCourseTeacherExists = await unitOfWork.ReadOnlyCourseTeacherRepository.ExistsAsync(courseTeacher, cancellationToken) ||
-                                    await unitOfWork.ReadOnlyGroupTeacherRepository.ExistsAsync(courseTeacher, cancellationToken);
-        if (!isCourseTeacherExists)
+        var isCourseTeacher = await unitOfWork.ReadOnlyCourseTeacherRepository.ExistsAsync(courseTeacher, cancellationToken);
+        if (!isCourseTeacher)
         {
-            throw new NotFoundException();
+            var isGroupTeacher = await unitOfWork.ReadOnlyGroupTeacherRepository.ExistsAsync(courseTeacher, cancellationToken);
+            if (!isGroupTeacher)
+            {
+                throw new NotFoundException();
+            }
         }
 
         var isCourseExists = await unitOfWork.ReadOnlyCourseRepository.ExistsAsync(query.CourseId, cancellationToken);
