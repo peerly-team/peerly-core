@@ -90,8 +90,12 @@ public sealed class DeleteHomeworkCommandValidatorTests
         result.AsT2.Message.Should().BeNull();
     }
 
-    [Fact]
-    public async Task ValidateAsync_HomeworkNotInDraftStatus_ShouldBeValidationError()
+    [Theory]
+    [InlineData(HomeworkStatus.Published)]
+    [InlineData(HomeworkStatus.Reviewing)]
+    [InlineData(HomeworkStatus.Confirmation)]
+    [InlineData(HomeworkStatus.Finished)]
+    public async Task ValidateAsync_HomeworkNotInDraftStatus_ShouldBeValidationError(HomeworkStatus homeworkStatus)
     {
         // Arrange
         var command = _fixture.Create<DeleteHomeworkCommand>();
@@ -99,7 +103,7 @@ public sealed class DeleteHomeworkCommandValidatorTests
         var homework = _fixture.Build<Homework>()
             .With(result => result.Id, command.HomeworkId)
             .With(result => result.TeacherId, command.TeacherId)
-            .With(result => result.Status, HomeworkStatus.Published)
+            .With(result => result.Status, homeworkStatus)
             .Create();
         _unitOfWorkMock
             .Setup(unitOfWork => unitOfWork.HomeworkRepository.GetAsync(command.HomeworkId, It.IsAny<CancellationToken>()))
