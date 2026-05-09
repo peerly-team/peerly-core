@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
-using Peerly.Core.ApplicationServices.Features.V1.Groups.CreateGroup.Abstractions;
+using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.Tools.Abstractions;
 
 namespace Peerly.Core.ApplicationServices.Features.V1.Groups.CreateGroup;
@@ -10,6 +10,6 @@ internal sealed class CreateGroupInstaller : IInstaller
 {
     public void InstallServices(IServiceCollection services)
     {
-        services.AddScoped<ICreateGroupValidator, CreateGroupValidator>();
+        services.AddScoped<ICommandValidator<CreateGroupCommand, CreateGroupCommandResponse>, CreateGroupCommandValidator>();
     }
 }
