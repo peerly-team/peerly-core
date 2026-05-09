@@ -29,7 +29,9 @@ using Peerly.Core.IntegrationTests.Features.V1.Courses.PublishCourse.Infrastruct
 using Peerly.Core.IntegrationTests.Features.V1.Courses.SearchStudentCourses.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Courses.SearchTeacherCourses.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Courses.UpdateCourse.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Groups.CreateGroup.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CorrectSubmittedHomeworkMark.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Submissions.CreateSubmittedHomework.Infrastructure;
 using Peerly.Core.Messaging.Extensions;
 using Peerly.Core.Persistence.Extensions;
 
@@ -104,9 +106,19 @@ public sealed class WebApplicationFactory : IAsyncDisposable
         return new DeleteCourseGrpcClient(GetOrCreateGrpcChannel());
     }
 
+    public CreateGroupGrpcClient CreateGroupClient()
+    {
+        return new CreateGroupGrpcClient(GetOrCreateGrpcChannel());
+    }
+
     public CorrectSubmittedHomeworkMarkGrpcClient CorrectSubmittedHomeworkMarkClient()
     {
         return new CorrectSubmittedHomeworkMarkGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public CreateSubmittedHomeworkGrpcClient CreateSubmittedHomeworkClient()
+    {
+        return new CreateSubmittedHomeworkGrpcClient(GetOrCreateGrpcChannel());
     }
 
     public async Task StartAsync()
