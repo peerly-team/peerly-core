@@ -11,31 +11,28 @@ namespace Peerly.Core.ApplicationServices.Features.V1.Submissions.CorrectSubmitt
 internal sealed class CorrectSubmittedHomeworkMarkHandler : ICommandHandler<CorrectSubmittedHomeworkMarkCommand, Success>
 {
     private readonly ICommonUnitOfWorkFactory _commonUnitOfWorkFactory;
+    private readonly ICommandValidator<CorrectSubmittedHomeworkMarkCommand, Success> _validator;
     private readonly IClock _clock;
 
     public CorrectSubmittedHomeworkMarkHandler(
         ICommonUnitOfWorkFactory commonUnitOfWorkFactory,
-        IClock clock)
+        IClock clock,
+        ICommandValidator<CorrectSubmittedHomeworkMarkCommand, Success> validator)
     {
         _commonUnitOfWorkFactory = commonUnitOfWorkFactory;
         _clock = clock;
+        _validator = validator;
     }
 
     public async Task<CommandResponse<Success>> ExecuteAsync(
         CorrectSubmittedHomeworkMarkCommand command,
         CancellationToken cancellationToken)
     {
-        // TODO: permission — TeacherId должен иметь доступ к курсу, к которому относится
-        // submittedHomework.HomeworkId. Паттерн: IReadOnlySubmittedHomeworkRepository.GetAsync ->
-        // IReadOnlyHomeworkRepository.GetAsync -> ITeacherCourseAccessChecker.
-        // Несоответствие → OtherError.NotFound() (скрытие существования сдачи).
-        // Закрыть одним PR с ListSubmittedHomeworkOverview/GetTeacherSubmittedHomework.
-        // TODO: статус homework'а — разрешить только Reviewing/Closed. Сейчас неявно покрыто через
-        // UpdateAsync == false → NotFound, но явный статус даст OtherError.Conflict с понятной ошибкой.
-        // TODO: has_discrepancy намеренно не пересчитываем — это инвариант расхождения между
-        // рецензентами, фиксируется в ReviewCompletionJobExecutor.AggregateReviewersMarksAsync.
-        // TODO: вынести в ICorrectSubmittedHomeworkMarkValidator + Validator + Installer при появлении
-        // 2+ бизнес-проверок, см. feedback_validator_extraction.
+        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
+        if (validationResult.TryPickError(out var error))
+        {
+            return error;
+        }
 
         await using var unitOfWork = await _commonUnitOfWorkFactory.CreateAsync(cancellationToken);
 
@@ -43,8 +40,7 @@ internal sealed class CorrectSubmittedHomeworkMarkHandler : ICommandHandler<Corr
             command.SubmittedHomeworkId,
             builder => builder
                 .Set(item => item.TeacherMark, command.TeacherMark)
-                .Set(item => item.TeacherId, command.TeacherId)
-                .Set(item => item.UpdateTime, _clock.GetCurrentTime()),
+                .Set(item => item.TeacherId, (long)command.TeacherId),
             cancellationToken);
 
         return isSuccess

@@ -29,6 +29,7 @@ using Peerly.Core.IntegrationTests.Features.V1.Courses.PublishCourse.Infrastruct
 using Peerly.Core.IntegrationTests.Features.V1.Courses.SearchStudentCourses.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Courses.SearchTeacherCourses.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Courses.UpdateCourse.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Submissions.CorrectSubmittedHomeworkMark.Infrastructure;
 using Peerly.Core.Messaging.Extensions;
 using Peerly.Core.Persistence.Extensions;
 
@@ -42,6 +43,7 @@ public sealed class WebApplicationFactory : IAsyncDisposable
     private readonly string _databaseUsername;
     private readonly string _databasePassword;
     private IHost? _host;
+    private GrpcChannel? _channel;
 
     public WebApplicationFactory(
         string databaseHost,
@@ -59,119 +61,52 @@ public sealed class WebApplicationFactory : IAsyncDisposable
 
     public CreateCourseGrpcClient CreateCourseClient()
     {
-        var handler = new GrpcWebHandler(GetTestServer().CreateHandler());
-        var channel = GrpcChannel.ForAddress(
-            "http://localhost",
-            new GrpcChannelOptions
-            {
-                HttpHandler = handler
-            });
-
-        return new CreateCourseGrpcClient(channel);
+        return new CreateCourseGrpcClient(GetOrCreateGrpcChannel());
     }
 
     public CreateCourseFileGrpcClient CreateCourseFileClient()
     {
-        var handler = new GrpcWebHandler(GetTestServer().CreateHandler());
-        var channel = GrpcChannel.ForAddress(
-            "http://localhost",
-            new GrpcChannelOptions
-            {
-                HttpHandler = handler
-            });
-
-        return new CreateCourseFileGrpcClient(channel);
+        return new CreateCourseFileGrpcClient(GetOrCreateGrpcChannel());
     }
 
     public GetStudentCourseGrpcClient GetStudentCourseClient()
     {
-        var handler = new GrpcWebHandler(GetTestServer().CreateHandler());
-        var channel = GrpcChannel.ForAddress(
-            "http://localhost",
-            new GrpcChannelOptions
-            {
-                HttpHandler = handler
-            });
-
-        return new GetStudentCourseGrpcClient(channel);
+        return new GetStudentCourseGrpcClient(GetOrCreateGrpcChannel());
     }
 
     public GetTeacherCourseGrpcClient GetTeacherCourseClient()
     {
-        var handler = new GrpcWebHandler(GetTestServer().CreateHandler());
-        var channel = GrpcChannel.ForAddress(
-            "http://localhost",
-            new GrpcChannelOptions
-            {
-                HttpHandler = handler
-            });
-
-        return new GetTeacherCourseGrpcClient(channel);
+        return new GetTeacherCourseGrpcClient(GetOrCreateGrpcChannel());
     }
 
     public SearchStudentCoursesGrpcClient SearchStudentCoursesClient()
     {
-        var handler = new GrpcWebHandler(GetTestServer().CreateHandler());
-        var channel = GrpcChannel.ForAddress(
-            "http://localhost",
-            new GrpcChannelOptions
-            {
-                HttpHandler = handler
-            });
-
-        return new SearchStudentCoursesGrpcClient(channel);
+        return new SearchStudentCoursesGrpcClient(GetOrCreateGrpcChannel());
     }
 
     public SearchTeacherCoursesGrpcClient SearchTeacherCoursesClient()
     {
-        var handler = new GrpcWebHandler(GetTestServer().CreateHandler());
-        var channel = GrpcChannel.ForAddress(
-            "http://localhost",
-            new GrpcChannelOptions
-            {
-                HttpHandler = handler
-            });
-
-        return new SearchTeacherCoursesGrpcClient(channel);
+        return new SearchTeacherCoursesGrpcClient(GetOrCreateGrpcChannel());
     }
 
     public UpdateCourseGrpcClient UpdateCourseClient()
     {
-        var handler = new GrpcWebHandler(GetTestServer().CreateHandler());
-        var channel = GrpcChannel.ForAddress(
-            "http://localhost",
-            new GrpcChannelOptions
-            {
-                HttpHandler = handler
-            });
-
-        return new UpdateCourseGrpcClient(channel);
+        return new UpdateCourseGrpcClient(GetOrCreateGrpcChannel());
     }
 
     public PublishCourseGrpcClient PublishCourseClient()
     {
-        var handler = new GrpcWebHandler(GetTestServer().CreateHandler());
-        var channel = GrpcChannel.ForAddress(
-            "http://localhost",
-            new GrpcChannelOptions
-            {
-                HttpHandler = handler
-            });
-
-        return new PublishCourseGrpcClient(channel);
+        return new PublishCourseGrpcClient(GetOrCreateGrpcChannel());
     }
 
     public DeleteCourseGrpcClient DeleteCourseClient()
     {
-        var handler = new GrpcWebHandler(GetTestServer().CreateHandler());
-        var channel = GrpcChannel.ForAddress(
-            "http://localhost",
-            new GrpcChannelOptions
-            {
-                HttpHandler = handler
-            });
+        return new DeleteCourseGrpcClient(GetOrCreateGrpcChannel());
+    }
 
-        return new DeleteCourseGrpcClient(channel);
+    public CorrectSubmittedHomeworkMarkGrpcClient CorrectSubmittedHomeworkMarkClient()
+    {
+        return new CorrectSubmittedHomeworkMarkGrpcClient(GetOrCreateGrpcChannel());
     }
 
     public async Task StartAsync()
@@ -206,6 +141,16 @@ public sealed class WebApplicationFactory : IAsyncDisposable
     {
         return _host?.GetTestServer()
             ?? throw new InvalidOperationException("Integration test host is not initialized.");
+    }
+
+    private GrpcChannel GetOrCreateGrpcChannel()
+    {
+        return _channel ??= GrpcChannel.ForAddress(
+            "http://localhost",
+            new GrpcChannelOptions
+            {
+                HttpHandler = new GrpcWebHandler(GetTestServer().CreateHandler())
+            });
     }
 
     private IReadOnlyDictionary<string, string?> GetConfiguration()
