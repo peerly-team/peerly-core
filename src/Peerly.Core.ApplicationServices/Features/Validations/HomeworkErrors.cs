@@ -9,4 +9,5 @@ internal static class HomeworkErrors
     public static ErrorMessage HomeworkDeadlinePassed => "Срок сдачи домашнего задания истёк";
     public static ErrorMessage HomeworkNotInConfirmationStatus => "Домашнее задание не находится в статусе подтверждения";
     public static ErrorMessage IncorrectHomeworkStatusForDelete => "Удалить домашнее задание можно только в статусе \"Черновик\"";
+    public static ErrorMessage IncorrectHomeworkStatusForDeleteFile => "Открепить файл можно когда домашнее задание в статусе \"Черновик\"";
 }

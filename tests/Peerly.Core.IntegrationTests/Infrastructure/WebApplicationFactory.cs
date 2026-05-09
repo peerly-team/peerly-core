@@ -31,6 +31,7 @@ using Peerly.Core.IntegrationTests.Features.V1.Courses.SearchTeacherCourses.Infr
 using Peerly.Core.IntegrationTests.Features.V1.Courses.UpdateCourse.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Groups.CreateGroup.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Homeworks.DeleteHomework.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Homeworks.DeleteHomeworkFile.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CorrectSubmittedHomeworkMark.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CreateSubmittedHomework.Infrastructure;
 using Peerly.Core.Messaging.Extensions;
@@ -115,6 +116,11 @@ public sealed class WebApplicationFactory : IAsyncDisposable
     public DeleteHomeworkGrpcClient DeleteHomeworkClient()
     {
         return new DeleteHomeworkGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public DeleteHomeworkFileGrpcClient DeleteHomeworkFileClient()
+    {
+        return new DeleteHomeworkFileGrpcClient(GetOrCreateGrpcChannel());
     }
 
     public CorrectSubmittedHomeworkMarkGrpcClient CorrectSubmittedHomeworkMarkClient()
