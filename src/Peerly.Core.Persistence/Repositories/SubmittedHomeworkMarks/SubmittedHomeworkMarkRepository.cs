@@ -117,7 +117,8 @@ internal sealed class SubmittedHomeworkMarkRepository : ISubmittedHomeworkMarkRe
         var query =
             $"""
              update {SubmittedHomeworkMarkTable.TableName} as new
-                set {SubmittedHomeworkMarkTable.TeacherMark} = case
+                set {SubmittedHomeworkMarkTable.UpdateTime} = now(),
+                    {SubmittedHomeworkMarkTable.TeacherMark} = case
                     when {configuration.GetFlagParamName(item => item.TeacherMark)}
                     then {configuration.GetParamName(item => item.TeacherMark)}
                     else {SubmittedHomeworkMarkTable.TeacherMark}
@@ -126,11 +127,6 @@ internal sealed class SubmittedHomeworkMarkRepository : ISubmittedHomeworkMarkRe
                     when {configuration.GetFlagParamName(item => item.TeacherId)}
                     then {configuration.GetParamName(item => item.TeacherId)}
                     else {SubmittedHomeworkMarkTable.TeacherId}
-                    end,
-                    {SubmittedHomeworkMarkTable.UpdateTime} = case
-                    when {configuration.GetFlagParamName(item => item.UpdateTime)}
-                    then {configuration.GetParamName(item => item.UpdateTime)}
-                    else {SubmittedHomeworkMarkTable.UpdateTime}
                     end
               from (select {SubmittedHomeworkMarkTable.SubmittedHomeworkId}
                       from {SubmittedHomeworkMarkTable.TableName}

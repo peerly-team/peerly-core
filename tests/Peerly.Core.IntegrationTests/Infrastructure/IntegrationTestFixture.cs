@@ -10,6 +10,7 @@ using Peerly.Core.IntegrationTests.Features.V1.Courses.PublishCourse.Infrastruct
 using Peerly.Core.IntegrationTests.Features.V1.Courses.SearchStudentCourses.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Courses.SearchTeacherCourses.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Courses.UpdateCourse.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Submissions.CorrectSubmittedHomeworkMark.Infrastructure;
 using Respawn;
 using Testcontainers.PostgreSql;
 using Xunit;
@@ -43,6 +44,7 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
     public UpdateCourseGrpcClient UpdateCourseClient => ApplicationFactory.UpdateCourseClient();
     public PublishCourseGrpcClient PublishCourseClient => ApplicationFactory.PublishCourseClient();
     public DeleteCourseGrpcClient DeleteCourseClient => ApplicationFactory.DeleteCourseClient();
+    public CorrectSubmittedHomeworkMarkGrpcClient CorrectSubmittedHomeworkMarkClient => ApplicationFactory.CorrectSubmittedHomeworkMarkClient();
 
     public async Task InitializeAsync()
     {
