@@ -13,6 +13,7 @@ using Peerly.Core.Models.Homeworks;
 
 namespace Peerly.Core.ApplicationServices.Validators.HomeworkSubmissionAccess;
 
+// todo: избавиться от этого валидатора
 internal sealed class HomeworkSubmissionAccessValidator : IHomeworkSubmissionAccessValidator
 {
     private readonly ICommonUnitOfWorkFactory _unitOfWorkFactory;
@@ -45,14 +46,9 @@ internal sealed class HomeworkSubmissionAccessValidator : IHomeworkSubmissionAcc
             return accessError;
         }
 
-        if (homework.Status is not HomeworkStatus.Published)
+        if (homework.Status is not HomeworkStatus.Published || _clock.GetCurrentTime() >= homework.Deadline)
         {
             return OtherError.Conflict(HomeworkErrors.HomeworkNotAcceptingSubmissions);
-        }
-
-        if (_clock.GetCurrentTime() >= homework.Deadline)
-        {
-            return OtherError.Conflict(HomeworkErrors.HomeworkDeadlinePassed);
         }
 
         return null;

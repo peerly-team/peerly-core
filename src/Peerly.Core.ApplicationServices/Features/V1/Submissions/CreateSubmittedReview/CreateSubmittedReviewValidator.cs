@@ -9,6 +9,7 @@ namespace Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmitte
 
 internal sealed class CreateSubmittedReviewValidator : ICreateSubmittedReviewValidator
 {
+    // todo: добавить проверку, что дедлайн проверки ещё не вышел
     public async Task<OtherError?> ValidateAsync(
         ICommonUnitOfWork unitOfWork,
         CreateSubmittedReviewCommand command,

@@ -53,14 +53,9 @@ internal sealed class CreateSubmittedHomeworkCommandValidator : ICommandValidato
             }
         }
 
-        if (homework.Status is not HomeworkStatus.Published)
+        if (homework.Status is not HomeworkStatus.Published || _clock.GetCurrentTime() >= homework.Deadline)
         {
             return OtherError.Conflict(HomeworkErrors.HomeworkNotAcceptingSubmissions);
-        }
-
-        if (_clock.GetCurrentTime() >= homework.Deadline)
-        {
-            return OtherError.Conflict(HomeworkErrors.HomeworkDeadlinePassed);
         }
 
         var homeworkStudent = new HomeworkStudent { HomeworkId = command.HomeworkId, StudentId = command.StudentId };
