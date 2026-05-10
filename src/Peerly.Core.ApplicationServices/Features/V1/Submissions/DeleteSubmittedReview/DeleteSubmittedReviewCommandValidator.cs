@@ -10,12 +10,12 @@ using Peerly.Core.Models.Homeworks;
 
 namespace Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedReview;
 
-internal sealed class DeleteSubmittedReviewValidator : ICommandValidator<DeleteSubmittedReviewCommand, Success>
+internal sealed class DeleteSubmittedReviewCommandValidator : ICommandValidator<DeleteSubmittedReviewCommand, Success>
 {
     private readonly ICommonUnitOfWorkFactory _unitOfWorkFactory;
     private readonly IClock _clock;
 
-    public DeleteSubmittedReviewValidator(ICommonUnitOfWorkFactory unitOfWorkFactory, IClock clock)
+    public DeleteSubmittedReviewCommandValidator(ICommonUnitOfWorkFactory unitOfWorkFactory, IClock clock)
     {
         _unitOfWorkFactory = unitOfWorkFactory;
         _clock = clock;

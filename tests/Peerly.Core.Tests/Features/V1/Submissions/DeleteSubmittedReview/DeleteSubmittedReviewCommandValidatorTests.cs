@@ -26,13 +26,13 @@ public sealed class DeleteSubmittedReviewCommandValidatorTests
     private readonly Mock<IClock> _clockMock = new();
     private readonly Fixture _fixture = new();
     private readonly DateTimeOffset _currentTime = DateTimeOffset.UtcNow;
-    private readonly DeleteSubmittedReviewValidator _validator;
+    private readonly DeleteSubmittedReviewCommandValidator _validator;
 
     public DeleteSubmittedReviewCommandValidatorTests()
     {
         _clockMock.Setup(clock => clock.GetCurrentTime()).Returns(_currentTime);
         var unitOfWorkFactory = SetupUnitOfWorkFactory();
-        _validator = new DeleteSubmittedReviewValidator(unitOfWorkFactory, _clockMock.Object);
+        _validator = new DeleteSubmittedReviewCommandValidator(unitOfWorkFactory, _clockMock.Object);
     }
 
     [Fact]

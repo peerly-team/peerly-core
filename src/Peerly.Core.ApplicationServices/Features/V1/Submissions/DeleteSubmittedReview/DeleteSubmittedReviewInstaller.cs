@@ -11,6 +11,6 @@ internal sealed class DeleteSubmittedReviewInstaller : IInstaller
 {
     public void InstallServices(IServiceCollection services)
     {
-        services.AddScoped<ICommandValidator<DeleteSubmittedReviewCommand, Success>, DeleteSubmittedReviewValidator>();
+        services.AddScoped<ICommandValidator<DeleteSubmittedReviewCommand, Success>, DeleteSubmittedReviewCommandValidator>();
     }
 }
