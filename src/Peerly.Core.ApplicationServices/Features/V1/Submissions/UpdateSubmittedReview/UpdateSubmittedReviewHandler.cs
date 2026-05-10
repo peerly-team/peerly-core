@@ -16,9 +16,7 @@ internal sealed class UpdateSubmittedReviewHandler : ICommandHandler<UpdateSubmi
         _commonUnitOfWorkFactory = commonUnitOfWorkFactory;
     }
 
-    public async Task<CommandResponse<Success>> ExecuteAsync(
-        UpdateSubmittedReviewCommand command,
-        CancellationToken cancellationToken)
+    public async Task<CommandResponse<Success>> ExecuteAsync(UpdateSubmittedReviewCommand command, CancellationToken cancellationToken)
     {
         // TODO: permission — StudentId должен быть автором рецензии SubmittedReviewId.
         // Потребуется IReadOnlySubmittedReviewRepository.GetAuthorAsync(SubmittedReviewId) -> StudentId?

@@ -90,22 +90,59 @@ public abstract class SubmissionIntegrationTestBase : IAsyncLifetime
             });
     }
 
+    protected async Task<long> AddGroupInDbAsync(long courseId)
+    {
+        await using var connection = await Fixture.DataSource.OpenConnectionAsync();
+
+        const string Query =
+            """
+            insert into groups (course_id, name, creation_time)
+            values (@courseId, @name, @creationTime)
+            returning id;
+            """;
+
+        return await connection.QuerySingleAsync<long>(
+            Query,
+            new
+            {
+                courseId,
+                name = $"Group {Guid.NewGuid():N}",
+                creationTime = DateTimeOffset.UtcNow
+            });
+    }
+
+    protected async Task AddGroupStudentInDbAsync(long groupId, long studentId)
+    {
+        await using var connection = await Fixture.DataSource.OpenConnectionAsync();
+
+        const string Query =
+            """
+            insert into group_students (group_id, student_id, creation_time)
+            values (@groupId, @studentId, @creationTime)
+            on conflict (group_id, student_id) do nothing;
+            """;
+
+        await connection.ExecuteAsync(Query, new { groupId, studentId, creationTime = DateTimeOffset.UtcNow });
+    }
+
     protected async Task<long> AddHomeworkInDbAsync(
         long courseId,
         long teacherId,
         HomeworkStatus status,
-        DateTimeOffset? reviewDeadline = null)
+        DateTimeOffset? reviewDeadline = null,
+        long? groupId = null,
+        DateTimeOffset? deadline = null)
     {
         await using var connection = await Fixture.DataSource.OpenConnectionAsync();
 
         const string Query =
             """
             insert into homeworks (
-                course_id, teacher_id, name, status,
+                course_id, group_id, teacher_id, name, status,
                 amount_of_reviewers, description, checklist,
                 deadline, review_deadline, discrepancy_threshold, creation_time)
             values (
-                @courseId, @teacherId, @name, @status,
+                @courseId, @groupId, @teacherId, @name, @status,
                 @amountOfReviewers, @description, @checklist,
                 @deadline, @reviewDeadline, @discrepancyThreshold, @creationTime)
             returning id;
@@ -116,20 +153,21 @@ public abstract class SubmissionIntegrationTestBase : IAsyncLifetime
             new
             {
                 courseId,
+                groupId,
                 teacherId,
                 name = $"Homework {Guid.NewGuid():N}",
                 status = status.ToString(),
                 amountOfReviewers = 2,
                 description = "Description",
                 checklist = "Checklist",
-                deadline = DateTimeOffset.UtcNow.AddDays(7),
+                deadline = deadline ?? DateTimeOffset.UtcNow.AddDays(7),
                 reviewDeadline = reviewDeadline ?? DateTimeOffset.UtcNow.AddDays(14),
                 discrepancyThreshold = 2,
                 creationTime = DateTimeOffset.UtcNow
             });
     }
 
-    protected async Task<long> AddSubmittedHomeworkInDbAsync(long homeworkId, long studentId)
+    protected async Task<long> AddSubmittedHomeworkInDbAsync(long homeworkId, long studentId, string comment = "Test comment")
     {
         await using var connection = await Fixture.DataSource.OpenConnectionAsync();
 
@@ -146,7 +184,7 @@ public abstract class SubmissionIntegrationTestBase : IAsyncLifetime
             {
                 homeworkId,
                 studentId,
-                comment = "Test comment",
+                comment,
                 creationTime = DateTimeOffset.UtcNow
             });
     }
