@@ -1,13 +1,13 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Peerly.Core.Abstractions.ApplicationServices;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Abstractions;
-using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomeworkFile.Abstractions;
-using Peerly.Core.ApplicationServices.Features.Validations;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.ApplicationServices.Services.Anonymization.Abstractions;
+using Peerly.Core.ApplicationServices.Services.Anonymization.Models;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Groups;
 using Peerly.Core.Models.Homeworks;
@@ -16,23 +16,22 @@ using Mapper = Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSub
 
 namespace Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomeworkFile;
 
-// todo: выполнить рефакторинг
 internal sealed class CreateSubmittedHomeworkFileHandler : ICommandHandler<CreateSubmittedHomeworkFileCommand, CreateSubmittedHomeworkFileCommandResponse>
 {
     private readonly ICommonUnitOfWorkFactory _commonUnitOfWorkFactory;
     private readonly IFileAnonymizationService _anonymizationService;
-    private readonly ICreateSubmittedHomeworkFileValidator _createSubmittedHomeworkFileValidator;
+    private readonly ICommandValidator<CreateSubmittedHomeworkFileCommand, CreateSubmittedHomeworkFileCommandResponse> _validator;
     private readonly IClock _clock;
 
     public CreateSubmittedHomeworkFileHandler(
         ICommonUnitOfWorkFactory commonUnitOfWorkFactory,
         IFileAnonymizationService anonymizationService,
-        ICreateSubmittedHomeworkFileValidator createSubmittedHomeworkFileValidator,
+        ICommandValidator<CreateSubmittedHomeworkFileCommand, CreateSubmittedHomeworkFileCommandResponse> validator,
         IClock clock)
     {
         _commonUnitOfWorkFactory = commonUnitOfWorkFactory;
         _anonymizationService = anonymizationService;
-        _createSubmittedHomeworkFileValidator = createSubmittedHomeworkFileValidator;
+        _validator = validator;
         _clock = clock;
     }
 
@@ -40,39 +39,27 @@ internal sealed class CreateSubmittedHomeworkFileHandler : ICommandHandler<Creat
         CreateSubmittedHomeworkFileCommand command,
         CancellationToken cancellationToken)
     {
-        await using var unitOfWork = await _commonUnitOfWorkFactory.CreateAsync(cancellationToken);
-
-        var validationError = await _createSubmittedHomeworkFileValidator.RunAsync(command, cancellationToken);
-        if (validationError is not null)
+        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
+        if (validationResult.TryPickError(out var error))
         {
-            return validationError;
+            return error;
         }
+
+        await using var unitOfWork = await _commonUnitOfWorkFactory.CreateAsync(cancellationToken);
 
         var submittedHomework = await unitOfWork.SubmittedHomeworkRepository.GetAsync(command.SubmittedHomeworkId, cancellationToken);
         var homework = await unitOfWork.HomeworkRepository.GetAsync(submittedHomework!.HomeworkId, cancellationToken);
-        if (homework is null)
-        {
-            return OtherError.NotFound(HomeworkErrors.HomeworkNotFound);
-        }
+        var students = await GetStudentsAsync(unitOfWork, homework!, cancellationToken);
 
-        // todo: добавить анонимизацию названия файла, чтобы не было случаев, когда пользователь назвал файл своим именем
-        var students = await GetStudentsAsync(unitOfWork, homework, cancellationToken);
-        var anonymizationResponse = await _anonymizationService.AnonymizeAsync(command.ToAnonymizationItem(students), cancellationToken);
+        var anonymizationResult = await _anonymizationService.AnonymizeAsync(command.ToAnonymizationItem(students), cancellationToken);
 
         await using var operationSet = await unitOfWork.StartOperationSet(cancellationToken);
 
         var creationTime = _clock.GetCurrentTime();
         var fileId = await unitOfWork.FileRepository.AddAsync(command.ToFileAddItem(creationTime), cancellationToken);
 
-        var anonymizedFileId = anonymizationResponse is null
-            ? (FileId?)null
-            : await unitOfWork.FileRepository.AddAsync(
-                command.ToAnonymizedFileAddItem(anonymizationResponse, creationTime),
-                cancellationToken);
-
-        await unitOfWork.SubmittedHomeworkFileRepository.AddAsync(
-            command.ToSubmittedHomeworkFileAddItem(fileId, anonymizedFileId),
-            cancellationToken);
+        var anonymizedFileId = await AddAnonymizeFileIfNeedAsync(unitOfWork, anonymizationResult, creationTime, cancellationToken);
+        await unitOfWork.SubmittedHomeworkFileRepository.AddAsync(command.ToSubmittedHomeworkFileAddItem(fileId, anonymizedFileId), cancellationToken);
 
         await operationSet.Complete(cancellationToken);
 
@@ -80,6 +67,22 @@ internal sealed class CreateSubmittedHomeworkFileHandler : ICommandHandler<Creat
         {
             FileId = fileId
         };
+    }
+
+    private static async Task<FileId?> AddAnonymizeFileIfNeedAsync(
+        ICommonUnitOfWork unitOfWork,
+        AnonymizationResult? anonymizationResult,
+        DateTimeOffset creationTime,
+        CancellationToken cancellationToken)
+    {
+        if (anonymizationResult is null)
+        {
+            return null;
+        }
+
+        return await unitOfWork.FileRepository.AddAsync(
+            anonymizationResult.ToAnonymizedFileAddItem(creationTime),
+            cancellationToken);
     }
 
     private static async Task<IReadOnlyCollection<Student>> GetStudentsAsync(

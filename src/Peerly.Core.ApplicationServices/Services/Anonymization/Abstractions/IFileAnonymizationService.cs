@@ -6,5 +6,5 @@ namespace Peerly.Core.ApplicationServices.Services.Anonymization.Abstractions;
 
 internal interface IFileAnonymizationService
 {
-    Task<AnonymizationResponse?> AnonymizeAsync(AnonymizationRequest request, CancellationToken cancellationToken);
+    Task<AnonymizationResult?> AnonymizeAsync(AnonymizationRequest request, CancellationToken cancellationToken);
 }

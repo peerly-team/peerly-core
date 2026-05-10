@@ -27,7 +27,7 @@ internal sealed class FileAnonymizationService : IFileAnonymizationService
         _storage = storage;
     }
 
-    public async Task<AnonymizationResponse?> AnonymizeAsync(
+    public async Task<AnonymizationResult?> AnonymizeAsync(
         AnonymizationRequest request,
         CancellationToken cancellationToken)
     {
@@ -40,17 +40,19 @@ internal sealed class FileAnonymizationService : IFileAnonymizationService
         await using var originalStream = await _storage.GetObjectAsync(request.OriginalStorageId, cancellationToken);
         var (content, encoding) = await ReadContentAsync(originalStream, cancellationToken);
 
-        var anonymizedContent = ReplaceStudentPiiInContent(content, request.Students);
+        var anonymizedContent = ReplaceStudentPiiInContent(content, request.Students, encoding);
+        var anonymizedFileName = ReplaceStudentPiiInContent(request.FileName, request.Students);
         var anonymizedBytes = encoding.GetBytes(anonymizedContent);
         var anonymizedStorageId = (StorageId)Guid.NewGuid();
 
         await using var uploadStream = new MemoryStream(anonymizedBytes);
         await _storage.PutObjectAsync(anonymizedStorageId, uploadStream, cancellationToken);
 
-        return new AnonymizationResponse
+        return new AnonymizationResult
         {
             AnonymizedStorageId = anonymizedStorageId,
-            Size = anonymizedBytes.Length
+            Size = anonymizedBytes.Length,
+            AnonymizedFileName = anonymizedFileName
         };
     }
 
@@ -68,9 +70,12 @@ internal sealed class FileAnonymizationService : IFileAnonymizationService
         return (encoding.GetString(bytes), encoding);
     }
 
-    private static string ReplaceStudentPiiInContent(string content, IReadOnlyCollection<Student> students)
+    private static string ReplaceStudentPiiInContent(
+        string content,
+        IReadOnlyCollection<Student> students,
+        Encoding? encoding = null)
     {
-        var replacements = GetReplacementModels(students);
+        var replacements = GetReplacementModels(students, encoding);
 
         foreach (var (original, replacement) in replacements)
         {
@@ -80,22 +85,34 @@ internal sealed class FileAnonymizationService : IFileAnonymizationService
         return content;
     }
 
-    private static List<ReplacementModel> GetReplacementModels(IReadOnlyCollection<Student> students)
+    private static List<ReplacementModel> GetReplacementModels(IReadOnlyCollection<Student> students, Encoding? encoding)
     {
         var result = new List<ReplacementModel>(2 * students.Count);
+        var emailReplacement = CanEncode(encoding, "[Почта X]") ? "[Почта X]" : "[Email X]";
+        var studentReplacement = CanEncode(encoding, "[Студент X]") ? "[Студент X]" : "[Student X]";
         foreach (var student in students)
         {
-            result.Add(new ReplacementModel(student.Email, "[Почта X]"));
+            result.Add(new ReplacementModel(student.Email, emailReplacement));
 
             if (student.Name is not null)
             {
-                result.Add(new ReplacementModel(student.Name, "[Студент X]"));
+                result.Add(new ReplacementModel(student.Name, studentReplacement));
             }
         }
 
         result.Sort((a, b) => b.Original.Length.CompareTo(a.Original.Length));
 
         return result;
+    }
+
+    private static bool CanEncode(Encoding? encoding, string content)
+    {
+        if (encoding is null)
+        {
+            return true;
+        }
+
+        return encoding.GetString(encoding.GetBytes(content)) == content;
     }
 
     private sealed record ReplacementModel(string Original, string Replacement);
