@@ -4,32 +4,32 @@ using AutoFixture;
 using FluentAssertions;
 using Moq;
 using Peerly.Core.Abstractions.UnitOfWork;
-using Peerly.Core.ApplicationServices.Features.V1.Homeworks.DeleteHomework;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.DeleteHomeworkFile;
 using Peerly.Core.ApplicationServices.Features.Validations;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Homeworks;
 using Xunit;
 
-namespace Peerly.Core.Tests.Features.V1.Homeworks.DeleteHomework;
+namespace Peerly.Core.Tests.Features.V1.Homeworks.DeleteHomeworkFile;
 
-public sealed class DeleteHomeworkCommandValidatorTests
+public sealed class DeleteHomeworkFileCommandValidatorTests
 {
     private readonly Mock<ICommonUnitOfWork> _unitOfWorkMock = new();
     private readonly Fixture _fixture = new();
-    private readonly DeleteHomeworkCommandValidator _validator;
+    private readonly DeleteHomeworkFileCommandValidator _validator;
 
-    public DeleteHomeworkCommandValidatorTests()
+    public DeleteHomeworkFileCommandValidatorTests()
     {
         var unitOfWorkFactory = SetupUnitOfWorkFactory();
-        _validator = new DeleteHomeworkCommandValidator(unitOfWorkFactory);
+        _validator = new DeleteHomeworkFileCommandValidator(unitOfWorkFactory);
     }
 
     [Fact]
     public async Task ValidateAsync_HomeworkTeacherMatchesAndHomeworkInDraftStatus_ShouldSuccess()
     {
         // Arrange
-        var command = _fixture.Create<DeleteHomeworkCommand>();
+        var command = _fixture.Create<DeleteHomeworkFileCommand>();
 
         var homework = _fixture.Build<Homework>()
             .With(result => result.Id, command.HomeworkId)
@@ -51,7 +51,7 @@ public sealed class DeleteHomeworkCommandValidatorTests
     public async Task ValidateAsync_HomeworkNotFound_ShouldBeOtherErrorNotFound()
     {
         // Arrange
-        var command = _fixture.Create<DeleteHomeworkCommand>();
+        var command = _fixture.Create<DeleteHomeworkFileCommand>();
 
         _unitOfWorkMock
             .Setup(unitOfWork => unitOfWork.HomeworkRepository.GetAsync(command.HomeworkId, It.IsAny<CancellationToken>()))
@@ -70,7 +70,7 @@ public sealed class DeleteHomeworkCommandValidatorTests
     public async Task ValidateAsync_HomeworkTeacherDoesNotMatch_ShouldBeOtherErrorPermissionDenied()
     {
         // Arrange
-        var command = _fixture.Create<DeleteHomeworkCommand>();
+        var command = _fixture.Create<DeleteHomeworkFileCommand>();
 
         var homework = _fixture.Build<Homework>()
             .With(result => result.Id, command.HomeworkId)
@@ -90,20 +90,16 @@ public sealed class DeleteHomeworkCommandValidatorTests
         result.AsT2.Message.Should().BeNull();
     }
 
-    [Theory]
-    [InlineData(HomeworkStatus.Published)]
-    [InlineData(HomeworkStatus.Reviewing)]
-    [InlineData(HomeworkStatus.Confirmation)]
-    [InlineData(HomeworkStatus.Finished)]
-    public async Task ValidateAsync_HomeworkNotInDraftStatus_ShouldBeValidationError(HomeworkStatus homeworkStatus)
+    [Fact]
+    public async Task ValidateAsync_HomeworkNotInDraftStatus_ShouldBeValidationError()
     {
         // Arrange
-        var command = _fixture.Create<DeleteHomeworkCommand>();
+        var command = _fixture.Create<DeleteHomeworkFileCommand>();
 
         var homework = _fixture.Build<Homework>()
             .With(result => result.Id, command.HomeworkId)
             .With(result => result.TeacherId, command.TeacherId)
-            .With(result => result.Status, homeworkStatus)
+            .With(result => result.Status, HomeworkStatus.Published)
             .Create();
         _unitOfWorkMock
             .Setup(unitOfWork => unitOfWork.HomeworkRepository.GetAsync(command.HomeworkId, It.IsAny<CancellationToken>()))

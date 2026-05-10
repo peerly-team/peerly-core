@@ -159,6 +159,7 @@ internal sealed class SubmittedReviewRepository : ISubmittedReviewRepository
         const string Query =
             $"""
              select {SubmittedReviewTable.Id},
+                    {SubmittedReviewTable.SubmittedHomeworkId},
                     {SubmittedReviewTable.StudentId},
                     {SubmittedReviewTable.Mark},
                     {SubmittedReviewTable.Comment}
@@ -216,6 +217,7 @@ internal sealed class SubmittedReviewRepository : ISubmittedReviewRepository
         const string Query =
             $"""
              select {SubmittedReviewTable.Id},
+                    {SubmittedReviewTable.SubmittedHomeworkId},
                     {SubmittedReviewTable.StudentId},
                     {SubmittedReviewTable.Mark},
                     {SubmittedReviewTable.Comment}

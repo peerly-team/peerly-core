@@ -98,6 +98,32 @@ internal sealed class SubmittedHomeworkFileRepository : ISubmittedHomeworkFileRe
         await _connectionContext.Connection.ExecuteAsync(command);
     }
 
+    public async Task<bool> ExistsAsync(SubmittedHomeworkId submittedHomeworkId, FileId fileId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            SubmittedHomeworkId = (long)submittedHomeworkId,
+            FileId = (long)fileId
+        };
+
+        const string Query =
+            $"""
+             select exists(
+                 select
+                   from {SubmittedHomeworkFileTable.TableName}
+                  where {SubmittedHomeworkFileTable.SubmittedHomeworkId} = @{nameof(queryParams.SubmittedHomeworkId)}
+                    and {SubmittedHomeworkFileTable.FileId} = @{nameof(queryParams.FileId)});
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+
+        return await _connectionContext.Connection.QuerySingleAsync<bool>(command);
+    }
+
     public async Task<IReadOnlyCollection<File>> ListBySubmittedHomeworkAsync(
         SubmittedHomeworkId submittedHomeworkId,
         CancellationToken cancellationToken)

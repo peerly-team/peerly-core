@@ -31,8 +31,12 @@ using Peerly.Core.IntegrationTests.Features.V1.Courses.SearchTeacherCourses.Infr
 using Peerly.Core.IntegrationTests.Features.V1.Courses.UpdateCourse.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Groups.CreateGroup.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Homeworks.DeleteHomework.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Homeworks.DeleteHomeworkFile.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CorrectSubmittedHomeworkMark.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CreateSubmittedHomework.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Submissions.DeleteSubmittedHomework.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Submissions.DeleteSubmittedHomeworkFile.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Submissions.DeleteSubmittedReview.Infrastructure;
 using Peerly.Core.Messaging.Extensions;
 using Peerly.Core.Persistence.Extensions;
 
@@ -117,6 +121,11 @@ public sealed class WebApplicationFactory : IAsyncDisposable
         return new DeleteHomeworkGrpcClient(GetOrCreateGrpcChannel());
     }
 
+    public DeleteHomeworkFileGrpcClient DeleteHomeworkFileClient()
+    {
+        return new DeleteHomeworkFileGrpcClient(GetOrCreateGrpcChannel());
+    }
+
     public CorrectSubmittedHomeworkMarkGrpcClient CorrectSubmittedHomeworkMarkClient()
     {
         return new CorrectSubmittedHomeworkMarkGrpcClient(GetOrCreateGrpcChannel());
@@ -125,6 +134,21 @@ public sealed class WebApplicationFactory : IAsyncDisposable
     public CreateSubmittedHomeworkGrpcClient CreateSubmittedHomeworkClient()
     {
         return new CreateSubmittedHomeworkGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public DeleteSubmittedHomeworkGrpcClient DeleteSubmittedHomeworkClient()
+    {
+        return new DeleteSubmittedHomeworkGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public DeleteSubmittedHomeworkFileGrpcClient DeleteSubmittedHomeworkFileClient()
+    {
+        return new DeleteSubmittedHomeworkFileGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public DeleteSubmittedReviewGrpcClient DeleteSubmittedReviewClient()
+    {
+        return new DeleteSubmittedReviewGrpcClient(GetOrCreateGrpcChannel());
     }
 
     public async Task StartAsync()

@@ -18,6 +18,7 @@ public interface ISubmittedHomeworkFileRepository : IReadOnlySubmittedHomeworkFi
 
 public interface IReadOnlySubmittedHomeworkFileRepository
 {
+    Task<bool> ExistsAsync(SubmittedHomeworkId submittedHomeworkId, FileId fileId, CancellationToken cancellationToken);
     Task<FileId?> GetAnonymizedFileIdAsync(FileId fileId, CancellationToken cancellationToken);
     Task<IReadOnlyCollection<File>> ListBySubmittedHomeworkAsync(SubmittedHomeworkId submittedHomeworkId, CancellationToken cancellationToken);
     Task<IReadOnlyCollection<File>> ListAnonymizedBySubmittedHomeworkAsync(SubmittedHomeworkId submittedHomeworkId, CancellationToken cancellationToken);

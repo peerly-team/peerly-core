@@ -4,13 +4,13 @@ using OneOf.Types;
 using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.Tools.Abstractions;
 
-namespace Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedHomeworkFile;
+namespace Peerly.Core.ApplicationServices.Features.V1.Homeworks.DeleteHomeworkFile;
 
 [ExcludeFromCodeCoverage]
-internal sealed class DeleteSubmittedHomeworkFileInstaller : IInstaller
+internal sealed class DeleteHomeworkFileInstaller : IInstaller
 {
     public void InstallServices(IServiceCollection services)
     {
-        services.AddScoped<ICommandValidator<DeleteSubmittedHomeworkFileCommand, Success>, DeleteSubmittedHomeworkFileValidator>();
+        services.AddScoped<ICommandValidator<DeleteHomeworkFileCommand, Success>, DeleteHomeworkFileCommandValidator>();
     }
 }

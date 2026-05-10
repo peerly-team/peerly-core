@@ -1,33 +1,44 @@
 using System.Threading;
 using System.Threading.Tasks;
+using OneOf.Types;
 using Peerly.Core.Abstractions.UnitOfWork;
-using Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedHomework.Abstractions;
+using Peerly.Core.ApplicationServices.Abstractions;
+using Peerly.Core.ApplicationServices.Features.Validations;
 using Peerly.Core.ApplicationServices.Models.Common;
+using Peerly.Core.Models.Homeworks;
 
 namespace Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedHomework;
 
-internal sealed class DeleteSubmittedHomeworkValidator : IDeleteSubmittedHomeworkValidator
+internal sealed class DeleteSubmittedHomeworkValidator : ICommandValidator<DeleteSubmittedHomeworkCommand, Success>
 {
-    public Task<OtherError?> ValidateAsync(
-        ICommonUnitOfWork unitOfWork,
-        DeleteSubmittedHomeworkCommand command,
-        CancellationToken cancellationToken)
+    private readonly ICommonUnitOfWorkFactory _unitOfWorkFactory;
+
+    public DeleteSubmittedHomeworkValidator(ICommonUnitOfWorkFactory unitOfWorkFactory)
     {
-        // TODO: реализовать бизнес-валидации по образцу UpdateSubmittedHomeworkValidator
-        //       + HomeworkSubmissionAccessValidator:
-        // 1. Existence: unitOfWork.SubmittedHomeworkRepository.GetAsync(...)
-        //    → NotFound(SubmittedHomeworkErrors.SubmittedHomeworkNotFound)
-        // 2. Ownership: submission.StudentId != command.StudentId
-        //    → NotFound (скрываем PermissionDenied, не раскрываем существование чужой отправки)
-        // 3. Access через IHomeworkSubmissionAccessValidator:
-        //    - homework существует и не в Draft
-        //    - IStudentCourseAccessChecker (студент в группе курса)
-        //    - если homework групповой — студент в его группе
-        //    - homework в статусе Published
-        //    - deadline не истёк
-        // 4. Conflict: если по submitted_homework_id есть записи в
-        //    submitted_reviews / submitted_homework_marks / distribution_reviewers
-        //    → Conflict (потребует HasAnyAsync методов и нового ErrorMessage).
-        return Task.FromResult<OtherError?>(null);
+        _unitOfWorkFactory = unitOfWorkFactory;
+    }
+
+    public async Task<CommandValidationResult> ValidateAsync(DeleteSubmittedHomeworkCommand command, CancellationToken cancellationToken)
+    {
+        await using var unitOfWork = await _unitOfWorkFactory.CreateReadOnlyAsync(cancellationToken);
+
+        var submittedHomework = await unitOfWork.ReadOnlySubmittedHomeworkRepository.GetAsync(command.SubmittedHomeworkId, cancellationToken);
+        if (submittedHomework is null || submittedHomework.StudentId != command.StudentId)
+        {
+            return OtherError.NotFound(SubmittedHomeworkErrors.SubmittedHomeworkNotFound);
+        }
+
+        var homework = await unitOfWork.ReadOnlyHomeworkRepository.GetAsync(submittedHomework.HomeworkId, cancellationToken);
+        if (homework is null)
+        {
+            return OtherError.NotFound(HomeworkErrors.HomeworkNotFound);
+        }
+
+        if (homework.Status is not HomeworkStatus.Published)
+        {
+            return ValidationError.From(HomeworkErrors.HomeworkNotAcceptingSubmissions);
+        }
+
+        return CommandValidationResult.Ok();
     }
 }
