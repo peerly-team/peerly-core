@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Peerly.Core.Abstractions.ApplicationServices;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Abstractions;
-using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedReview.Abstractions;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Models.Submissions;
 
@@ -13,12 +12,12 @@ internal sealed class CreateSubmittedReviewHandler : ICommandHandler<CreateSubmi
 {
     private readonly ICommonUnitOfWorkFactory _commonUnitOfWorkFactory;
     private readonly IClock _clock;
-    private readonly ICreateSubmittedReviewValidator _validator;
+    private readonly ICommandValidator<CreateSubmittedReviewCommand, CreateSubmittedReviewCommandResponse> _validator;
 
     public CreateSubmittedReviewHandler(
         ICommonUnitOfWorkFactory commonUnitOfWorkFactory,
         IClock clock,
-        ICreateSubmittedReviewValidator validator)
+        ICommandValidator<CreateSubmittedReviewCommand, CreateSubmittedReviewCommandResponse> validator)
     {
         _commonUnitOfWorkFactory = commonUnitOfWorkFactory;
         _clock = clock;
@@ -29,13 +28,13 @@ internal sealed class CreateSubmittedReviewHandler : ICommandHandler<CreateSubmi
         CreateSubmittedReviewCommand command,
         CancellationToken cancellationToken)
     {
-        await using var unitOfWork = await _commonUnitOfWorkFactory.CreateAsync(cancellationToken);
-
-        var validationError = await _validator.ValidateAsync(unitOfWork, command, cancellationToken);
-        if (validationError is not null)
+        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
+        if (validationResult.TryPickError(out var error))
         {
-            return validationError;
+            return error;
         }
+
+        await using var unitOfWork = await _commonUnitOfWorkFactory.CreateAsync(cancellationToken);
 
         var submittedReviewAddItem = new SubmittedReviewAddItem
         {
