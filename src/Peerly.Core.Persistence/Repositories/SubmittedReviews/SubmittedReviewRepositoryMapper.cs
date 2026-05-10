@@ -20,6 +20,7 @@ internal static class SubmittedReviewRepositoryMapper
         return new SubmittedReview
         {
             Id = new SubmittedReviewId(db.Id),
+            SubmittedHomeworkId = new SubmittedHomeworkId(db.SubmittedHomeworkId),
             StudentId = new StudentId(db.StudentId),
             Mark = db.Mark,
             Comment = db.Comment

@@ -10,21 +10,23 @@ namespace Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmitte
 internal sealed class DeleteSubmittedReviewHandler : ICommandHandler<DeleteSubmittedReviewCommand, Success>
 {
     private readonly ICommonUnitOfWorkFactory _commonUnitOfWorkFactory;
+    private readonly ICommandValidator<DeleteSubmittedReviewCommand, Success> _validator;
 
-    public DeleteSubmittedReviewHandler(ICommonUnitOfWorkFactory commonUnitOfWorkFactory)
+    public DeleteSubmittedReviewHandler(
+        ICommonUnitOfWorkFactory commonUnitOfWorkFactory,
+        ICommandValidator<DeleteSubmittedReviewCommand, Success> validator)
     {
         _commonUnitOfWorkFactory = commonUnitOfWorkFactory;
+        _validator = validator;
     }
 
     public async Task<CommandResponse<Success>> ExecuteAsync(DeleteSubmittedReviewCommand command, CancellationToken cancellationToken)
     {
-        // TODO: permission — StudentId должен быть автором рецензии SubmittedReviewId.
-        // Потребуется IReadOnlySubmittedReviewRepository.GetAsync(SubmittedReviewId) -> SubmittedReview?
-        // (или тонкий GetAuthorAsync(SubmittedReviewId) -> StudentId?). PermissionDenied раньше NotFound
-        // (правило permission-before-existence, образец — DeleteCourseHandler).
-        // TODO: homework во «фазе ревью», ReviewDeadline не истёк — иначе ValidationError.
-        // TODO: вынести проверки в IDeleteSubmittedReviewValidator + DeleteSubmittedReviewValidator
-        // + DeleteSubmittedReviewInstaller по образцу DeleteSubmittedHomeworkValidator.
+        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
+        if (validationResult.TryPickError(out var error))
+        {
+            return error;
+        }
 
         await using var unitOfWork = await _commonUnitOfWorkFactory.CreateAsync(cancellationToken);
 
