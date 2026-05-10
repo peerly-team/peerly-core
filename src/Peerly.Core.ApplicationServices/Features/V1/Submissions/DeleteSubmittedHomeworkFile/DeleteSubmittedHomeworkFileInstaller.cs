@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
-using Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedHomeworkFile.Abstractions;
+using OneOf.Types;
+using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.Tools.Abstractions;
 
 namespace Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedHomeworkFile;
@@ -10,6 +11,6 @@ internal sealed class DeleteSubmittedHomeworkFileInstaller : IInstaller
 {
     public void InstallServices(IServiceCollection services)
     {
-        services.AddScoped<IDeleteSubmittedHomeworkFileValidator, DeleteSubmittedHomeworkFileValidator>();
+        services.AddScoped<ICommandValidator<DeleteSubmittedHomeworkFileCommand, Success>, DeleteSubmittedHomeworkFileValidator>();
     }
 }

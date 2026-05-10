@@ -16,6 +16,7 @@ using Peerly.Core.IntegrationTests.Features.V1.Homeworks.DeleteHomeworkFile.Infr
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CorrectSubmittedHomeworkMark.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CreateSubmittedHomework.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.DeleteSubmittedHomework.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Submissions.DeleteSubmittedHomeworkFile.Infrastructure;
 using Respawn;
 using Testcontainers.PostgreSql;
 using Xunit;
@@ -55,6 +56,7 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
     public CorrectSubmittedHomeworkMarkGrpcClient CorrectSubmittedHomeworkMarkClient => ApplicationFactory.CorrectSubmittedHomeworkMarkClient();
     public CreateSubmittedHomeworkGrpcClient CreateSubmittedHomeworkClient => ApplicationFactory.CreateSubmittedHomeworkClient();
     public DeleteSubmittedHomeworkGrpcClient DeleteSubmittedHomeworkClient => ApplicationFactory.DeleteSubmittedHomeworkClient();
+    public DeleteSubmittedHomeworkFileGrpcClient DeleteSubmittedHomeworkFileClient => ApplicationFactory.DeleteSubmittedHomeworkFileClient();
 
     public async Task InitializeAsync()
     {
