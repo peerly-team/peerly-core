@@ -70,6 +70,8 @@ public class UnitOfWorkInstaller : IInstaller
                 Password = opt.Password,
                 SslMode = opt.SslMode,
                 Pooling = true,
+                MaxPoolSize = opt.MaxPoolSize,
+                ConnectionIdleLifetime = opt.ConnectionIdleLifetime,
             };
 
             return NpgsqlDataSource.Create(csb.ConnectionString);

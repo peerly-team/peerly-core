@@ -217,6 +217,8 @@ public sealed class WebApplicationFactory : IAsyncDisposable
             ["ConnectionFactoryOptions:UserName"] = _databaseUsername,
             ["ConnectionFactoryOptions:Password"] = _databasePassword,
             ["ConnectionFactoryOptions:SslMode"] = "Disable",
+            ["ConnectionFactoryOptions:MaxPoolSize"] = "100",
+            ["ConnectionFactoryOptions:ConnectionIdleLifetime"] = "300",
             ["KafkaConsumer:BootstrapServers"] = "localhost:9092",
             ["KafkaConsumer:GroupId"] = "peerly-core-tests",
             ["KafkaConsumer:Topic"] = "user_registration_events",
