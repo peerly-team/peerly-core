@@ -10,20 +10,23 @@ namespace Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmitte
 internal sealed class UpdateSubmittedReviewHandler : ICommandHandler<UpdateSubmittedReviewCommand, Success>
 {
     private readonly ICommonUnitOfWorkFactory _commonUnitOfWorkFactory;
+    private readonly ICommandValidator<UpdateSubmittedReviewCommand, Success> _validator;
 
-    public UpdateSubmittedReviewHandler(ICommonUnitOfWorkFactory commonUnitOfWorkFactory)
+    public UpdateSubmittedReviewHandler(
+        ICommonUnitOfWorkFactory commonUnitOfWorkFactory,
+        ICommandValidator<UpdateSubmittedReviewCommand, Success> validator)
     {
         _commonUnitOfWorkFactory = commonUnitOfWorkFactory;
+        _validator = validator;
     }
 
     public async Task<CommandResponse<Success>> ExecuteAsync(UpdateSubmittedReviewCommand command, CancellationToken cancellationToken)
     {
-        // TODO: permission — StudentId должен быть автором рецензии SubmittedReviewId.
-        // Потребуется IReadOnlySubmittedReviewRepository.GetAuthorAsync(SubmittedReviewId) -> StudentId?
-        // или GetAsync(SubmittedReviewId) -> SubmittedReview?. PermissionDenied до проверки существования.
-        // TODO: homework во «фазе ревью», ReviewDeadline не истёк — иначе ValidationError.
-        // TODO: вынести проверки в IUpdateSubmittedReviewValidator + UpdateSubmittedReviewValidator
-        // + UpdateSubmittedReviewInstaller по паттерну CreateSubmittedReviewValidator.
+        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
+        if (validationResult.TryPickError(out var error))
+        {
+            return error;
+        }
 
         await using var unitOfWork = await _commonUnitOfWorkFactory.CreateAsync(cancellationToken);
 
