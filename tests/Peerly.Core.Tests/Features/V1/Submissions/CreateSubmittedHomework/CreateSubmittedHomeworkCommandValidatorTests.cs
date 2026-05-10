@@ -265,7 +265,7 @@ public sealed class CreateSubmittedHomeworkCommandValidatorTests
         // Assert
         result.IsT2.Should().BeTrue();
         result.AsT2.Type.Should().Be(ErrorType.Conflict);
-        result.AsT2.Message.Should().Be(HomeworkErrors.HomeworkDeadlinePassed);
+        result.AsT2.Message.Should().Be(HomeworkErrors.HomeworkNotAcceptingSubmissions);
     }
 
     [Fact]

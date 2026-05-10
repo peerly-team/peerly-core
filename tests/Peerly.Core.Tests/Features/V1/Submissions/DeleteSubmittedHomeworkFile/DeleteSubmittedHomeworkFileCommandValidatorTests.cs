@@ -1,8 +1,10 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
 using Moq;
+using Peerly.Core.Abstractions.ApplicationServices;
 using Peerly.Core.Abstractions.Repositories;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedHomeworkFile;
@@ -19,13 +21,16 @@ public sealed class DeleteSubmittedHomeworkFileCommandValidatorTests
 {
     private readonly Mock<ICommonReadOnlyUnitOfWork> _unitOfWorkMock = new();
     private readonly Mock<IReadOnlySubmittedHomeworkFileRepository> _submittedHomeworkFileRepositoryMock = new();
+    private readonly Mock<IClock> _clockMock = new();
     private readonly Fixture _fixture = new();
+    private readonly DateTimeOffset _currentTime = DateTimeOffset.UtcNow;
     private readonly DeleteSubmittedHomeworkFileValidator _validator;
 
     public DeleteSubmittedHomeworkFileCommandValidatorTests()
     {
+        _clockMock.Setup(clock => clock.GetCurrentTime()).Returns(_currentTime);
         var unitOfWorkFactory = SetupUnitOfWorkFactory();
-        _validator = new DeleteSubmittedHomeworkFileValidator(unitOfWorkFactory);
+        _validator = new DeleteSubmittedHomeworkFileValidator(unitOfWorkFactory, _clockMock.Object);
     }
 
     [Fact]
@@ -157,6 +162,24 @@ public sealed class DeleteSubmittedHomeworkFileCommandValidatorTests
         result.AsT1.Errors.Should().NotBeNull().And.ContainSingle(HomeworkErrors.HomeworkNotAcceptingSubmissions);
     }
 
+    [Fact]
+    public async Task ValidateAsync_HomeworkDeadlinePassed_ShouldBeValidationError()
+    {
+        // Arrange
+        var command = _fixture.Create<DeleteSubmittedHomeworkFileCommand>();
+
+        var submittedHomework = SetupSubmittedHomework(command);
+        SetupSubmittedHomeworkFileExists(command, exists: true);
+        SetupHomework(submittedHomework.HomeworkId, HomeworkStatus.Published, _currentTime.AddTicks(-1));
+
+        // Act
+        var result = await _validator.ValidateAsync(command, CancellationToken.None);
+
+        // Assert
+        result.IsT1.Should().BeTrue();
+        result.AsT1.Errors.Should().NotBeNull().And.ContainSingle(HomeworkErrors.HomeworkNotAcceptingSubmissions);
+    }
+
     private SubmittedHomework SetupSubmittedHomework(DeleteSubmittedHomeworkFileCommand command)
     {
         var submittedHomework = _fixture.Build<SubmittedHomework>()
@@ -179,9 +202,15 @@ public sealed class DeleteSubmittedHomeworkFileCommandValidatorTests
 
     private void SetupHomework(HomeworkId homeworkId, HomeworkStatus status)
     {
+        SetupHomework(homeworkId, status, _currentTime.AddDays(1));
+    }
+
+    private void SetupHomework(HomeworkId homeworkId, HomeworkStatus status, DateTimeOffset deadline)
+    {
         var homework = _fixture.Build<Homework>()
             .With(result => result.Id, homeworkId)
             .With(result => result.Status, status)
+            .With(result => result.Deadline, deadline)
             .Create();
         _unitOfWorkMock
             .Setup(uow => uow.ReadOnlyHomeworkRepository.GetAsync(homeworkId, It.IsAny<CancellationToken>()))

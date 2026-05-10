@@ -254,7 +254,7 @@ public sealed class CreateSubmittedHomeworkIntegrationTests : CreateSubmittedHom
         // Assert
         response.ResponseCase.Should().Be(V1CreateSubmittedHomeworkResponse.ResponseOneofCase.OtherError);
         response.OtherError.Type.Should().Be(OtherError.Types.ErrorType.Conflict);
-        response.OtherError.Message.Should().Be("Срок сдачи домашнего задания истёк");
+        response.OtherError.Message.Should().Be("Отправка ответов для домашнего задания закрыта");
 
         var submittedHomeworksCount = await GetSubmittedHomeworksCountAsync(request.HomeworkId, request.StudentId);
         submittedHomeworksCount.Should().Be(0);

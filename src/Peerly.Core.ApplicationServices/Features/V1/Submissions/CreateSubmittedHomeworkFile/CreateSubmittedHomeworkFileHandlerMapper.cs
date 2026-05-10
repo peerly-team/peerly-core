@@ -24,15 +24,14 @@ internal static class CreateSubmittedHomeworkFileHandlerMapper
     }
 
     public static FileAddItem ToAnonymizedFileAddItem(
-        this CreateSubmittedHomeworkFileCommand command,
-        AnonymizationResponse response,
+        this AnonymizationResult result,
         DateTimeOffset creationTime)
     {
         return new FileAddItem
         {
-            StorageId = response.AnonymizedStorageId,
-            Name = command.FileName,
-            Size = response.Size,
+            StorageId = result.AnonymizedStorageId,
+            Name = result.AnonymizedFileName,
+            Size = result.Size,
             CreationTime = creationTime
         };
     }
