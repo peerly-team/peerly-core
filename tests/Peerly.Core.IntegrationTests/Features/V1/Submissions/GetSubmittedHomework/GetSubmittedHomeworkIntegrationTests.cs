@@ -31,7 +31,7 @@ public sealed class GetSubmittedHomeworkIntegrationTests : GetSubmittedHomeworkI
         await AddStudentInDbAsync(ownerStudentId);
         await AddStudentInDbAsync(reviewerStudentId);
 
-        var homeworkId = await AddHomeworkInDbAsync(courseId, teacherId, HomeworkStatusModel.Confirmation);
+        var homeworkId = await AddHomeworkInDbAsync(courseId, teacherId, HomeworkStatusModel.Finished);
         var submittedHomeworkId = await AddSubmittedHomeworkInDbAsync(homeworkId, ownerStudentId);
         var file = await AddFileInDbAsync(_fixture.Create<string>(), 1024);
         await AddSubmittedHomeworkFileInDbAsync(submittedHomeworkId, file.Id);
@@ -67,7 +67,7 @@ public sealed class GetSubmittedHomeworkIntegrationTests : GetSubmittedHomeworkI
         await AddTeacherInDbAsync(teacherId);
         await AddStudentInDbAsync(studentId);
 
-        var homeworkId = await AddHomeworkInDbAsync(courseId, teacherId, HomeworkStatusModel.Confirmation);
+        var homeworkId = await AddHomeworkInDbAsync(courseId, teacherId, HomeworkStatusModel.Finished);
         var submittedHomeworkId = await AddSubmittedHomeworkInDbAsync(homeworkId, studentId);
         await AddSubmittedHomeworkMarkInDbAsync(submittedHomeworkId, reviewersMark: 70, teacherMark: 95);
 
@@ -94,7 +94,7 @@ public sealed class GetSubmittedHomeworkIntegrationTests : GetSubmittedHomeworkI
         await AddTeacherInDbAsync(teacherId);
         await AddStudentInDbAsync(studentId);
 
-        var homeworkId = await AddHomeworkInDbAsync(courseId, teacherId, HomeworkStatusModel.Confirmation);
+        var homeworkId = await AddHomeworkInDbAsync(courseId, teacherId, HomeworkStatusModel.Finished);
         var submittedHomeworkId = await AddSubmittedHomeworkInDbAsync(homeworkId, studentId);
 
         var request = _fixture.Build<V1GetSubmittedHomeworkRequest>()
@@ -106,6 +106,43 @@ public sealed class GetSubmittedHomeworkIntegrationTests : GetSubmittedHomeworkI
         var response = await GetSubmittedHomeworkClient.V1GetSubmittedHomeworkAsync(request);
 
         // Assert
+        response.HasFinalMark.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task V1GetSubmittedHomework_HomeworkNotFinished_ShouldHideReviewsAndFinalMark()
+    {
+        // Arrange
+        var teacherId = _fixture.Create<long>();
+        var ownerStudentId = _fixture.Create<long>();
+        var reviewerStudentId = _fixture.Create<long>();
+        var courseId = await AddCourseInDbAsync();
+
+        await AddTeacherInDbAsync(teacherId);
+        await AddStudentInDbAsync(ownerStudentId);
+        await AddStudentInDbAsync(reviewerStudentId);
+
+        var homeworkId = await AddHomeworkInDbAsync(courseId, teacherId, HomeworkStatusModel.Confirmation);
+        var submittedHomeworkId = await AddSubmittedHomeworkInDbAsync(homeworkId, ownerStudentId);
+        var file = await AddFileInDbAsync(_fixture.Create<string>(), 1024);
+        await AddSubmittedHomeworkFileInDbAsync(submittedHomeworkId, file.Id);
+        await AddSubmittedReviewInDbAsync(submittedHomeworkId, reviewerStudentId, mark: 81);
+        await AddSubmittedHomeworkMarkInDbAsync(submittedHomeworkId, reviewersMark: 81);
+
+        var request = _fixture.Build<V1GetSubmittedHomeworkRequest>()
+            .With(result => result.SubmittedHomeworkId, submittedHomeworkId)
+            .With(result => result.StudentId, ownerStudentId)
+            .Create();
+
+        // Act
+        var response = await GetSubmittedHomeworkClient.V1GetSubmittedHomeworkAsync(request);
+
+        // Assert
+        response.SubmittedHomework.Id.Should().Be(submittedHomeworkId);
+        response.SubmittedHomework.Comment.Should().Be("Test comment");
+        response.SubmittedHomework.Files.Should().ContainSingle().Which
+            .Should().BeEquivalentTo(new { file.Id, file.Name, file.Size });
+        response.SubmittedReviews.Should().BeEmpty();
         response.HasFinalMark.Should().BeFalse();
     }
 

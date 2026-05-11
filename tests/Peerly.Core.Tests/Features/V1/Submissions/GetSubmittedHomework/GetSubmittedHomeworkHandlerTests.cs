@@ -10,6 +10,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetSubmittedHomewo
 using Peerly.Core.Exceptions;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Files;
+using Peerly.Core.Models.Homeworks;
 using Peerly.Core.Models.Submissions;
 using Xunit;
 
@@ -20,6 +21,7 @@ public sealed class GetSubmittedHomeworkHandlerTests
     private readonly Mock<ICommonUnitOfWorkFactory> _unitOfWorkFactoryMock = new();
     private readonly Mock<ICommonReadOnlyUnitOfWork> _unitOfWorkMock = new();
     private readonly Mock<IReadOnlySubmittedHomeworkRepository> _submittedHomeworkRepositoryMock = new();
+    private readonly Mock<IReadOnlyHomeworkRepository> _homeworkRepositoryMock = new();
     private readonly Mock<IReadOnlySubmittedHomeworkFileRepository> _submittedHomeworkFileRepositoryMock = new();
     private readonly Mock<IReadOnlySubmittedReviewRepository> _submittedReviewRepositoryMock = new();
     private readonly Mock<IReadOnlySubmittedHomeworkMarkRepository> _submittedHomeworkMarkRepositoryMock = new();
@@ -38,6 +40,7 @@ public sealed class GetSubmittedHomeworkHandlerTests
         // Arrange
         var query = _fixture.Create<GetSubmittedHomeworkQuery>();
         var submittedHomework = SetupSubmittedHomework(query);
+        SetupHomework(submittedHomework.HomeworkId, HomeworkStatus.Finished);
         var files = new[]
         {
             _fixture.Build<File>().With(result => result.StorageId, (StorageId)Guid.NewGuid()).Create(),
@@ -79,7 +82,8 @@ public sealed class GetSubmittedHomeworkHandlerTests
     {
         // Arrange
         var query = _fixture.Create<GetSubmittedHomeworkQuery>();
-        SetupSubmittedHomework(query);
+        var submittedHomework = SetupSubmittedHomework(query);
+        SetupHomework(submittedHomework.HomeworkId, HomeworkStatus.Finished);
         var submittedHomeworkMark = _fixture.Build<SubmittedHomeworkMark>()
             .With(result => result.SubmittedHomeworkId, query.SubmittedHomeworkId)
             .With(result => result.ReviewersMark, 70)
@@ -108,7 +112,8 @@ public sealed class GetSubmittedHomeworkHandlerTests
     {
         // Arrange
         var query = _fixture.Create<GetSubmittedHomeworkQuery>();
-        SetupSubmittedHomework(query);
+        var submittedHomework = SetupSubmittedHomework(query);
+        SetupHomework(submittedHomework.HomeworkId, HomeworkStatus.Finished);
 
         _submittedHomeworkFileRepositoryMock
             .Setup(repository => repository.ListBySubmittedHomeworkAsync(query.SubmittedHomeworkId, It.IsAny<CancellationToken>()))
@@ -125,6 +130,65 @@ public sealed class GetSubmittedHomeworkHandlerTests
 
         // Assert
         response.FinalMark.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_HomeworkNotFinished_ShouldHideReviewsAndFinalMark()
+    {
+        // Arrange
+        var query = _fixture.Create<GetSubmittedHomeworkQuery>();
+        var submittedHomework = SetupSubmittedHomework(query);
+        SetupHomework(submittedHomework.HomeworkId, HomeworkStatus.Confirmation);
+        var files = new[]
+        {
+            _fixture.Build<File>().With(result => result.StorageId, (StorageId)Guid.NewGuid()).Create()
+        };
+
+        _submittedHomeworkFileRepositoryMock
+            .Setup(repository => repository.ListBySubmittedHomeworkAsync(query.SubmittedHomeworkId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(files);
+
+        // Act
+        var response = await _handler.ExecuteAsync(query, CancellationToken.None);
+
+        // Assert
+        response.SubmittedHomework.Should().Be(submittedHomework);
+        response.Files.Should().BeEquivalentTo(files);
+        response.SubmittedReviews.Should().BeEmpty();
+        response.FinalMark.Should().BeNull();
+        _submittedReviewRepositoryMock.Verify(
+            repository => repository.ListBySubmittedHomeworkAsync(It.IsAny<SubmittedHomeworkId>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+        _submittedHomeworkMarkRepositoryMock.Verify(
+            repository => repository.GetBySubmittedHomeworkAsync(It.IsAny<SubmittedHomeworkId>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_LinkedHomeworkNotFound_ShouldThrowNotFoundException()
+    {
+        // Arrange
+        var query = _fixture.Create<GetSubmittedHomeworkQuery>();
+        var submittedHomework = SetupSubmittedHomework(query);
+
+        _homeworkRepositoryMock
+            .Setup(repository => repository.GetAsync(submittedHomework.HomeworkId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Homework?)null);
+
+        // Act
+        var action = () => _handler.ExecuteAsync(query, CancellationToken.None);
+
+        // Assert
+        await action.Should().ThrowAsync<NotFoundException>();
+        _submittedReviewRepositoryMock.Verify(
+            repository => repository.ListBySubmittedHomeworkAsync(It.IsAny<SubmittedHomeworkId>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+        _submittedHomeworkFileRepositoryMock.Verify(
+            repository => repository.ListBySubmittedHomeworkAsync(It.IsAny<SubmittedHomeworkId>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+        _submittedHomeworkMarkRepositoryMock.Verify(
+            repository => repository.GetBySubmittedHomeworkAsync(It.IsAny<SubmittedHomeworkId>(), It.IsAny<CancellationToken>()),
+            Times.Never);
     }
 
     [Fact]
@@ -197,6 +261,17 @@ public sealed class GetSubmittedHomeworkHandlerTests
         return submittedHomework;
     }
 
+    private void SetupHomework(HomeworkId homeworkId, HomeworkStatus status)
+    {
+        var homework = _fixture.Build<Homework>()
+            .With(result => result.Id, homeworkId)
+            .With(result => result.Status, status)
+            .Create();
+        _homeworkRepositoryMock
+            .Setup(repository => repository.GetAsync(homeworkId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(homework);
+    }
+
     private void SetupUnitOfWorkFactory()
     {
         _unitOfWorkFactoryMock
@@ -206,6 +281,9 @@ public sealed class GetSubmittedHomeworkHandlerTests
         _unitOfWorkMock
             .SetupGet(unitOfWork => unitOfWork.ReadOnlySubmittedHomeworkRepository)
             .Returns(_submittedHomeworkRepositoryMock.Object);
+        _unitOfWorkMock
+            .SetupGet(unitOfWork => unitOfWork.ReadOnlyHomeworkRepository)
+            .Returns(_homeworkRepositoryMock.Object);
         _unitOfWorkMock
             .SetupGet(unitOfWork => unitOfWork.ReadOnlySubmittedHomeworkFileRepository)
             .Returns(_submittedHomeworkFileRepositoryMock.Object);
