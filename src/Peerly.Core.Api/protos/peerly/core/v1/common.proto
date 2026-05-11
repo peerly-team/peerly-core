@@ -52,6 +52,7 @@ message CourseInfo {
   string name = 2;
   google.protobuf.StringValue description = 3;
   CourseStatus status = 4;
+  repeated TeacherInfo teachers = 5;
 }
 
 message GroupInfo {

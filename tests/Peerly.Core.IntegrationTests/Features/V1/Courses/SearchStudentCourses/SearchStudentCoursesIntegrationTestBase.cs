@@ -52,6 +52,28 @@ public abstract class SearchStudentCoursesIntegrationTestBase : IAsyncLifetime
             });
     }
 
+    protected async Task AddTeacherInDbAsync(long teacherId, string? email = null, string? name = null)
+    {
+        await using var connection = await Fixture.DataSource.OpenConnectionAsync();
+
+        const string Query =
+            """
+            insert into teachers (id, email, name, creation_time)
+            values (@teacherId, @email, @name, @creationTime)
+            on conflict (id) do nothing;
+            """;
+
+        await connection.ExecuteAsync(
+            Query,
+            new
+            {
+                teacherId,
+                email = email ?? $"teacher-{teacherId}@peerly.test",
+                name = name ?? $"Teacher {teacherId}",
+                creationTime = DateTimeOffset.UtcNow
+            });
+    }
+
     protected async Task<long> AddCourseInDbAsync(
         string name,
         string description,
@@ -94,6 +116,27 @@ public abstract class SearchStudentCoursesIntegrationTestBase : IAsyncLifetime
             {
                 courseId,
                 name,
+                creationTime = DateTimeOffset.UtcNow
+            });
+    }
+
+    protected async Task AddCourseTeacherInDbAsync(long courseId, long teacherId)
+    {
+        await using var connection = await Fixture.DataSource.OpenConnectionAsync();
+
+        const string Query =
+            """
+            insert into course_teachers (course_id, teacher_id, creation_time)
+            values (@courseId, @teacherId, @creationTime)
+            on conflict (course_id, teacher_id) do nothing;
+            """;
+
+        await connection.ExecuteAsync(
+            Query,
+            new
+            {
+                courseId,
+                teacherId,
                 creationTime = DateTimeOffset.UtcNow
             });
     }

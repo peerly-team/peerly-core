@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using OneOf.Types;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourseFile;
@@ -14,6 +15,7 @@ using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Courses;
 using Peerly.Core.Models.Files;
+using Peerly.Core.Models.Teachers;
 using Peerly.Core.Pagination;
 using Peerly.Core.Tools;
 using Proto = Peerly.Core.V1;
@@ -35,7 +37,7 @@ internal static class CourseMappingMapper
     {
         return new Proto.V1GetTeacherCourseResponse
         {
-            CourseInfo = queryResponse.Course.ToProto(),
+            CourseInfo = queryResponse.Course.ToProto(queryResponse.Teachers),
             StudentCount = queryResponse.StudentCount,
             HomeworkCount = queryResponse.HomeworkCount,
             Files = { queryResponse.Files.ToArrayBy(file => file.ToProto()) }
@@ -55,7 +57,7 @@ internal static class CourseMappingMapper
     {
         return new Proto.V1GetStudentCourseResponse
         {
-            CourseInfo = queryResponse.Course.ToProto(),
+            CourseInfo = queryResponse.Course.ToProto(queryResponse.Teachers),
             StudentCount = queryResponse.StudentCount,
             HomeworkCount = queryResponse.HomeworkCount,
             Files = { queryResponse.Files.ToArrayBy(file => file.ToProto()) }
@@ -196,7 +198,10 @@ internal static class CourseMappingMapper
     {
         return new Proto.V1SearchStudentCoursesResponse
         {
-            CourseInfos = { queryResponse.Courses.ToArrayBy(course => course.ToProto()) }
+            CourseInfos =
+            {
+                queryResponse.Courses.ToArrayBy(courseInfo => courseInfo.ToProto(queryResponse.TeachersByCourseId.GetValueOrDefault(courseInfo.Id, [])))
+            }
         };
     }
 
@@ -210,23 +215,36 @@ internal static class CourseMappingMapper
         };
     }
 
-    public static Proto.V1SearchTeacherCoursesResponse ToV1SearchTeacherCoursesResponse(
-        this SearchTeacherCoursesQueryResponse queryResponse)
+    public static Proto.V1SearchTeacherCoursesResponse ToV1SearchTeacherCoursesResponse(this SearchTeacherCoursesQueryResponse queryResponse)
     {
         return new Proto.V1SearchTeacherCoursesResponse
         {
-            CourseInfos = { queryResponse.Courses.ToArrayBy(courseInfo => courseInfo.ToProto()) }
+            CourseInfos =
+            {
+                queryResponse.Courses.ToArrayBy(courseInfo => courseInfo.ToProto(queryResponse.TeachersByCourseId.GetValueOrDefault(courseInfo.Id, [])))
+            }
         };
     }
 
-    private static Proto.CourseInfo ToProto(this Course course)
+    private static Proto.CourseInfo ToProto(this Course course, IReadOnlyCollection<Teacher> teachers)
     {
         return new Proto.CourseInfo
         {
             Id = (long)course.Id,
             Name = course.Name,
             Description = course.Description,
-            Status = course.Status.ToProto()
+            Status = course.Status.ToProto(),
+            Teachers = { teachers.ToArrayBy(teacher => teacher.ToProto()) }
+        };
+    }
+
+    private static Proto.TeacherInfo ToProto(this Teacher teacher)
+    {
+        return new Proto.TeacherInfo
+        {
+            TeacherId = (long)teacher.Id,
+            Email = teacher.Email,
+            Name = teacher.Name ?? string.Empty
         };
     }
 
