@@ -44,4 +44,5 @@ public interface ICommonReadOnlyUnitOfWork : IUnitOfWork
     IReadOnlySubmittedHomeworkMarkRepository ReadOnlySubmittedHomeworkMarkRepository { get; }
     IReadOnlyStudentRepository ReadOnlyStudentRepository { get; }
     IReadOnlyTeacherRepository ReadOnlyTeacherRepository { get; }
+    IReadOnlyUserSearchRepository ReadOnlyUserSearchRepository { get; }
 }

@@ -23,6 +23,7 @@ using Peerly.Core.IntegrationTests.Features.V1.Submissions.DeleteSubmittedReview
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.GetAssignedReview.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.UpdateSubmittedHomework.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.UpdateSubmittedReview.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Users.SearchUsers.Infrastructure;
 using Respawn;
 using Testcontainers.PostgreSql;
 using Xunit;
@@ -69,6 +70,7 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
     public DeleteSubmittedReviewGrpcClient DeleteSubmittedReviewClient => ApplicationFactory.DeleteSubmittedReviewClient();
     public UpdateSubmittedHomeworkGrpcClient UpdateSubmittedHomeworkClient => ApplicationFactory.UpdateSubmittedHomeworkClient();
     public UpdateSubmittedReviewGrpcClient UpdateSubmittedReviewClient => ApplicationFactory.UpdateSubmittedReviewClient();
+    public SearchUsersGrpcClient SearchUsersClient => ApplicationFactory.SearchUsersClient();
 
     public async Task InitializeAsync()
     {

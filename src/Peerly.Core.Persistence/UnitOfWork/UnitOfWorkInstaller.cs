@@ -23,6 +23,7 @@ using Peerly.Core.Persistence.Repositories.SubmittedHomeworkMarks;
 using Peerly.Core.Persistence.Repositories.Students;
 using Peerly.Core.Persistence.Repositories.Teachers;
 using Peerly.Core.Persistence.Repositories.SubmittedReviews;
+using Peerly.Core.Persistence.Repositories.UserSearch;
 using Peerly.Core.Tools.Abstractions;
 
 namespace Peerly.Core.Persistence.UnitOfWork;
@@ -56,6 +57,7 @@ public class UnitOfWorkInstaller : IInstaller
         services.AddRepositoryFactory<ISubmittedHomeworkMarkRepository, SubmittedHomeworkMarkRepository>();
         services.AddRepositoryFactory<IStudentRepository, StudentRepository>();
         services.AddRepositoryFactory<ITeacherRepository, TeacherRepository>();
+        services.AddRepositoryFactory<IReadOnlyUserSearchRepository, UserSearchRepository>();
 
         services.AddSingleton<NpgsqlDataSource>(sp =>
         {

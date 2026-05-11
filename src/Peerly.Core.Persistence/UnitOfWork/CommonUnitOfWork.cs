@@ -25,6 +25,7 @@ internal sealed class CommonUnitOfWork : UnitOfWork, ICommonUnitOfWork, ICommonR
     private readonly Lazy<ISubmittedHomeworkMarkRepository> _submittedHomeworkMarkRepository;
     private readonly Lazy<IStudentRepository> _studentRepository;
     private readonly Lazy<ITeacherRepository> _teacherRepository;
+    private readonly Lazy<IReadOnlyUserSearchRepository> _userSearchRepository;
 
     public CommonUnitOfWork(
         DbConnection connection,
@@ -45,7 +46,8 @@ internal sealed class CommonUnitOfWork : UnitOfWork, ICommonUnitOfWork, ICommonR
         Func<IConnectionContext, ISubmittedReviewRepository> submittedReviewRepositoryFactory,
         Func<IConnectionContext, ISubmittedHomeworkMarkRepository> submittedHomeworkMarkRepositoryFactory,
         Func<IConnectionContext, IStudentRepository> studentRepositoryFactory,
-        Func<IConnectionContext, ITeacherRepository> teacherRepositoryFactory) : base(connection)
+        Func<IConnectionContext, ITeacherRepository> teacherRepositoryFactory,
+        Func<IConnectionContext, IReadOnlyUserSearchRepository> userSearchRepositoryFactory) : base(connection)
     {
         _courseRepository = new Lazy<ICourseRepository>(() => courseRepositoryFactory(this));
         _distributionReviewerRepository = new Lazy<IDistributionReviewerRepository>(() => distributionReviewerRepositoryFactory(this));
@@ -65,6 +67,7 @@ internal sealed class CommonUnitOfWork : UnitOfWork, ICommonUnitOfWork, ICommonR
         _submittedHomeworkMarkRepository = new Lazy<ISubmittedHomeworkMarkRepository>(() => submittedHomeworkMarkRepositoryFactory(this));
         _studentRepository = new Lazy<IStudentRepository>(() => studentRepositoryFactory(this));
         _teacherRepository = new Lazy<ITeacherRepository>(() => teacherRepositoryFactory(this));
+        _userSearchRepository = new Lazy<IReadOnlyUserSearchRepository>(() => userSearchRepositoryFactory(this));
     }
 
     public ICourseRepository CourseRepository => _courseRepository.Value;
@@ -104,4 +107,5 @@ internal sealed class CommonUnitOfWork : UnitOfWork, ICommonUnitOfWork, ICommonR
     public IReadOnlySubmittedHomeworkMarkRepository ReadOnlySubmittedHomeworkMarkRepository => _submittedHomeworkMarkRepository.Value;
     public IReadOnlyStudentRepository ReadOnlyStudentRepository => _studentRepository.Value;
     public IReadOnlyTeacherRepository ReadOnlyTeacherRepository => _teacherRepository.Value;
+    public IReadOnlyUserSearchRepository ReadOnlyUserSearchRepository => _userSearchRepository.Value;
 }

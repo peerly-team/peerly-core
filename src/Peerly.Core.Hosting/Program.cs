@@ -9,6 +9,7 @@ using Peerly.Core.Api.Controllers.Homeworks;
 using Peerly.Core.Api.Controllers.Participants;
 using Peerly.Core.Api.Controllers.Storage;
 using Peerly.Core.Api.Controllers.Submissions;
+using Peerly.Core.Api.Controllers.Users;
 using Peerly.Core.Api.Extensions;
 using Peerly.Core.Api.Infrastructure.Configuration;
 using Peerly.Core.ApplicationServices.Extensions;
@@ -67,6 +68,7 @@ public static class Program
         app.MapGrpcService<SubmissionController>();
         app.MapGrpcService<GroupController>();
         app.MapGrpcService<ParticipantController>();
+        app.MapGrpcService<UserController>();
 
         app.MapGrpcReflectionService();
 
