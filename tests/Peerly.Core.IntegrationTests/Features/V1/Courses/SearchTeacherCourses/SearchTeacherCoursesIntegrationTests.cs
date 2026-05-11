@@ -25,8 +25,14 @@ public sealed class SearchTeacherCoursesIntegrationTests : SearchTeacherCoursesI
     {
         // Arrange
         var teacherId = _fixture.Create<long>();
+        var courseTeacherId = _fixture.Create<long>();
         var otherTeacherId = _fixture.Create<long>();
-        await AddTeacherInDbAsync(teacherId);
+        var teacherEmail = _fixture.Create<string>();
+        var teacherName = _fixture.Create<string>();
+        var courseTeacherEmail = _fixture.Create<string>();
+        var courseTeacherName = _fixture.Create<string>();
+        await AddTeacherInDbAsync(teacherId, teacherEmail, teacherName);
+        await AddTeacherInDbAsync(courseTeacherId, courseTeacherEmail, courseTeacherName);
         await AddTeacherInDbAsync(otherTeacherId);
 
         var inProgressCourseName = _fixture.Create<string>();
@@ -38,6 +44,7 @@ public sealed class SearchTeacherCoursesIntegrationTests : SearchTeacherCoursesI
         var otherTeacherCourseId = await AddCourseInDbAsync(_fixture.Create<string>(), _fixture.Create<string>(), CourseStatusModel.Finished);
 
         await AddCourseTeacherInDbAsync(inProgressCourseId, teacherId);
+        await AddCourseTeacherInDbAsync(inProgressCourseId, courseTeacherId);
         await AddGroupTeacherInDbAsync(await AddGroupInDbAsync(finishedCourseId, _fixture.Create<string>()), teacherId);
         await AddCourseTeacherInDbAsync(deletedCourseId, teacherId);
         await AddCourseTeacherInDbAsync(otherTeacherCourseId, otherTeacherId);
@@ -61,9 +68,18 @@ public sealed class SearchTeacherCoursesIntegrationTests : SearchTeacherCoursesI
 
         // Assert
         var courseInfo = response.CourseInfos.Should().ContainSingle().Which;
+        courseInfo.Id.Should().Be(inProgressCourseId);
         courseInfo.Name.Should().Be(inProgressCourseName);
         courseInfo.Description.Should().Be(inProgressCourseDescription);
         courseInfo.Status.Should().Be(ProtoCourseStatus.InProgress);
+        courseInfo.Teachers
+            .Select(teacherInfo => new { teacherInfo.TeacherId, teacherInfo.Email, teacherInfo.Name })
+            .Should()
+            .BeEquivalentTo(
+            [
+                new { TeacherId = teacherId, Email = teacherEmail, Name = teacherName },
+                new { TeacherId = courseTeacherId, Email = courseTeacherEmail, Name = courseTeacherName }
+            ]);
     }
 
     [Fact]
@@ -71,7 +87,9 @@ public sealed class SearchTeacherCoursesIntegrationTests : SearchTeacherCoursesI
     {
         // Arrange
         var teacherId = _fixture.Create<long>();
-        await AddTeacherInDbAsync(teacherId);
+        var teacherEmail = _fixture.Create<string>();
+        var teacherName = _fixture.Create<string>();
+        await AddTeacherInDbAsync(teacherId, teacherEmail, teacherName);
 
         var draftCourseId = await AddCourseInDbAsync(_fixture.Create<string>(), _fixture.Create<string>());
         var inProgressCourseId = await AddCourseInDbAsync(_fixture.Create<string>(), _fixture.Create<string>(), CourseStatusModel.InProgress);
@@ -97,6 +115,14 @@ public sealed class SearchTeacherCoursesIntegrationTests : SearchTeacherCoursesI
 
         // Assert
         response.CourseInfos.Select(courseInfo => courseInfo.Id).Should().BeEquivalentTo([draftCourseId, inProgressCourseId]);
+        var draftCourseInfo = response.CourseInfos.Single(courseInfo => courseInfo.Id == draftCourseId);
+        draftCourseInfo.Teachers
+            .Select(teacherInfo => new { teacherInfo.TeacherId, teacherInfo.Email, teacherInfo.Name })
+            .Should()
+            .BeEquivalentTo([new { TeacherId = teacherId, Email = teacherEmail, Name = teacherName }]);
+
+        var inProgressCourseInfo = response.CourseInfos.Single(courseInfo => courseInfo.Id == inProgressCourseId);
+        inProgressCourseInfo.Teachers.Should().BeEmpty();
     }
 
     [Fact]

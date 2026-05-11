@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Peerly.Core.Models.Courses;
 using Peerly.Core.Models.Files;
+using Peerly.Core.Models.Teachers;
 
 namespace Peerly.Core.ApplicationServices.Features.V1.Courses.GetTeacherCourse;
 
@@ -10,4 +11,5 @@ public sealed record GetTeacherCourseQueryResponse
     public required long StudentCount { get; init; }
     public required long HomeworkCount { get; init; }
     public required IReadOnlyCollection<File> Files { get; init; }
+    public required IReadOnlyCollection<Teacher> Teachers { get; init; }
 }

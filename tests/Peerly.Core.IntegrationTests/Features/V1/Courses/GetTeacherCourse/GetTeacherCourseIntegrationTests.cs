@@ -26,14 +26,21 @@ public sealed class GetTeacherCourseIntegrationTests : GetTeacherCourseIntegrati
         var courseName = _fixture.Create<string>();
         var courseDescription = _fixture.Create<string>();
         var teacherId = _fixture.Create<long>();
+        var teacherEmail = _fixture.Create<string>();
+        var teacherName = _fixture.Create<string>();
+        var otherTeacherId = _fixture.Create<long>();
+        var otherTeacherEmail = _fixture.Create<string>();
+        var otherTeacherName = _fixture.Create<string>();
         var courseId = await AddCourseInDbAsync(courseName, courseDescription);
         var request = _fixture.Build<V1GetTeacherCourseRequest>()
             .With(result => result.CourseId, courseId)
             .With(result => result.TeacherId, teacherId)
             .Create();
 
-        await AddTeacherInDbAsync(teacherId);
+        await AddTeacherInDbAsync(teacherId, teacherEmail, teacherName);
+        await AddTeacherInDbAsync(otherTeacherId, otherTeacherEmail, otherTeacherName);
         await AddCourseTeacherInDbAsync(courseId, teacherId);
+        await AddCourseTeacherInDbAsync(courseId, otherTeacherId);
         var firstFile = await AddCourseFileInDbAsync(courseId, teacherId, _fixture.Create<string>(), 1024);
         var secondFile = await AddCourseFileInDbAsync(courseId, teacherId, _fixture.Create<string>(), 2048);
 
@@ -45,6 +52,14 @@ public sealed class GetTeacherCourseIntegrationTests : GetTeacherCourseIntegrati
         response.CourseInfo.Name.Should().Be(courseName);
         response.CourseInfo.Description.Should().Be(courseDescription);
         response.CourseInfo.Status.Should().Be(ProtoCourseStatus.Draft);
+        response.CourseInfo.Teachers
+            .Select(teacher => new { teacher.TeacherId, teacher.Email, teacher.Name })
+            .Should()
+            .BeEquivalentTo(
+            [
+                new { TeacherId = teacherId, Email = teacherEmail, Name = teacherName },
+                new { TeacherId = otherTeacherId, Email = otherTeacherEmail, Name = otherTeacherName }
+            ]);
         response.StudentCount.Should().Be(0);
         response.HomeworkCount.Should().Be(0);
         response.Files
@@ -103,6 +118,7 @@ public sealed class GetTeacherCourseIntegrationTests : GetTeacherCourseIntegrati
         response.CourseInfo.Name.Should().Be(courseName);
         response.CourseInfo.Description.Should().Be(courseDescription);
         response.CourseInfo.Status.Should().Be(ProtoCourseStatus.Draft);
+        response.CourseInfo.Teachers.Should().BeEmpty();
         response.StudentCount.Should().Be(3);
         response.HomeworkCount.Should().Be(2);
     }
