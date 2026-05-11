@@ -20,6 +20,10 @@ using Peerly.Core.IntegrationTests.Features.V1.Submissions.CreateSubmittedReview
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.DeleteSubmittedHomework.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.DeleteSubmittedHomeworkFile.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.DeleteSubmittedReview.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Submissions.GetAssignedReview.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Submissions.UpdateSubmittedHomework.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Submissions.UpdateSubmittedReview.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Users.SearchUsers.Infrastructure;
 using Respawn;
 using Testcontainers.PostgreSql;
 using Xunit;
@@ -60,9 +64,13 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
     public CreateSubmittedHomeworkGrpcClient CreateSubmittedHomeworkClient => ApplicationFactory.CreateSubmittedHomeworkClient();
     public CreateSubmittedHomeworkFileGrpcClient CreateSubmittedHomeworkFileClient => ApplicationFactory.CreateSubmittedHomeworkFileClient();
     public CreateSubmittedReviewGrpcClient CreateSubmittedReviewClient => ApplicationFactory.CreateSubmittedReviewClient();
+    public GetAssignedReviewGrpcClient GetAssignedReviewClient => ApplicationFactory.GetAssignedReviewClient();
     public DeleteSubmittedHomeworkGrpcClient DeleteSubmittedHomeworkClient => ApplicationFactory.DeleteSubmittedHomeworkClient();
     public DeleteSubmittedHomeworkFileGrpcClient DeleteSubmittedHomeworkFileClient => ApplicationFactory.DeleteSubmittedHomeworkFileClient();
     public DeleteSubmittedReviewGrpcClient DeleteSubmittedReviewClient => ApplicationFactory.DeleteSubmittedReviewClient();
+    public UpdateSubmittedHomeworkGrpcClient UpdateSubmittedHomeworkClient => ApplicationFactory.UpdateSubmittedHomeworkClient();
+    public UpdateSubmittedReviewGrpcClient UpdateSubmittedReviewClient => ApplicationFactory.UpdateSubmittedReviewClient();
+    public SearchUsersGrpcClient SearchUsersClient => ApplicationFactory.SearchUsersClient();
 
     public async Task InitializeAsync()
     {

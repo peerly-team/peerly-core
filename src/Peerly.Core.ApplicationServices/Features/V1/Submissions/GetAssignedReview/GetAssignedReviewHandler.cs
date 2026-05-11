@@ -9,25 +9,21 @@ namespace Peerly.Core.ApplicationServices.Features.V1.Submissions.GetAssignedRev
 internal sealed class GetAssignedReviewHandler : IQueryHandler<GetAssignedReviewQuery, GetAssignedReviewQueryResponse>
 {
     private readonly ICommonUnitOfWorkFactory _commonUnitOfWorkFactory;
+    private readonly IQueryValidator<GetAssignedReviewQuery, GetAssignedReviewQueryResponse> _validator;
 
-    public GetAssignedReviewHandler(ICommonUnitOfWorkFactory commonUnitOfWorkFactory)
+    public GetAssignedReviewHandler(
+        ICommonUnitOfWorkFactory commonUnitOfWorkFactory,
+        IQueryValidator<GetAssignedReviewQuery, GetAssignedReviewQueryResponse> validator)
     {
         _commonUnitOfWorkFactory = commonUnitOfWorkFactory;
+        _validator = validator;
     }
 
-    public async Task<GetAssignedReviewQueryResponse> ExecuteAsync(
-        GetAssignedReviewQuery query,
-        CancellationToken cancellationToken)
+    public async Task<GetAssignedReviewQueryResponse> ExecuteAsync(GetAssignedReviewQuery query, CancellationToken cancellationToken)
     {
-        await using var unitOfWork = await _commonUnitOfWorkFactory.CreateReadOnlyAsync(cancellationToken);
+        await _validator.ValidateAsync(query, cancellationToken);
 
-        // TODO: permission-check — убедиться, что studentId назначен ревьюером на этот submittedHomeworkId
-        // (IReadOnlyDistributionReviewerRepository.ExistsAsync(SubmittedHomeworkStudent)) — при отсутствии бросать
-        // PermissionDeniedException до проверки существования работы (правило permission-before-existence).
-        // TODO: проверить, что homework во «фазе ревью» и ReviewDeadline не истёк — иначе возвращать FailedPrecondition.
-        // NOTE: File.Name у анонимизированной копии сейчас совпадает с исходным — возможна утечка PII
-        // через имя файла (например, "Иванов_Иван_ДЗ.txt"). Решается на стороне upload/анонимайзера,
-        // не здесь.
+        await using var unitOfWork = await _commonUnitOfWorkFactory.CreateReadOnlyAsync(cancellationToken);
 
         var submission = await unitOfWork.ReadOnlySubmittedHomeworkRepository.GetAsync(query.SubmittedHomeworkId, cancellationToken)
                          ?? throw new NotFoundException();

@@ -4,13 +4,13 @@ using OneOf.Types;
 using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.Tools.Abstractions;
 
-namespace Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedHomework;
+namespace Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedReview;
 
 [ExcludeFromCodeCoverage]
-internal sealed class UpdateSubmittedHomeworkInstaller : IInstaller
+internal sealed class UpdateSubmittedReviewInstaller : IInstaller
 {
     public void InstallServices(IServiceCollection services)
     {
-        services.AddScoped<ICommandValidator<UpdateSubmittedHomeworkCommand, Success>, UpdateSubmittedHomeworkCommandValidator>();
+        services.AddScoped<ICommandValidator<UpdateSubmittedReviewCommand, Success>, UpdateSubmittedReviewCommandValidator>();
     }
 }

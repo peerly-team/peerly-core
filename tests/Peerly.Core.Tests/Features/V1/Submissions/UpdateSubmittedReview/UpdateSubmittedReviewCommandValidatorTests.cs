@@ -7,7 +7,7 @@ using Moq;
 using Peerly.Core.Abstractions.ApplicationServices;
 using Peerly.Core.Abstractions.Repositories;
 using Peerly.Core.Abstractions.UnitOfWork;
-using Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedReview;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedReview;
 using Peerly.Core.ApplicationServices.Features.Validations;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
@@ -15,9 +15,9 @@ using Peerly.Core.Models.Homeworks;
 using Peerly.Core.Models.Submissions;
 using Xunit;
 
-namespace Peerly.Core.Tests.Features.V1.Submissions.DeleteSubmittedReview;
+namespace Peerly.Core.Tests.Features.V1.Submissions.UpdateSubmittedReview;
 
-public sealed class DeleteSubmittedReviewCommandValidatorTests
+public sealed class UpdateSubmittedReviewCommandValidatorTests
 {
     private readonly Mock<ICommonReadOnlyUnitOfWork> _unitOfWorkMock = new();
     private readonly Mock<IReadOnlySubmittedReviewRepository> _submittedReviewRepositoryMock = new();
@@ -26,20 +26,20 @@ public sealed class DeleteSubmittedReviewCommandValidatorTests
     private readonly Mock<IClock> _clockMock = new();
     private readonly Fixture _fixture = new();
     private readonly DateTimeOffset _currentTime = DateTimeOffset.UtcNow;
-    private readonly DeleteSubmittedReviewCommandValidator _validator;
+    private readonly UpdateSubmittedReviewCommandValidator _validator;
 
-    public DeleteSubmittedReviewCommandValidatorTests()
+    public UpdateSubmittedReviewCommandValidatorTests()
     {
         _clockMock.Setup(clock => clock.GetCurrentTime()).Returns(_currentTime);
         var unitOfWorkFactory = SetupUnitOfWorkFactory();
-        _validator = new DeleteSubmittedReviewCommandValidator(unitOfWorkFactory, _clockMock.Object);
+        _validator = new UpdateSubmittedReviewCommandValidator(unitOfWorkFactory, _clockMock.Object);
     }
 
     [Fact]
     public async Task ValidateAsync_ReviewBelongsToStudentAndHomeworkReviewingAndDeadlineInFuture_ShouldSuccess()
     {
         // Arrange
-        var command = _fixture.Create<DeleteSubmittedReviewCommand>();
+        var command = _fixture.Create<UpdateSubmittedReviewCommand>();
 
         var submittedReview = SetupSubmittedReview(command);
         var submittedHomework = SetupSubmittedHomework(submittedReview.SubmittedHomeworkId);
@@ -56,7 +56,7 @@ public sealed class DeleteSubmittedReviewCommandValidatorTests
     public async Task ValidateAsync_SubmittedReviewNotFound_ShouldBeOtherErrorNotFound()
     {
         // Arrange
-        var command = _fixture.Create<DeleteSubmittedReviewCommand>();
+        var command = _fixture.Create<UpdateSubmittedReviewCommand>();
         _submittedReviewRepositoryMock
             .Setup(repository => repository.GetAsync(command.SubmittedReviewId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((SubmittedReview?)null);
@@ -77,7 +77,7 @@ public sealed class DeleteSubmittedReviewCommandValidatorTests
     public async Task ValidateAsync_SubmittedReviewBelongsToAnotherStudent_ShouldBeOtherErrorPermissionDenied()
     {
         // Arrange
-        var command = _fixture.Create<DeleteSubmittedReviewCommand>();
+        var command = _fixture.Create<UpdateSubmittedReviewCommand>();
         var submittedReview = _fixture.Build<SubmittedReview>()
             .With(result => result.Id, command.SubmittedReviewId)
             .With(result => result.StudentId, (StudentId)((long)command.StudentId + 1))
@@ -104,7 +104,7 @@ public sealed class DeleteSubmittedReviewCommandValidatorTests
     public async Task ValidateAsync_SubmittedHomeworkNotFound_ShouldBeOtherErrorNotFound()
     {
         // Arrange
-        var command = _fixture.Create<DeleteSubmittedReviewCommand>();
+        var command = _fixture.Create<UpdateSubmittedReviewCommand>();
         var submittedReview = SetupSubmittedReview(command);
         _submittedHomeworkRepositoryMock
             .Setup(repository => repository.GetAsync(submittedReview.SubmittedHomeworkId, It.IsAny<CancellationToken>()))
@@ -126,7 +126,7 @@ public sealed class DeleteSubmittedReviewCommandValidatorTests
     public async Task ValidateAsync_HomeworkNotFound_ShouldBeOtherErrorNotFound()
     {
         // Arrange
-        var command = _fixture.Create<DeleteSubmittedReviewCommand>();
+        var command = _fixture.Create<UpdateSubmittedReviewCommand>();
         var submittedReview = SetupSubmittedReview(command);
         var submittedHomework = SetupSubmittedHomework(submittedReview.SubmittedHomeworkId);
         _homeworkRepositoryMock
@@ -150,7 +150,7 @@ public sealed class DeleteSubmittedReviewCommandValidatorTests
     public async Task ValidateAsync_HomeworkNotInReviewingStatus_ShouldBeValidationError(HomeworkStatus status)
     {
         // Arrange
-        var command = _fixture.Create<DeleteSubmittedReviewCommand>();
+        var command = _fixture.Create<UpdateSubmittedReviewCommand>();
         var submittedReview = SetupSubmittedReview(command);
         var submittedHomework = SetupSubmittedHomework(submittedReview.SubmittedHomeworkId);
         SetupHomework(submittedHomework.HomeworkId, status, _currentTime.AddDays(1));
@@ -169,7 +169,7 @@ public sealed class DeleteSubmittedReviewCommandValidatorTests
     public async Task ValidateAsync_ReviewDeadlineNotInFuture_ShouldBeValidationError(int deadlineOffsetSeconds)
     {
         // Arrange
-        var command = _fixture.Create<DeleteSubmittedReviewCommand>();
+        var command = _fixture.Create<UpdateSubmittedReviewCommand>();
         var submittedReview = SetupSubmittedReview(command);
         var submittedHomework = SetupSubmittedHomework(submittedReview.SubmittedHomeworkId);
         SetupHomework(submittedHomework.HomeworkId, HomeworkStatus.Reviewing, _currentTime.AddSeconds(deadlineOffsetSeconds));
@@ -182,7 +182,7 @@ public sealed class DeleteSubmittedReviewCommandValidatorTests
         result.AsT1.Errors.Should().NotBeNull().And.ContainSingle(HomeworkErrors.HomeworkNotAcceptingReviews);
     }
 
-    private SubmittedReview SetupSubmittedReview(DeleteSubmittedReviewCommand command)
+    private SubmittedReview SetupSubmittedReview(UpdateSubmittedReviewCommand command)
     {
         var submittedReview = _fixture.Build<SubmittedReview>()
             .With(result => result.Id, command.SubmittedReviewId)

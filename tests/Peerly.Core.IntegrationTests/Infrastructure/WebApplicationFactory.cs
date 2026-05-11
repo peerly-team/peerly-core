@@ -16,6 +16,7 @@ using Peerly.Core.Api.Controllers.Homeworks;
 using Peerly.Core.Api.Controllers.Participants;
 using Peerly.Core.Api.Controllers.Storage;
 using Peerly.Core.Api.Controllers.Submissions;
+using Peerly.Core.Api.Controllers.Users;
 using Peerly.Core.Api.Extensions;
 using Peerly.Core.Api.Infrastructure.Configuration;
 using Peerly.Core.ApplicationServices.Extensions;
@@ -39,6 +40,10 @@ using Peerly.Core.IntegrationTests.Features.V1.Submissions.CreateSubmittedReview
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.DeleteSubmittedHomework.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.DeleteSubmittedHomeworkFile.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.DeleteSubmittedReview.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Submissions.GetAssignedReview.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Submissions.UpdateSubmittedHomework.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Submissions.UpdateSubmittedReview.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Users.SearchUsers.Infrastructure;
 using Peerly.Core.Messaging.Extensions;
 using Peerly.Core.Persistence.Extensions;
 
@@ -148,6 +153,11 @@ public sealed class WebApplicationFactory : IAsyncDisposable
         return new CreateSubmittedReviewGrpcClient(GetOrCreateGrpcChannel());
     }
 
+    public GetAssignedReviewGrpcClient GetAssignedReviewClient()
+    {
+        return new GetAssignedReviewGrpcClient(GetOrCreateGrpcChannel());
+    }
+
     public DeleteSubmittedHomeworkGrpcClient DeleteSubmittedHomeworkClient()
     {
         return new DeleteSubmittedHomeworkGrpcClient(GetOrCreateGrpcChannel());
@@ -161,6 +171,21 @@ public sealed class WebApplicationFactory : IAsyncDisposable
     public DeleteSubmittedReviewGrpcClient DeleteSubmittedReviewClient()
     {
         return new DeleteSubmittedReviewGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public UpdateSubmittedHomeworkGrpcClient UpdateSubmittedHomeworkClient()
+    {
+        return new UpdateSubmittedHomeworkGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public UpdateSubmittedReviewGrpcClient UpdateSubmittedReviewClient()
+    {
+        return new UpdateSubmittedReviewGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public SearchUsersGrpcClient SearchUsersClient()
+    {
+        return new SearchUsersGrpcClient(GetOrCreateGrpcChannel());
     }
 
     public async Task StartAsync()
@@ -257,6 +282,7 @@ public sealed class WebApplicationFactory : IAsyncDisposable
                 endpoints.MapGrpcService<SubmissionController>();
                 endpoints.MapGrpcService<GroupController>();
                 endpoints.MapGrpcService<ParticipantController>();
+                endpoints.MapGrpcService<UserController>();
                 endpoints.MapGrpcReflectionService();
             });
 

@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package peerly.core.v1;
+
+import "peerly/core/v1/common.proto";
+
+option csharp_namespace = "Peerly.Core.V1.Proto";
+
+service UserService {
+  rpc V1SearchUsers(V1SearchUsersRequest) returns (V1SearchUsersResponse);
+}
+
+message V1SearchUsersRequest {
+  SearchUsersFilter filter = 1;
+  int32 limit = 2;
+
+  message SearchUsersFilter {
+    repeated Role roles = 1;
+    string query = 2;
+  }
+}
+
+message V1SearchUsersResponse {
+  repeated UserInfo users = 1;
+
+  message UserInfo {
+    int64 id = 1;
+    string email = 2;
+    string name = 3;
+    Role role = 4;
+  }
+}

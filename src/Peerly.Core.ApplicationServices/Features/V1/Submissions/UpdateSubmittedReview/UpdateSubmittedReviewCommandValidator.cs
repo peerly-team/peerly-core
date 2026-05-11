@@ -8,20 +8,20 @@ using Peerly.Core.ApplicationServices.Features.Validations;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Models.Homeworks;
 
-namespace Peerly.Core.ApplicationServices.Features.V1.Submissions.DeleteSubmittedReview;
+namespace Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedReview;
 
-internal sealed class DeleteSubmittedReviewValidator : ICommandValidator<DeleteSubmittedReviewCommand, Success>
+internal sealed class UpdateSubmittedReviewCommandValidator : ICommandValidator<UpdateSubmittedReviewCommand, Success>
 {
     private readonly ICommonUnitOfWorkFactory _unitOfWorkFactory;
     private readonly IClock _clock;
 
-    public DeleteSubmittedReviewValidator(ICommonUnitOfWorkFactory unitOfWorkFactory, IClock clock)
+    public UpdateSubmittedReviewCommandValidator(ICommonUnitOfWorkFactory unitOfWorkFactory, IClock clock)
     {
         _unitOfWorkFactory = unitOfWorkFactory;
         _clock = clock;
     }
 
-    public async Task<CommandValidationResult> ValidateAsync(DeleteSubmittedReviewCommand command, CancellationToken cancellationToken)
+    public async Task<CommandValidationResult> ValidateAsync(UpdateSubmittedReviewCommand command, CancellationToken cancellationToken)
     {
         await using var unitOfWork = await _unitOfWorkFactory.CreateReadOnlyAsync(cancellationToken);
 
