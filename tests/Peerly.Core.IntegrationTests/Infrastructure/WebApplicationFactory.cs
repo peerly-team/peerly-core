@@ -33,6 +33,12 @@ using Peerly.Core.IntegrationTests.Features.V1.Courses.UpdateCourse.Infrastructu
 using Peerly.Core.IntegrationTests.Features.V1.Groups.CreateGroup.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Homeworks.DeleteHomework.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Homeworks.DeleteHomeworkFile.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Homeworks.GetStudentHomework.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Homeworks.GetTeacherHomework.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Homeworks.ListStudentCourseHomeworks.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Homeworks.ListTeacherCourseHomeworks.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Homeworks.SearchStudentHomeworks.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Homeworks.SearchTeacherHomeworks.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CorrectSubmittedHomeworkMark.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CreateSubmittedHomework.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CreateSubmittedHomeworkFile.Infrastructure;
@@ -133,6 +139,36 @@ public sealed class WebApplicationFactory : IAsyncDisposable
     public DeleteHomeworkFileGrpcClient DeleteHomeworkFileClient()
     {
         return new DeleteHomeworkFileGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public GetStudentHomeworkGrpcClient GetStudentHomeworkClient()
+    {
+        return new GetStudentHomeworkGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public GetTeacherHomeworkGrpcClient GetTeacherHomeworkClient()
+    {
+        return new GetTeacherHomeworkGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public ListStudentCourseHomeworksGrpcClient ListStudentCourseHomeworksClient()
+    {
+        return new ListStudentCourseHomeworksGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public ListTeacherCourseHomeworksGrpcClient ListTeacherCourseHomeworksClient()
+    {
+        return new ListTeacherCourseHomeworksGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public SearchStudentHomeworksGrpcClient SearchStudentHomeworksClient()
+    {
+        return new SearchStudentHomeworksGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public SearchTeacherHomeworksGrpcClient SearchTeacherHomeworksClient()
+    {
+        return new SearchTeacherHomeworksGrpcClient(GetOrCreateGrpcChannel());
     }
 
     public CorrectSubmittedHomeworkMarkGrpcClient CorrectSubmittedHomeworkMarkClient()

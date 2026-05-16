@@ -58,7 +58,7 @@ internal sealed class GetTeacherCourseHandler : IQueryHandler<GetTeacherCourseQu
         CourseId courseId,
         CancellationToken cancellationToken)
     {
-        var teacherIds = await unitOfWork.ReadOnlyCourseTeacherRepository.ListTeacherIdAsync(courseId, cancellationToken);
+        var teacherIds = await unitOfWork.ReadOnlyCourseTeacherRepository.ListTeacherIdsAsync(courseId, cancellationToken);
         if (teacherIds.Count == 0)
             return [];
 

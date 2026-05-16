@@ -1,0 +1,17 @@
+using System;
+using Peerly.Core.Identifiers;
+
+namespace Peerly.Core.Models.Homeworks;
+
+public sealed record StudentHomeworkInfo
+{
+    public required HomeworkId Id { get; init; }
+    public required string Name { get; init; }
+    public required HomeworkStatus Status { get; init; }
+    public required string CheckList { get; init; }
+    public required string? Description { get; init; }
+    public required DateTimeOffset Deadline { get; init; }
+    public required DateTimeOffset ReviewDeadline { get; init; }
+    public required int AmountOfReviewers { get; init; }
+    public required bool IsHomeworkSubmitted { get; init; }
+}

@@ -88,7 +88,7 @@ public sealed class GetTeacherCourseHandlerTests
             _fixture.Create<TeacherId>()
         };
         _unitOfWorkMock
-            .Setup(unitOfWork => unitOfWork.ReadOnlyCourseTeacherRepository.ListTeacherIdAsync(query.CourseId, It.IsAny<CancellationToken>()))
+            .Setup(unitOfWork => unitOfWork.ReadOnlyCourseTeacherRepository.ListTeacherIdsAsync(query.CourseId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(teacherIds);
 
         var teachers = teacherIds
@@ -129,7 +129,7 @@ public sealed class GetTeacherCourseHandlerTests
             unitOfWork => unitOfWork.ReadOnlyCourseFileRepository.ListFilesAsync(query.CourseId, It.IsAny<CancellationToken>()),
             Times.Once);
         _unitOfWorkMock.Verify(
-            unitOfWork => unitOfWork.ReadOnlyCourseTeacherRepository.ListTeacherIdAsync(query.CourseId, It.IsAny<CancellationToken>()),
+            unitOfWork => unitOfWork.ReadOnlyCourseTeacherRepository.ListTeacherIdsAsync(query.CourseId, It.IsAny<CancellationToken>()),
             Times.Once);
         _unitOfWorkMock.Verify(
             unitOfWork => unitOfWork.ReadOnlyTeacherRepository.ListAsync(
@@ -164,7 +164,7 @@ public sealed class GetTeacherCourseHandlerTests
             .ReturnsAsync([]);
 
         _unitOfWorkMock
-            .Setup(unitOfWork => unitOfWork.ReadOnlyCourseTeacherRepository.ListTeacherIdAsync(query.CourseId, It.IsAny<CancellationToken>()))
+            .Setup(unitOfWork => unitOfWork.ReadOnlyCourseTeacherRepository.ListTeacherIdsAsync(query.CourseId, It.IsAny<CancellationToken>()))
             .ReturnsAsync([]);
 
         // Act

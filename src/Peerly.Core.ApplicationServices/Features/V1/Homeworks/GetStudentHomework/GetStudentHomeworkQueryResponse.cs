@@ -7,7 +7,7 @@ namespace Peerly.Core.ApplicationServices.Features.V1.Homeworks.GetStudentHomewo
 
 public sealed record GetStudentHomeworkQueryResponse
 {
-    public required Homework Homework { get; init; }
-    public required SubmittedHomeworkId? SubmittedHomeworkId { get; init; }
+    public required StudentHomeworkInfo StudentHomeworkInfo { get; init; }
     public required IReadOnlyCollection<File> Files { get; init; }
+    public SubmittedHomeworkId? SubmittedHomeworkId { get; init; }
 }

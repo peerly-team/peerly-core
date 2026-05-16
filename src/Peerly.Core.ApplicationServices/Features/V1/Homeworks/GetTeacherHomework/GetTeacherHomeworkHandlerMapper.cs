@@ -15,11 +15,19 @@ internal static class GetTeacherHomeworkHandlerMapper
         };
     }
 
-    public static SubmittedHomeworkFilter ToSubmittedHomeworkFilter(this GetTeacherHomeworkQuery query, HomeworkId homeworkId)
+    public static TeacherHomeworkInfo ToTeacherHomeworkInfo(this Homework homework)
     {
-        return new SubmittedHomeworkFilter
+        return new TeacherHomeworkInfo
         {
-            HomeworkIds = [homeworkId]
+            Id = homework.Id,
+            Name = homework.Name,
+            Status = homework.Status,
+            CheckList = homework.CheckList,
+            Description = homework.Description,
+            Deadline = homework.Deadline,
+            ReviewDeadline = homework.ReviewDeadline,
+            AmountOfReviewers = homework.AmountOfReviewers,
+            DiscrepancyThreshold = homework.DiscrepancyThreshold
         };
     }
 }

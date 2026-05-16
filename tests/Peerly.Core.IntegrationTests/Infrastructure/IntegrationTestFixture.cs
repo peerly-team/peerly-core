@@ -13,6 +13,12 @@ using Peerly.Core.IntegrationTests.Features.V1.Courses.UpdateCourse.Infrastructu
 using Peerly.Core.IntegrationTests.Features.V1.Groups.CreateGroup.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Homeworks.DeleteHomework.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Homeworks.DeleteHomeworkFile.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Homeworks.GetStudentHomework.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Homeworks.GetTeacherHomework.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Homeworks.ListStudentCourseHomeworks.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Homeworks.ListTeacherCourseHomeworks.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Homeworks.SearchStudentHomeworks.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Homeworks.SearchTeacherHomeworks.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CorrectSubmittedHomeworkMark.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CreateSubmittedHomework.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CreateSubmittedHomeworkFile.Infrastructure;
@@ -62,6 +68,12 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
     public CreateGroupGrpcClient CreateGroupClient => ApplicationFactory.CreateGroupClient();
     public DeleteHomeworkGrpcClient DeleteHomeworkClient => ApplicationFactory.DeleteHomeworkClient();
     public DeleteHomeworkFileGrpcClient DeleteHomeworkFileClient => ApplicationFactory.DeleteHomeworkFileClient();
+    public GetStudentHomeworkGrpcClient GetStudentHomeworkClient => ApplicationFactory.GetStudentHomeworkClient();
+    public GetTeacherHomeworkGrpcClient GetTeacherHomeworkClient => ApplicationFactory.GetTeacherHomeworkClient();
+    public ListStudentCourseHomeworksGrpcClient ListStudentCourseHomeworksClient => ApplicationFactory.ListStudentCourseHomeworksClient();
+    public ListTeacherCourseHomeworksGrpcClient ListTeacherCourseHomeworksClient => ApplicationFactory.ListTeacherCourseHomeworksClient();
+    public SearchStudentHomeworksGrpcClient SearchStudentHomeworksClient => ApplicationFactory.SearchStudentHomeworksClient();
+    public SearchTeacherHomeworksGrpcClient SearchTeacherHomeworksClient => ApplicationFactory.SearchTeacherHomeworksClient();
     public CorrectSubmittedHomeworkMarkGrpcClient CorrectSubmittedHomeworkMarkClient => ApplicationFactory.CorrectSubmittedHomeworkMarkClient();
     public CreateSubmittedHomeworkGrpcClient CreateSubmittedHomeworkClient => ApplicationFactory.CreateSubmittedHomeworkClient();
     public CreateSubmittedHomeworkFileGrpcClient CreateSubmittedHomeworkFileClient => ApplicationFactory.CreateSubmittedHomeworkFileClient();

@@ -25,4 +25,5 @@ public interface IReadOnlyGroupRepository
     Task<IReadOnlyCollection<Group>> ListAsync(GroupFilter filter, CancellationToken cancellationToken);
     Task<IReadOnlyCollection<CourseId>> ListCourseIdsAsync(StudentId studentId, CancellationToken cancellationToken);
     Task<IReadOnlyCollection<CourseId>> ListCourseIdAsync(TeacherId teacherId, CancellationToken cancellationToken);
+    Task<IReadOnlyCollection<GroupId>> ListGroupIdsAsync(StudentId studentId, CancellationToken cancellationToken);
 }

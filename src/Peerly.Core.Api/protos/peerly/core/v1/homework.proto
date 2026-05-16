@@ -22,8 +22,8 @@ service HomeworkService {
   rpc V1GetTeacherHomework(V1GetTeacherHomeworkRequest) returns (V1GetTeacherHomeworkResponse);
   rpc V1ListTeacherCourseHomeworks(V1ListTeacherCourseHomeworksRequest) returns (V1ListTeacherCourseHomeworksResponse);
   rpc V1ListStudentCourseHomeworks(V1ListStudentCourseHomeworksRequest) returns (V1ListStudentCourseHomeworksResponse);
-  rpc V1SearchTeacherHomeworks(V1SearchTeacherHomeworksRequest) returns (V1SearchTeacherHomeworksResponse); // todo: реализовать GET api/v1/teacher/homeworks
-  rpc V1SearchStudentHomeworks(V1SearchStudentHomeworksRequest) returns (V1SearchStudentHomeworksResponse); // todo: реализовать GET api/v1/student/homeworks
+  rpc V1SearchTeacherHomeworks(V1SearchTeacherHomeworksRequest) returns (V1SearchTeacherHomeworksResponse);
+  rpc V1SearchStudentHomeworks(V1SearchStudentHomeworksRequest) returns (V1SearchStudentHomeworksResponse);
 }
 
 message V1CreateCourseHomeworkRequest {
@@ -200,7 +200,7 @@ message V1ListStudentCourseHomeworksRequest {
 }
 
 message V1ListStudentCourseHomeworksResponse {
-  repeated HomeworkInfo homework_infos = 1;
+  repeated StudentHomeworkInfo student_homework_infos = 1;
 }
 
 message V1GetStudentHomeworkRequest {
@@ -209,9 +209,9 @@ message V1GetStudentHomeworkRequest {
 }
 
 message V1GetStudentHomeworkResponse {
-  HomeworkInfo homework_info = 1;
-  google.protobuf.Int64Value submitted_homework_id = 2;
-  repeated File files = 3;
+  StudentHomeworkInfo student_homework_info = 1;
+  repeated File homework_files = 2;
+  optional int64 submitted_homework_id = 3;
 }
 
 message V1GetTeacherHomeworkRequest {
@@ -220,10 +220,9 @@ message V1GetTeacherHomeworkRequest {
 }
 
 message V1GetTeacherHomeworkResponse {
-  HomeworkInfo homework_info = 1;
-  int32 submitted_count = 2;
-  int32 total_students_count = 3;
-  repeated File files = 4;
+  TeacherHomeworkInfo teacher_homework_info = 1;
+  repeated File homework_files = 2;
+  optional int32 submitted_count = 3;
 }
 
 message V1ListTeacherCourseHomeworksRequest {
@@ -232,7 +231,7 @@ message V1ListTeacherCourseHomeworksRequest {
 }
 
 message V1ListTeacherCourseHomeworksResponse {
-  repeated HomeworkInfo homework_infos = 1;
+  repeated TeacherHomeworkInfo teacher_homework_infos = 1;
 }
 
 message V1SearchTeacherHomeworksRequest {
@@ -242,7 +241,7 @@ message V1SearchTeacherHomeworksRequest {
 }
 
 message V1SearchTeacherHomeworksResponse {
-  repeated HomeworkInfo homework_infos = 1;
+  repeated TeacherHomeworkInfo teacher_homework_infos = 1;
 }
 
 message V1SearchStudentHomeworksRequest {
@@ -252,5 +251,5 @@ message V1SearchStudentHomeworksRequest {
 }
 
 message V1SearchStudentHomeworksResponse {
-  repeated HomeworkInfo homework_infos = 1;
+  repeated StudentHomeworkInfo student_homework_infos = 1;
 }

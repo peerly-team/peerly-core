@@ -46,7 +46,7 @@ internal sealed class ListGroupParticipantsHandler : IQueryHandler<ListGroupPart
         ICommonReadOnlyUnitOfWork unitOfWork,
         CancellationToken cancellationToken)
     {
-        var teacherIds = await unitOfWork.ReadOnlyGroupTeacherRepository.ListTeacherIdAsync(query.GroupId, cancellationToken);
+        var teacherIds = await unitOfWork.ReadOnlyGroupTeacherRepository.ListTeacherIdsAsync(query.GroupId, cancellationToken);
         if (teacherIds.Count == 0)
         {
             return [];

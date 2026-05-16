@@ -51,7 +51,7 @@ internal sealed class CourseTeacherRepository : ICourseTeacherRepository
         return affectedRows == 1;
     }
 
-    public async Task<IReadOnlyCollection<CourseId>> ListCourseIdAsync(TeacherId teacherId, CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<CourseId>> ListCourseIdsAsync(TeacherId teacherId, CancellationToken cancellationToken)
     {
         var queryParams = new
         {
@@ -75,7 +75,7 @@ internal sealed class CourseTeacherRepository : ICourseTeacherRepository
         return courseIds.ToArrayBy(courseId => new CourseId(courseId));
     }
 
-    public async Task<IReadOnlyCollection<TeacherId>> ListTeacherIdAsync(CourseId courseId, CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<TeacherId>> ListTeacherIdsAsync(CourseId courseId, CancellationToken cancellationToken)
     {
         var queryParams = new
         {

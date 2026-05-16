@@ -2,79 +2,42 @@ using System.Threading;
 using System.Threading.Tasks;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Abstractions;
-using Peerly.Core.ApplicationServices.Checkers.CourseAccess.Abstractions;
-using Peerly.Core.Exceptions;
-using Peerly.Core.Models.Groups;
-using Peerly.Core.Models.Homeworks;
 
 namespace Peerly.Core.ApplicationServices.Features.V1.Homeworks.GetStudentHomework;
 
 internal sealed class GetStudentHomeworkHandler : IQueryHandler<GetStudentHomeworkQuery, GetStudentHomeworkQueryResponse>
 {
     private readonly ICommonUnitOfWorkFactory _commonUnitOfWorkFactory;
-    private readonly IStudentCourseAccessChecker _studentCourseAccessChecker;
+    private readonly IQueryValidator<GetStudentHomeworkQuery, GetStudentHomeworkQueryResponse> _validator;
 
     public GetStudentHomeworkHandler(
         ICommonUnitOfWorkFactory commonUnitOfWorkFactory,
-        IStudentCourseAccessChecker studentCourseAccessChecker)
+        IQueryValidator<GetStudentHomeworkQuery, GetStudentHomeworkQueryResponse> validator)
     {
         _commonUnitOfWorkFactory = commonUnitOfWorkFactory;
-        _studentCourseAccessChecker = studentCourseAccessChecker;
+        _validator = validator;
     }
 
     public async Task<GetStudentHomeworkQueryResponse> ExecuteAsync(
         GetStudentHomeworkQuery query,
         CancellationToken cancellationToken)
     {
+        await _validator.ValidateAsync(query, cancellationToken);
+
         await using var unitOfWork = await _commonUnitOfWorkFactory.CreateReadOnlyAsync(cancellationToken);
+        var homeworkStudent = query.ToHomeworkStudent(query.HomeworkId);
+        var studentHomework = await unitOfWork.ReadOnlyHomeworkRepository.GetStudentHomeworkInfoAsync(homeworkStudent, cancellationToken);
+        var files = await unitOfWork.ReadOnlyHomeworkFileRepository.ListFilesAsync(query.HomeworkId, cancellationToken);
 
-        var homework = await unitOfWork.ReadOnlyHomeworkRepository.GetAsync(query.HomeworkId, cancellationToken);
-        if (homework is null || homework.Status is HomeworkStatus.Draft)
-        {
-            throw new NotFoundException();
-        }
-
-        await EnsureStudentHasAccessAsync(unitOfWork, query, homework, cancellationToken);
-
-        var homeworkStudent = query.ToHomeworkStudent(homework.Id);
-        var submittedHomeworkId =
-            await unitOfWork.ReadOnlySubmittedHomeworkRepository.GetSubmittedHomeworkIdAsync(homeworkStudent, cancellationToken);
-        var files = await unitOfWork.ReadOnlyHomeworkFileRepository.ListFilesAsync(homework.Id, cancellationToken);
+        var submittedHomeworkId = studentHomework!.IsHomeworkSubmitted
+            ? await unitOfWork.ReadOnlySubmittedHomeworkRepository.GetSubmittedHomeworkIdAsync(homeworkStudent, cancellationToken)
+            : null;
 
         return new GetStudentHomeworkQueryResponse
         {
-            Homework = homework,
-            SubmittedHomeworkId = submittedHomeworkId,
-            Files = files
+            StudentHomeworkInfo = studentHomework,
+            Files = files,
+            SubmittedHomeworkId = submittedHomeworkId
         };
-    }
-
-    private async Task EnsureStudentHasAccessAsync(
-        ICommonReadOnlyUnitOfWork unitOfWork,
-        GetStudentHomeworkQuery query,
-        Homework homework,
-        CancellationToken cancellationToken)
-    {
-        var courseStudent = query.ToCourseStudent(homework.CourseId);
-        if (!await _studentCourseAccessChecker.RunAsync(courseStudent, cancellationToken))
-        {
-            throw new NotFoundException();
-        }
-
-        if (homework.GroupId is not { } homeworkGroupId)
-        {
-            return;
-        }
-
-        var groupStudentFilter = new GroupStudentFilter
-        {
-            GroupIds = [homeworkGroupId],
-            StudentIds = [query.StudentId]
-        };
-        var groupStudents = await unitOfWork.ReadOnlyGroupStudentRepository.ListAsync(groupStudentFilter, cancellationToken);
-        if (groupStudents.Count == 0)
-        {
-            throw new NotFoundException();
-        }
     }
 }

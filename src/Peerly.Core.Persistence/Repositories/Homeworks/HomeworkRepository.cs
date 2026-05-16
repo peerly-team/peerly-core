@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using Dapper;
 using Peerly.Core.Abstractions.Repositories;
 using Peerly.Core.Identifiers;
+using Peerly.Core.Models.Courses;
 using Peerly.Core.Models.Homeworks;
+using Peerly.Core.Pagination;
 using Peerly.Core.Persistence.Common;
 using Peerly.Core.Persistence.Repositories.Homeworks.Models;
 using Peerly.Core.Persistence.UnitOfWork;
@@ -56,6 +58,42 @@ internal sealed class HomeworkRepository : IHomeworkRepository
         var homeworkDb = await _connectionContext.Connection.QuerySingleOrDefaultAsync<HomeworkDb>(command);
 
         return homeworkDb?.ToHomework();
+    }
+
+    public async Task<StudentHomeworkInfo?> GetStudentHomeworkInfoAsync(HomeworkStudent homeworkStudent, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            HomeworkId = (long)homeworkStudent.HomeworkId,
+            StudentId = (long)homeworkStudent.StudentId
+        };
+
+        const string Query =
+            $"""
+             select h.{HomeworkTable.Id},
+                    h.{HomeworkTable.Name},
+                    h.{HomeworkTable.Status},
+                    h.{HomeworkTable.AmountOfReviewers},
+                    h.{HomeworkTable.Description},
+                    h.{HomeworkTable.Checklist},
+                    h.{HomeworkTable.Deadline},
+                    h.{HomeworkTable.ReviewDeadline},
+                    (sh.{SubmittedHomeworkTable.HomeworkId} is not null) as is_homework_submitted
+               from {HomeworkTable.TableName} h
+               left join {SubmittedHomeworkTable.TableName} sh
+                 on sh.{SubmittedHomeworkTable.HomeworkId} = h.{HomeworkTable.Id}
+                and sh.{SubmittedHomeworkTable.StudentId} = @{nameof(queryParams.StudentId)}
+              where h.{HomeworkTable.Id} = @{nameof(queryParams.HomeworkId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var homeworkDb = await _connectionContext.Connection.QuerySingleOrDefaultAsync<StudentHomeworkInfoDb>(command);
+
+        return homeworkDb?.ToStudentHomeworkInfo();
     }
 
     public async Task<int> GetHomeworkCountAsync(CourseId courseId, CancellationToken cancellationToken)
@@ -121,6 +159,229 @@ internal sealed class HomeworkRepository : IHomeworkRepository
         var homeworkDbs = await _connectionContext.Connection.QueryAsync<HomeworkDb>(command);
 
         return homeworkDbs.ToArrayBy(homeworkDb => homeworkDb.ToHomework());
+    }
+
+    public async Task<TeacherHomeworkInfo?> GetTeacherHomeworkInfoAsync(HomeworkId homeworkId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            HomeworkId = (long)homeworkId
+        };
+
+        const string Query =
+            $"""
+             select h.{HomeworkTable.Id},
+                    h.{HomeworkTable.Name},
+                    h.{HomeworkTable.Status},
+                    h.{HomeworkTable.AmountOfReviewers},
+                    h.{HomeworkTable.Description},
+                    h.{HomeworkTable.Checklist},
+                    h.{HomeworkTable.Deadline},
+                    h.{HomeworkTable.ReviewDeadline},
+                    h.{HomeworkTable.DiscrepancyThreshold}
+               from {HomeworkTable.TableName} h
+              where h.{HomeworkTable.Id} = @{nameof(queryParams.HomeworkId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var homeworkDb = await _connectionContext.Connection.QuerySingleOrDefaultAsync<TeacherHomeworkInfoDb>(command);
+
+        return homeworkDb?.ToTeacherHomeworkInfo();
+    }
+
+    public async Task<IReadOnlyCollection<StudentHomeworkInfo>> ListStudentHomeworkInfosAsync(
+        CourseStudent courseStudent,
+        CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            CourseId = (long)courseStudent.CourseId,
+            StudentId = (long)courseStudent.StudentId,
+            DraftStatus = HomeworkStatus.Draft.ToString()
+        };
+
+        const string Query =
+            $"""
+              with student_course_groups as (
+                  select gs.{GroupStudentTable.GroupId}
+                    from {GroupStudentTable.TableName} gs
+                    join {GroupTable.TableName} g on g.{GroupTable.Id} = gs.{GroupStudentTable.GroupId}
+                   where g.{GroupTable.CourseId} = @{nameof(queryParams.CourseId)}
+                     and gs.{GroupStudentTable.StudentId} = @{nameof(queryParams.StudentId)})
+
+              select h.{HomeworkTable.Id},
+                     h.{HomeworkTable.Name},
+                     h.{HomeworkTable.Status},
+                     h.{HomeworkTable.AmountOfReviewers},
+                     h.{HomeworkTable.Description},
+                     h.{HomeworkTable.Checklist},
+                     h.{HomeworkTable.Deadline},
+                     h.{HomeworkTable.ReviewDeadline},
+                     (sh.{SubmittedHomeworkTable.HomeworkId} is not null) as is_homework_submitted
+                from {HomeworkTable.TableName} h
+                left join {SubmittedHomeworkTable.TableName} sh on sh.{SubmittedHomeworkTable.HomeworkId} = h.{HomeworkTable.Id}
+                                                                and sh.{SubmittedHomeworkTable.StudentId} = @{nameof(queryParams.StudentId)}
+               where h.{HomeworkTable.Status} <> @{nameof(queryParams.DraftStatus)}
+                 and h.{HomeworkTable.CourseId} = @{nameof(queryParams.CourseId)}
+                 and (
+                     (h.{HomeworkTable.GroupId} is null and exists (select from student_course_groups))
+                     or h.{HomeworkTable.GroupId} in (select group_id from student_course_groups)
+                     )
+               order by h.{HomeworkTable.Deadline} desc;
+              """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var homeworkDbs = await _connectionContext.Connection.QueryAsync<StudentHomeworkInfoDb>(command);
+
+        return homeworkDbs.ToArrayBy(homeworkDb => homeworkDb.ToStudentHomeworkInfo());
+    }
+
+    public async Task<IReadOnlyCollection<TeacherHomeworkInfo>> ListTeacherHomeworkInfosAsync(
+        CourseTeacher courseTeacher,
+        CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            CourseId = (long)courseTeacher.CourseId,
+            TeacherId = (long)courseTeacher.TeacherId
+        };
+
+        const string Query =
+            $"""
+             select h.{HomeworkTable.Id},
+                    h.{HomeworkTable.Name},
+                    h.{HomeworkTable.Status},
+                    h.{HomeworkTable.AmountOfReviewers},
+                    h.{HomeworkTable.Description},
+                    h.{HomeworkTable.Checklist},
+                    h.{HomeworkTable.Deadline},
+                    h.{HomeworkTable.ReviewDeadline},
+                    h.{HomeworkTable.DiscrepancyThreshold}
+               from {HomeworkTable.TableName} h
+              where h.{HomeworkTable.CourseId} = @{nameof(queryParams.CourseId)}
+                and (
+                    exists (select
+                              from {CourseTeacherTable.TableName} ct
+                             where ct.{CourseTeacherTable.CourseId} = @{nameof(queryParams.CourseId)}
+                               and ct.{CourseTeacherTable.TeacherId} = @{nameof(queryParams.TeacherId)})
+                    or exists (select 1
+                                 from {GroupTeacherTable.TableName} gt
+                                 join {GroupTable.TableName} g on g.{GroupTable.Id} = gt.{GroupTeacherTable.GroupId}
+                                where g.{GroupTable.CourseId} = @{nameof(queryParams.CourseId)}
+                                  and gt.{GroupTeacherTable.TeacherId} = @{nameof(queryParams.TeacherId)})
+                    )
+              order by h.{HomeworkTable.Deadline} desc;
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var homeworkDbs = await _connectionContext.Connection.QueryAsync<TeacherHomeworkInfoDb>(command);
+
+        return homeworkDbs.ToArrayBy(homeworkDb => homeworkDb.ToTeacherHomeworkInfo());
+    }
+
+    public async Task<IReadOnlyCollection<TeacherHomeworkInfo>> SearchTeacherHomeworkInfosAsync(
+        TeacherHomeworkSearchFilter filter,
+        PaginationInfo paginationInfo,
+        CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            CourseIds = filter.CourseIds.ToArrayBy(courseId => (long)courseId),
+            GroupIds = filter.GroupIds.ToArrayBy(groupId => (long)groupId),
+            HomeworkStatuses = filter.HomeworkStatuses.ToArrayBy(homeworkStatus => homeworkStatus.ToString()),
+            Limit = paginationInfo.PageSize,
+            paginationInfo.Offset
+        };
+
+        const string Query =
+            $"""
+             select h.{HomeworkTable.Id},
+                    h.{HomeworkTable.Name},
+                    h.{HomeworkTable.Status},
+                    h.{HomeworkTable.AmountOfReviewers},
+                    h.{HomeworkTable.Description},
+                    h.{HomeworkTable.Checklist},
+                    h.{HomeworkTable.Deadline},
+                    h.{HomeworkTable.ReviewDeadline},
+                    h.{HomeworkTable.DiscrepancyThreshold}
+               from {HomeworkTable.TableName} h
+              where (h.{HomeworkTable.CourseId} = any(@{nameof(queryParams.CourseIds)})
+                    or h.{HomeworkTable.GroupId} = any(@{nameof(queryParams.GroupIds)}))
+                and (cardinality(@{nameof(queryParams.HomeworkStatuses)}) = 0
+                    or h.{HomeworkTable.Status} = any(@{nameof(queryParams.HomeworkStatuses)}))
+              order by h.{HomeworkTable.Deadline} desc
+              limit @{nameof(queryParams.Limit)}
+             offset @{nameof(queryParams.Offset)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var homeworkDbs = await _connectionContext.Connection.QueryAsync<TeacherHomeworkInfoDb>(command);
+
+        return homeworkDbs.ToArrayBy(homeworkDb => homeworkDb.ToTeacherHomeworkInfo());
+    }
+
+    public async Task<IReadOnlyCollection<StudentHomeworkInfo>> SearchStudentHomeworkInfosAsync(
+        StudentHomeworkSearchFilter filter,
+        PaginationInfo paginationInfo,
+        CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            StudentId = (long)filter.StudentId,
+            CourseIds = filter.CourseIds.ToArrayBy(courseId => (long)courseId),
+            GroupIds = filter.GroupIds.ToArrayBy(groupId => (long)groupId),
+            HomeworkStatuses = filter.HomeworkStatuses.ToArrayBy(homeworkStatus => homeworkStatus.ToString()),
+            Limit = paginationInfo.PageSize,
+            paginationInfo.Offset
+        };
+
+        const string Query =
+            $"""
+             select h.{HomeworkTable.Id},
+                    h.{HomeworkTable.Name},
+                    h.{HomeworkTable.Status},
+                    h.{HomeworkTable.AmountOfReviewers},
+                    h.{HomeworkTable.Description},
+                    h.{HomeworkTable.Checklist},
+                    h.{HomeworkTable.Deadline},
+                    h.{HomeworkTable.ReviewDeadline},
+                    (sh.{SubmittedHomeworkTable.HomeworkId} is not null) as is_homework_submitted
+               from {HomeworkTable.TableName} h
+               left join {SubmittedHomeworkTable.TableName} sh on sh.{SubmittedHomeworkTable.HomeworkId} = h.{HomeworkTable.Id}
+                                                               and sh.{SubmittedHomeworkTable.StudentId} = @{nameof(queryParams.StudentId)}
+              where (h.{HomeworkTable.CourseId} = any(@{nameof(queryParams.CourseIds)})
+                    or h.{HomeworkTable.GroupId} = any(@{nameof(queryParams.GroupIds)}))
+                and (cardinality(@{nameof(queryParams.HomeworkStatuses)}) = 0
+                    or h.{HomeworkTable.Status} = any(@{nameof(queryParams.HomeworkStatuses)}))
+              order by h.{HomeworkTable.Deadline} desc
+              limit @{nameof(queryParams.Limit)}
+             offset @{nameof(queryParams.Offset)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var homeworkDbs = await _connectionContext.Connection.QueryAsync<StudentHomeworkInfoDb>(command);
+
+        return homeworkDbs.ToArrayBy(homeworkDb => homeworkDb.ToStudentHomeworkInfo());
     }
 
     public async Task<HomeworkId> AddAsync(HomeworkAddItem item, CancellationToken cancellationToken)
