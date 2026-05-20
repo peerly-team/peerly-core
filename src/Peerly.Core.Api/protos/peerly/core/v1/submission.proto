@@ -150,7 +150,7 @@ message V1GetAssignedReviewResponse {
   message SubmissionForReview {
     int64 submitted_homework_id = 1;
     string comment = 2;
-    // NOTE: если есть персональные данные, то передаем идентификатор анонимизированного файла
+    // NOTE: если файл содержит персональные данные, то передаем анонимизированную копию файла
     repeated File files = 3;
     string checklist = 4;
     optional int64 submitted_review_id = 5;

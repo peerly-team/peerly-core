@@ -41,7 +41,7 @@ public sealed class SearchTeacherCoursesHandlerTests
             .Create();
 
         _unitOfWorkMock
-            .Setup(unitOfWork => unitOfWork.ReadOnlyCourseTeacherRepository.ListCourseIdAsync(query.TeacherId, It.IsAny<CancellationToken>()))
+            .Setup(unitOfWork => unitOfWork.ReadOnlyCourseTeacherRepository.ListCourseIdsAsync(query.TeacherId, It.IsAny<CancellationToken>()))
             .ReturnsAsync([]);
         _unitOfWorkMock
             .Setup(unitOfWork => unitOfWork.ReadOnlyGroupRepository.ListCourseIdAsync(query.TeacherId, It.IsAny<CancellationToken>()))
@@ -54,7 +54,7 @@ public sealed class SearchTeacherCoursesHandlerTests
         queryResponse.Courses.Should().BeEmpty();
         queryResponse.TeachersByCourseId.Should().BeEmpty();
         _unitOfWorkMock.Verify(
-            unitOfWork => unitOfWork.ReadOnlyCourseTeacherRepository.ListCourseIdAsync(query.TeacherId, It.IsAny<CancellationToken>()),
+            unitOfWork => unitOfWork.ReadOnlyCourseTeacherRepository.ListCourseIdsAsync(query.TeacherId, It.IsAny<CancellationToken>()),
             Times.Once);
         _unitOfWorkMock.Verify(
             unitOfWork => unitOfWork.ReadOnlyGroupRepository.ListCourseIdAsync(query.TeacherId, It.IsAny<CancellationToken>()),
@@ -102,7 +102,7 @@ public sealed class SearchTeacherCoursesHandlerTests
         var groupCourseIds = new[] { deletedCourse.Id, inProgressCourse.Id };
         var generalCourseIds = courseIds.Concat(groupCourseIds).ToArray();
         _unitOfWorkMock
-            .Setup(unitOfWork => unitOfWork.ReadOnlyCourseTeacherRepository.ListCourseIdAsync(query.TeacherId, It.IsAny<CancellationToken>()))
+            .Setup(unitOfWork => unitOfWork.ReadOnlyCourseTeacherRepository.ListCourseIdsAsync(query.TeacherId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(courseIds);
         _unitOfWorkMock
             .Setup(unitOfWork => unitOfWork.ReadOnlyGroupRepository.ListCourseIdAsync(query.TeacherId, It.IsAny<CancellationToken>()))
@@ -152,7 +152,7 @@ public sealed class SearchTeacherCoursesHandlerTests
         queryResponse.TeachersByCourseId[inProgressCourse.Id].Should().BeEquivalentTo([thirdTeacher]);
         queryResponse.TeachersByCourseId.Should().NotContainKey(deletedCourse.Id);
         _unitOfWorkMock.Verify(
-            unitOfWork => unitOfWork.ReadOnlyCourseTeacherRepository.ListCourseIdAsync(query.TeacherId, It.IsAny<CancellationToken>()),
+            unitOfWork => unitOfWork.ReadOnlyCourseTeacherRepository.ListCourseIdsAsync(query.TeacherId, It.IsAny<CancellationToken>()),
             Times.Once);
         _unitOfWorkMock.Verify(
             unitOfWork => unitOfWork.ReadOnlyGroupRepository.ListCourseIdAsync(query.TeacherId, It.IsAny<CancellationToken>()),

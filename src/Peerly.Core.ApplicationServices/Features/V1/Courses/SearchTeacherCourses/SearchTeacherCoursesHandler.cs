@@ -24,7 +24,7 @@ internal sealed class SearchTeacherCoursesHandler : IQueryHandler<SearchTeacherC
     {
         await using var unitOfWork = await _unitOfWorkFactory.CreateReadOnlyAsync(cancellationToken);
 
-        var courseIds = await unitOfWork.ReadOnlyCourseTeacherRepository.ListCourseIdAsync(query.TeacherId, cancellationToken);
+        var courseIds = await unitOfWork.ReadOnlyCourseTeacherRepository.ListCourseIdsAsync(query.TeacherId, cancellationToken);
         var groupCourseIds = await unitOfWork.ReadOnlyGroupRepository.ListCourseIdAsync(query.TeacherId, cancellationToken);
         var generalCourseIds = courseIds.Concat(groupCourseIds).ToArray();
         if (generalCourseIds.Length == 0)

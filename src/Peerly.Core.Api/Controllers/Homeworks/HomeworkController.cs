@@ -15,6 +15,8 @@ using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ListStudentCourseHom
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.ListTeacherCourseHomeworks;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PostponeHomeworkDeadlines;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PublishHomework;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.SearchStudentHomeworks;
+using Peerly.Core.ApplicationServices.Features.V1.Homeworks.SearchTeacherHomeworks;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.UpdateDraftHomework;
 using Peerly.Core.V1;
 
@@ -36,6 +38,8 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
     private readonly IQueryHandler<GetTeacherHomeworkQuery, GetTeacherHomeworkQueryResponse> _getTeacherHomeworkHandler;
     private readonly ICommandHandler<DeleteHomeworkCommand, Success> _deleteHomeworkHandler;
     private readonly ICommandHandler<DeleteHomeworkFileCommand, Success> _deleteHomeworkFileHandler;
+    private readonly IQueryHandler<SearchTeacherHomeworksQuery, SearchTeacherHomeworksQueryResponse> _searchTeacherHomeworksHandler;
+    private readonly IQueryHandler<SearchStudentHomeworksQuery, SearchStudentHomeworksQueryResponse> _searchStudentHomeworksHandler;
 
     public HomeworkController(
         ICommandHandler<CreateCourseHomeworkCommand, CreateCourseHomeworkCommandResponse> createHomeworkHandler,
@@ -50,7 +54,9 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
         IQueryHandler<GetStudentHomeworkQuery, GetStudentHomeworkQueryResponse> getStudentHomeworkHandler,
         IQueryHandler<GetTeacherHomeworkQuery, GetTeacherHomeworkQueryResponse> getTeacherHomeworkHandler,
         ICommandHandler<DeleteHomeworkCommand, Success> deleteHomeworkHandler,
-        ICommandHandler<DeleteHomeworkFileCommand, Success> deleteHomeworkFileHandler)
+        ICommandHandler<DeleteHomeworkFileCommand, Success> deleteHomeworkFileHandler,
+        IQueryHandler<SearchTeacherHomeworksQuery, SearchTeacherHomeworksQueryResponse> searchTeacherHomeworksHandler,
+        IQueryHandler<SearchStudentHomeworksQuery, SearchStudentHomeworksQueryResponse> searchStudentHomeworksHandler)
     {
         _createHomeworkHandler = createHomeworkHandler;
         _createGroupHomeworkHandler = createGroupHomeworkHandler;
@@ -65,6 +71,8 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
         _getTeacherHomeworkHandler = getTeacherHomeworkHandler;
         _deleteHomeworkHandler = deleteHomeworkHandler;
         _deleteHomeworkFileHandler = deleteHomeworkFileHandler;
+        _searchTeacherHomeworksHandler = searchTeacherHomeworksHandler;
+        _searchStudentHomeworksHandler = searchStudentHomeworksHandler;
     }
 
     public override async Task<V1CreateCourseHomeworkResponse> V1CreateCourseHomework(V1CreateCourseHomeworkRequest request, ServerCallContext context)
@@ -156,5 +164,19 @@ public sealed class HomeworkController : HomeworkService.HomeworkServiceBase
         var command = request.ToDeleteHomeworkFileCommand();
         var commandResponse = await _deleteHomeworkFileHandler.ExecuteAsync(command, context.CancellationToken);
         return commandResponse.ToV1DeleteHomeworkFileResponse();
+    }
+
+    public override async Task<V1SearchStudentHomeworksResponse> V1SearchStudentHomeworks(V1SearchStudentHomeworksRequest request, ServerCallContext context)
+    {
+        var query = request.ToSearchStudentHomeworksQuery();
+        var queryResponse = await _searchStudentHomeworksHandler.ExecuteAsync(query, context.CancellationToken);
+        return queryResponse.ToV1SearchStudentHomeworksResponse();
+    }
+
+    public override async Task<V1SearchTeacherHomeworksResponse> V1SearchTeacherHomeworks(V1SearchTeacherHomeworksRequest request, ServerCallContext context)
+    {
+        var query = request.ToSearchTeacherHomeworksQuery();
+        var queryResponse = await _searchTeacherHomeworksHandler.ExecuteAsync(query, context.CancellationToken);
+        return queryResponse.ToV1SearchTeacherHomeworksResponse();
     }
 }

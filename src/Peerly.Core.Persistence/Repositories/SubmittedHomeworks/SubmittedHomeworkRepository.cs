@@ -51,29 +51,6 @@ internal sealed class SubmittedHomeworkRepository : ISubmittedHomeworkRepository
         return db?.ToSubmittedHomework();
     }
 
-    public async Task<bool> ExistsAsync(SubmittedHomeworkId submittedHomeworkId, CancellationToken cancellationToken)
-    {
-        var queryParams = new
-        {
-            Id = (long)submittedHomeworkId
-        };
-
-        const string Query =
-            $"""
-             select exists(
-                 select 1
-                   from {SubmittedHomeworkTable.TableName}
-                  where {SubmittedHomeworkTable.Id} = @{nameof(queryParams.Id)});
-             """;
-
-        var command = new CommandDefinition(
-            Query,
-            queryParams,
-            _connectionContext.Transaction,
-            cancellationToken: cancellationToken);
-        return await _connectionContext.Connection.QuerySingleAsync<bool>(command);
-    }
-
     public async Task<SubmittedHomeworkId?> GetSubmittedHomeworkIdAsync(HomeworkStudent homeworkStudent, CancellationToken cancellationToken)
     {
         var queryParams = new
@@ -98,6 +75,29 @@ internal sealed class SubmittedHomeworkRepository : ISubmittedHomeworkRepository
         var id = await _connectionContext.Connection.QuerySingleOrDefaultAsync<long?>(command);
 
         return id is null ? null : new SubmittedHomeworkId(id.Value);
+    }
+
+    public async Task<int> GetCountAsync(HomeworkId homeworkId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            HomeworkId = (long)homeworkId
+        };
+
+        const string Query =
+            $"""
+             select count(*)
+               from {SubmittedHomeworkTable.TableName}
+              where {SubmittedHomeworkTable.HomeworkId} = @{nameof(queryParams.HomeworkId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+
+        return await _connectionContext.Connection.QuerySingleAsync<int>(command);
     }
 
     public async Task<SubmittedHomeworkId> AddAsync(SubmittedHomeworkAddItem item, CancellationToken cancellationToken)

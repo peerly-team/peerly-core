@@ -33,6 +33,12 @@ using Peerly.Core.IntegrationTests.Features.V1.Courses.UpdateCourse.Infrastructu
 using Peerly.Core.IntegrationTests.Features.V1.Groups.CreateGroup.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Homeworks.DeleteHomework.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Homeworks.DeleteHomeworkFile.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Homeworks.GetStudentHomework.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Homeworks.GetTeacherHomework.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Homeworks.ListStudentCourseHomeworks.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Homeworks.ListTeacherCourseHomeworks.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Homeworks.SearchStudentHomeworks.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Homeworks.SearchTeacherHomeworks.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CorrectSubmittedHomeworkMark.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CreateSubmittedHomework.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CreateSubmittedHomeworkFile.Infrastructure;
@@ -41,6 +47,8 @@ using Peerly.Core.IntegrationTests.Features.V1.Submissions.DeleteSubmittedHomewo
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.DeleteSubmittedHomeworkFile.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.DeleteSubmittedReview.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.GetAssignedReview.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Submissions.GetSubmittedHomework.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Submissions.GetSubmittedReview.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.UpdateSubmittedHomework.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.UpdateSubmittedReview.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Users.SearchUsers.Infrastructure;
@@ -133,6 +141,36 @@ public sealed class WebApplicationFactory : IAsyncDisposable
         return new DeleteHomeworkFileGrpcClient(GetOrCreateGrpcChannel());
     }
 
+    public GetStudentHomeworkGrpcClient GetStudentHomeworkClient()
+    {
+        return new GetStudentHomeworkGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public GetTeacherHomeworkGrpcClient GetTeacherHomeworkClient()
+    {
+        return new GetTeacherHomeworkGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public ListStudentCourseHomeworksGrpcClient ListStudentCourseHomeworksClient()
+    {
+        return new ListStudentCourseHomeworksGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public ListTeacherCourseHomeworksGrpcClient ListTeacherCourseHomeworksClient()
+    {
+        return new ListTeacherCourseHomeworksGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public SearchStudentHomeworksGrpcClient SearchStudentHomeworksClient()
+    {
+        return new SearchStudentHomeworksGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public SearchTeacherHomeworksGrpcClient SearchTeacherHomeworksClient()
+    {
+        return new SearchTeacherHomeworksGrpcClient(GetOrCreateGrpcChannel());
+    }
+
     public CorrectSubmittedHomeworkMarkGrpcClient CorrectSubmittedHomeworkMarkClient()
     {
         return new CorrectSubmittedHomeworkMarkGrpcClient(GetOrCreateGrpcChannel());
@@ -156,6 +194,16 @@ public sealed class WebApplicationFactory : IAsyncDisposable
     public GetAssignedReviewGrpcClient GetAssignedReviewClient()
     {
         return new GetAssignedReviewGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public GetSubmittedHomeworkGrpcClient GetSubmittedHomeworkClient()
+    {
+        return new GetSubmittedHomeworkGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public GetSubmittedReviewGrpcClient GetSubmittedReviewClient()
+    {
+        return new GetSubmittedReviewGrpcClient(GetOrCreateGrpcChannel());
     }
 
     public DeleteSubmittedHomeworkGrpcClient DeleteSubmittedHomeworkClient()

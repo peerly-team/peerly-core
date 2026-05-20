@@ -51,7 +51,7 @@ internal sealed class GroupTeacherRepository : IGroupTeacherRepository
         await _connectionContext.Connection.ExecuteAsync(command);
     }
 
-    public async Task<IReadOnlyCollection<TeacherId>> ListTeacherIdAsync(GroupId groupId, CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<TeacherId>> ListTeacherIdsAsync(GroupId groupId, CancellationToken cancellationToken)
     {
         var queryParams = new
         {
@@ -73,6 +73,30 @@ internal sealed class GroupTeacherRepository : IGroupTeacherRepository
         var teacherIds = await _connectionContext.Connection.QueryAsync<long>(command);
 
         return teacherIds.ToArrayBy(teacherId => new TeacherId(teacherId));
+    }
+
+    public async Task<IReadOnlyCollection<GroupId>> ListGroupIdsAsync(TeacherId teacherId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            TeacherId = (long)teacherId
+        };
+
+        const string Query =
+            $"""
+             select {GroupTeacherTable.GroupId}
+               from {GroupTeacherTable.TableName}
+              where {GroupTeacherTable.TeacherId} = @{nameof(queryParams.TeacherId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var groupIds = await _connectionContext.Connection.QueryAsync<long>(command);
+
+        return groupIds.ToArrayBy(groupId => new GroupId(groupId));
     }
 
     public async Task<bool> ExistsAsync(GroupTeacher groupTeacher, CancellationToken cancellationToken)

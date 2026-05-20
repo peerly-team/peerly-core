@@ -5,5 +5,5 @@ namespace Peerly.Core.ApplicationServices.Features.V1.Homeworks.ListStudentCours
 
 public sealed record ListStudentCourseHomeworksQueryResponse
 {
-    public required IReadOnlyCollection<Homework> Homeworks { get; init; }
+    public required IReadOnlyCollection<StudentHomeworkInfo> StudentHomeworks { get; init; }
 }

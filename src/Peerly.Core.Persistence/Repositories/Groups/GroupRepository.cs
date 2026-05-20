@@ -130,6 +130,30 @@ internal sealed class GroupRepository : IGroupRepository
         return courseIds.ToArrayBy(courseId => new CourseId(courseId));
     }
 
+    public async Task<IReadOnlyCollection<GroupId>> ListGroupIdsAsync(StudentId studentId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            StudentId = (long)studentId
+        };
+
+        const string Query =
+            $"""
+             select {GroupStudentTable.GroupId}
+               from {GroupStudentTable.TableName}
+              where {GroupStudentTable.StudentId} = @{nameof(queryParams.StudentId)};
+             """;
+
+        var command = new CommandDefinition(
+            commandText: Query,
+            parameters: queryParams,
+            transaction: _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var groupIds = await _connectionContext.Connection.QueryAsync<long>(command);
+
+        return groupIds.ToArrayBy(groupId => new GroupId(groupId));
+    }
+
     public async Task<IReadOnlyCollection<CourseId>> ListCourseIdAsync(TeacherId teacherId, CancellationToken cancellationToken)
     {
         var queryParams = new
