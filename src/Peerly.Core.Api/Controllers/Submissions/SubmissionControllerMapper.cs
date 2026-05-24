@@ -316,7 +316,7 @@ internal static class SubmissionControllerMapper
     public static Proto.V1GetTeacherSubmittedHomeworkResponse ToV1GetTeacherSubmittedHomeworkResponse(
         this GetTeacherSubmittedHomeworkQueryResponse queryResponse)
     {
-        return new Proto.V1GetTeacherSubmittedHomeworkResponse
+        var response = new Proto.V1GetTeacherSubmittedHomeworkResponse
         {
             SubmittedHomework = new Proto.SubmittedHomeworkInfo
             {
@@ -325,10 +325,20 @@ internal static class SubmissionControllerMapper
                 Files = { queryResponse.Files.ToArrayBy(file => file.ToProto()) }
             },
             Student = queryResponse.Student.ToProto(),
-            SubmittedReviews = { queryResponse.SubmittedReviews.ToArrayBy(review => review.ToProto()) },
-            ReviewersMark = queryResponse.ReviewersMark,
-            TeacherMark = queryResponse.TeacherMark
+            SubmittedReviews = { queryResponse.SubmittedReviews.ToArrayBy(review => review.ToProto()) }
         };
+
+        if (queryResponse.ReviewersMark is { } reviewersMark)
+        {
+            response.ReviewersMark = reviewersMark;
+        }
+
+        if (queryResponse.TeacherMark is { } teacherMark)
+        {
+            response.TeacherMark = teacherMark;
+        }
+
+        return response;
     }
 
     private static Proto.TeacherSubmittedReviewInfo ToProto(this TeacherSubmittedReview teacherSubmittedReview)

@@ -49,6 +49,7 @@ using Peerly.Core.IntegrationTests.Features.V1.Submissions.DeleteSubmittedReview
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.GetAssignedReview.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.GetSubmittedHomework.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.GetSubmittedReview.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Submissions.GetTeacherSubmittedHomework.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.UpdateSubmittedHomework.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.UpdateSubmittedReview.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Users.SearchUsers.Infrastructure;
@@ -204,6 +205,11 @@ public sealed class WebApplicationFactory : IAsyncDisposable
     public GetSubmittedReviewGrpcClient GetSubmittedReviewClient()
     {
         return new GetSubmittedReviewGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public GetTeacherSubmittedHomeworkGrpcClient GetTeacherSubmittedHomeworkClient()
+    {
+        return new GetTeacherSubmittedHomeworkGrpcClient(GetOrCreateGrpcChannel());
     }
 
     public DeleteSubmittedHomeworkGrpcClient DeleteSubmittedHomeworkClient()

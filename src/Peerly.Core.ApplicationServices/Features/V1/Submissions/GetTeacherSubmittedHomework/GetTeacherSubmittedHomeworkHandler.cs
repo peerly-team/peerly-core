@@ -6,33 +6,31 @@ using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.Exceptions;
 using Peerly.Core.Identifiers;
+using Peerly.Core.Models.Homeworks;
 using Peerly.Core.Models.Students;
 using Peerly.Core.Models.Submissions;
 using Peerly.Core.Tools;
 
 namespace Peerly.Core.ApplicationServices.Features.V1.Submissions.GetTeacherSubmittedHomework;
 
-internal sealed class GetTeacherSubmittedHomeworkHandler
-    : IQueryHandler<GetTeacherSubmittedHomeworkQuery, GetTeacherSubmittedHomeworkQueryResponse>
+internal sealed class GetTeacherSubmittedHomeworkHandler : IQueryHandler<GetTeacherSubmittedHomeworkQuery, GetTeacherSubmittedHomeworkQueryResponse>
 {
     private readonly ICommonUnitOfWorkFactory _commonUnitOfWorkFactory;
+    private readonly IQueryValidator<GetTeacherSubmittedHomeworkQuery, GetTeacherSubmittedHomeworkQueryResponse> _validator;
 
-    public GetTeacherSubmittedHomeworkHandler(ICommonUnitOfWorkFactory commonUnitOfWorkFactory)
+    public GetTeacherSubmittedHomeworkHandler(
+        ICommonUnitOfWorkFactory commonUnitOfWorkFactory,
+        IQueryValidator<GetTeacherSubmittedHomeworkQuery, GetTeacherSubmittedHomeworkQueryResponse> validator)
     {
         _commonUnitOfWorkFactory = commonUnitOfWorkFactory;
+        _validator = validator;
     }
 
     public async Task<GetTeacherSubmittedHomeworkQueryResponse> ExecuteAsync(
         GetTeacherSubmittedHomeworkQuery query,
         CancellationToken cancellationToken)
     {
-        // TODO: permission — TeacherId должен вести курс, к которому относится HomeworkId сдачи
-        // (homework_id берётся из submittedHomework.HomeworkId). Несоответствие → NotFoundException
-        // (единый паттерн с ListSubmittedHomeworkOverviewHandler, закрыть одним PR).
-        // TODO: статус — возможно ограничить выдачу только homework'ами в статусе Reviewing/Closed.
-        // Сейчас запрос закрыт INNER-семантикой через GetBySubmittedHomeworkAsync == null → NotFound.
-        // TODO: вынести в IGetTeacherSubmittedHomeworkValidator + Validator + Installer
-        // при появлении 2+ проверок, см. feedback_validator_extraction.
+        await _validator.ValidateAsync(query, cancellationToken);
 
         await using var unitOfWork = await _commonUnitOfWorkFactory.CreateReadOnlyAsync(cancellationToken);
 
@@ -42,18 +40,22 @@ internal sealed class GetTeacherSubmittedHomeworkHandler
 
         var files = await unitOfWork.ReadOnlySubmittedHomeworkFileRepository.ListBySubmittedHomeworkAsync(submittedHomeworkId, cancellationToken);
         var reviews = await unitOfWork.ReadOnlySubmittedReviewRepository.ListBySubmittedHomeworkAsync(submittedHomeworkId, cancellationToken);
-        var submittedHomeworkMark = await unitOfWork.ReadOnlySubmittedHomeworkMarkRepository.GetBySubmittedHomeworkAsync(submittedHomeworkId, cancellationToken)
-                                    ?? throw new NotFoundException();
 
         var studentById = await GetStudentByIdAsync(unitOfWork, reviews, submittedHomework.StudentId, cancellationToken);
+
+        var homework = await unitOfWork.ReadOnlyHomeworkRepository.GetAsync(submittedHomework.HomeworkId, cancellationToken);
+        var submittedHomeworkMark = homework!.Status is HomeworkStatus.Reviewing
+            ? null
+            : await unitOfWork.ReadOnlySubmittedHomeworkMarkRepository.GetBySubmittedHomeworkAsync(submittedHomeworkId, cancellationToken);
+
         return new GetTeacherSubmittedHomeworkQueryResponse
         {
             SubmittedHomework = submittedHomework,
             Student = studentById[submittedHomework.StudentId],
             Files = files,
             SubmittedReviews = reviews.ToArrayBy(review => review.ToTeacherSubmittedReview(studentById[review.StudentId])),
-            ReviewersMark = submittedHomeworkMark.ReviewersMark,
-            TeacherMark = submittedHomeworkMark.TeacherMark
+            ReviewersMark = submittedHomeworkMark?.ReviewersMark,
+            TeacherMark = submittedHomeworkMark?.TeacherMark
         };
     }
 
