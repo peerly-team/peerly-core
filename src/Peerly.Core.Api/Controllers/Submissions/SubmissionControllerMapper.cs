@@ -256,15 +256,29 @@ internal static class SubmissionControllerMapper
 
     private static Proto.V1ListSubmittedHomeworkOverviewResponse.Types.SubmittedHomeworkOverview ToProto(this SubmittedHomeworkOverview overview)
     {
-        return new Proto.V1ListSubmittedHomeworkOverviewResponse.Types.SubmittedHomeworkOverview
+        var proto = new Proto.V1ListSubmittedHomeworkOverviewResponse.Types.SubmittedHomeworkOverview
         {
             Id = (long)overview.SubmittedHomeworkId,
             Student = overview.Student.ToProto(),
-            ReviewCount = overview.ReviewCount,
-            ReviewersMark = overview.ReviewersMark,
-            HasDiscrepancy = overview.HasDiscrepancy,
-            TeacherMark = overview.TeacherMark
+            ReviewCount = overview.ReviewCount
         };
+
+        if (overview.ReviewersMark is { } reviewersMark)
+        {
+            proto.ReviewersMark = reviewersMark;
+        }
+
+        if (overview.HasDiscrepancy is { } hasDiscrepancy)
+        {
+            proto.HasDiscrepancy = hasDiscrepancy;
+        }
+
+        if (overview.TeacherMark is { } teacherMark)
+        {
+            proto.TeacherMark = teacherMark;
+        }
+
+        return proto;
     }
 
     private static Proto.StudentInfo ToProto(this Student student)
@@ -316,7 +330,7 @@ internal static class SubmissionControllerMapper
     public static Proto.V1GetTeacherSubmittedHomeworkResponse ToV1GetTeacherSubmittedHomeworkResponse(
         this GetTeacherSubmittedHomeworkQueryResponse queryResponse)
     {
-        return new Proto.V1GetTeacherSubmittedHomeworkResponse
+        var response = new Proto.V1GetTeacherSubmittedHomeworkResponse
         {
             SubmittedHomework = new Proto.SubmittedHomeworkInfo
             {
@@ -325,10 +339,20 @@ internal static class SubmissionControllerMapper
                 Files = { queryResponse.Files.ToArrayBy(file => file.ToProto()) }
             },
             Student = queryResponse.Student.ToProto(),
-            SubmittedReviews = { queryResponse.SubmittedReviews.ToArrayBy(review => review.ToProto()) },
-            ReviewersMark = queryResponse.ReviewersMark,
-            TeacherMark = queryResponse.TeacherMark
+            SubmittedReviews = { queryResponse.SubmittedReviews.ToArrayBy(review => review.ToProto()) }
         };
+
+        if (queryResponse.ReviewersMark is { } reviewersMark)
+        {
+            response.ReviewersMark = reviewersMark;
+        }
+
+        if (queryResponse.TeacherMark is { } teacherMark)
+        {
+            response.TeacherMark = teacherMark;
+        }
+
+        return response;
     }
 
     private static Proto.TeacherSubmittedReviewInfo ToProto(this TeacherSubmittedReview teacherSubmittedReview)

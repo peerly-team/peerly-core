@@ -14,6 +14,6 @@ public interface IDistributionReviewerRepository : IReadOnlyDistributionReviewer
 
 public interface IReadOnlyDistributionReviewerRepository
 {
-    Task<IReadOnlyCollection<SubmittedHomeworkId>> ListAssignedByAsync(StudentId studentId, HomeworkId homeworkId, CancellationToken cancellationToken);
+    Task<IReadOnlyCollection<SubmittedHomeworkId>> ListAssignedByAsync(HomeworkStudent homeworkStudent, CancellationToken cancellationToken);
     Task<bool> ExistsAsync(SubmittedHomeworkStudent submittedHomeworkStudent, CancellationToken cancellationToken);
 }

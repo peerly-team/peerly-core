@@ -229,9 +229,9 @@ message V1ListSubmittedHomeworkOverviewResponse {
     int64 id = 1;
     StudentInfo student = 2;
     int32 review_count = 3;
-    int32 reviewers_mark = 4;
-    bool has_discrepancy = 5;
-    google.protobuf.Int32Value teacher_mark = 6;
+    optional int32 reviewers_mark = 4;
+    optional bool has_discrepancy = 5;
+    optional int32 teacher_mark = 6;
   }
 }
 
@@ -244,8 +244,8 @@ message V1GetTeacherSubmittedHomeworkResponse {
   SubmittedHomeworkInfo submitted_homework = 1;
   StudentInfo student = 2;
   repeated TeacherSubmittedReviewInfo submitted_reviews = 3;
-  int32 reviewers_mark = 4;
-  google.protobuf.Int32Value teacher_mark = 5;
+  optional int32 reviewers_mark = 4;
+  optional int32 teacher_mark = 5;
 }
 
 message V1CorrectSubmittedHomeworkMarkRequest {

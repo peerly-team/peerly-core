@@ -54,14 +54,13 @@ internal sealed class DistributionReviewerRepository : IDistributionReviewerRepo
     }
 
     public async Task<IReadOnlyCollection<SubmittedHomeworkId>> ListAssignedByAsync(
-        StudentId studentId,
-        HomeworkId homeworkId,
+        HomeworkStudent homeworkStudent,
         CancellationToken cancellationToken)
     {
         var queryParams = new
         {
-            StudentId = (long)studentId,
-            HomeworkId = (long)homeworkId
+            StudentId = (long)homeworkStudent.StudentId,
+            HomeworkId = (long)homeworkStudent.HomeworkId
         };
 
         const string Query =
