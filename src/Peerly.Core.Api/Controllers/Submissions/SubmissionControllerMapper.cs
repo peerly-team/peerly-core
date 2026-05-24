@@ -256,15 +256,29 @@ internal static class SubmissionControllerMapper
 
     private static Proto.V1ListSubmittedHomeworkOverviewResponse.Types.SubmittedHomeworkOverview ToProto(this SubmittedHomeworkOverview overview)
     {
-        return new Proto.V1ListSubmittedHomeworkOverviewResponse.Types.SubmittedHomeworkOverview
+        var proto = new Proto.V1ListSubmittedHomeworkOverviewResponse.Types.SubmittedHomeworkOverview
         {
             Id = (long)overview.SubmittedHomeworkId,
             Student = overview.Student.ToProto(),
-            ReviewCount = overview.ReviewCount,
-            ReviewersMark = overview.ReviewersMark,
-            HasDiscrepancy = overview.HasDiscrepancy,
-            TeacherMark = overview.TeacherMark
+            ReviewCount = overview.ReviewCount
         };
+
+        if (overview.ReviewersMark is { } reviewersMark)
+        {
+            proto.ReviewersMark = reviewersMark;
+        }
+
+        if (overview.HasDiscrepancy is { } hasDiscrepancy)
+        {
+            proto.HasDiscrepancy = hasDiscrepancy;
+        }
+
+        if (overview.TeacherMark is { } teacherMark)
+        {
+            proto.TeacherMark = teacherMark;
+        }
+
+        return proto;
     }
 
     private static Proto.StudentInfo ToProto(this Student student)

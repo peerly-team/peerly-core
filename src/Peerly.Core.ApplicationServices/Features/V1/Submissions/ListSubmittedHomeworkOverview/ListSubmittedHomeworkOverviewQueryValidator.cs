@@ -5,26 +5,23 @@ using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.Exceptions;
 using Peerly.Core.Models.Homeworks;
 
-namespace Peerly.Core.ApplicationServices.Features.V1.Submissions.GetTeacherSubmittedHomework;
+namespace Peerly.Core.ApplicationServices.Features.V1.Submissions.ListSubmittedHomeworkOverview;
 
-internal sealed class GetTeacherSubmittedHomeworkQueryValidator
-    : IQueryValidator<GetTeacherSubmittedHomeworkQuery, GetTeacherSubmittedHomeworkQueryResponse>
+internal sealed class ListSubmittedHomeworkOverviewQueryValidator
+    : IQueryValidator<ListSubmittedHomeworkOverviewQuery, ListSubmittedHomeworkOverviewQueryResponse>
 {
     private readonly ICommonUnitOfWorkFactory _unitOfWorkFactory;
 
-    public GetTeacherSubmittedHomeworkQueryValidator(ICommonUnitOfWorkFactory unitOfWorkFactory)
+    public ListSubmittedHomeworkOverviewQueryValidator(ICommonUnitOfWorkFactory unitOfWorkFactory)
     {
         _unitOfWorkFactory = unitOfWorkFactory;
     }
 
-    public async Task ValidateAsync(GetTeacherSubmittedHomeworkQuery query, CancellationToken cancellationToken)
+    public async Task ValidateAsync(ListSubmittedHomeworkOverviewQuery query, CancellationToken cancellationToken)
     {
         await using var unitOfWork = await _unitOfWorkFactory.CreateReadOnlyAsync(cancellationToken);
 
-        var submittedHomework = await unitOfWork.ReadOnlySubmittedHomeworkRepository.GetAsync(query.SubmittedHomeworkId, cancellationToken)
-                                ?? throw new NotFoundException();
-
-        var homework = await unitOfWork.ReadOnlyHomeworkRepository.GetAsync(submittedHomework.HomeworkId, cancellationToken);
+        var homework = await unitOfWork.ReadOnlyHomeworkRepository.GetAsync(query.HomeworkId, cancellationToken);
         if (homework?.Status is not (HomeworkStatus.Reviewing or HomeworkStatus.Confirmation or HomeworkStatus.Finished))
         {
             throw new NotFoundException();

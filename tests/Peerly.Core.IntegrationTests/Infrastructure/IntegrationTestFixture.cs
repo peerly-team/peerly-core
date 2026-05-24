@@ -31,6 +31,7 @@ using Peerly.Core.IntegrationTests.Features.V1.Submissions.GetSubmittedHomework.
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.GetSubmittedReview.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.GetTeacherSubmittedHomework.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.ListAssignedReviews.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Submissions.ListSubmittedHomeworkOverview.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.UpdateSubmittedHomework.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.UpdateSubmittedReview.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Users.SearchUsers.Infrastructure;
@@ -85,6 +86,7 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
     public GetSubmittedReviewGrpcClient GetSubmittedReviewClient => ApplicationFactory.GetSubmittedReviewClient();
     public GetTeacherSubmittedHomeworkGrpcClient GetTeacherSubmittedHomeworkClient => ApplicationFactory.GetTeacherSubmittedHomeworkClient();
     public ListAssignedReviewsGrpcClient ListAssignedReviewsClient => ApplicationFactory.ListAssignedReviewsClient();
+    public ListSubmittedHomeworkOverviewGrpcClient ListSubmittedHomeworkOverviewClient => ApplicationFactory.ListSubmittedHomeworkOverviewClient();
     public DeleteSubmittedHomeworkGrpcClient DeleteSubmittedHomeworkClient => ApplicationFactory.DeleteSubmittedHomeworkClient();
     public DeleteSubmittedHomeworkFileGrpcClient DeleteSubmittedHomeworkFileClient => ApplicationFactory.DeleteSubmittedHomeworkFileClient();
     public DeleteSubmittedReviewGrpcClient DeleteSubmittedReviewClient => ApplicationFactory.DeleteSubmittedReviewClient();
