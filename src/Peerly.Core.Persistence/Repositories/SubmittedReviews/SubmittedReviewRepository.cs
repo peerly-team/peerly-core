@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Peerly.Core.Abstractions.Repositories;
 using Peerly.Core.Identifiers;
+using Peerly.Core.Models.Homeworks;
 using Peerly.Core.Models.Submissions;
 using Peerly.Core.Persistence.Common;
 using Peerly.Core.Persistence.Repositories.SubmittedReviews.Models;
@@ -236,14 +237,13 @@ internal sealed class SubmittedReviewRepository : ISubmittedReviewRepository
     }
 
     public async Task<IReadOnlyCollection<SubmittedHomeworkId>> ListReviewedByAsync(
-        StudentId studentId,
-        HomeworkId homeworkId,
+        HomeworkStudent homeworkStudent,
         CancellationToken cancellationToken)
     {
         var queryParams = new
         {
-            StudentId = (long)studentId,
-            HomeworkId = (long)homeworkId
+            StudentId = (long)homeworkStudent.StudentId,
+            HomeworkId = (long)homeworkStudent.HomeworkId
         };
 
         const string Query =
