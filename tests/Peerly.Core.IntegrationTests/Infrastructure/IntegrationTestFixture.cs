@@ -34,7 +34,11 @@ using Peerly.Core.IntegrationTests.Features.V1.Submissions.ListAssignedReviews.I
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.ListSubmittedHomeworkOverview.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.UpdateSubmittedHomework.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.UpdateSubmittedReview.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Users.GetStudent.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Users.GetTeacher.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Users.SearchUsers.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Users.UpdateStudent.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Users.UpdateTeacher.Infrastructure;
 using Respawn;
 using Testcontainers.PostgreSql;
 using Xunit;
@@ -93,6 +97,10 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
     public UpdateSubmittedHomeworkGrpcClient UpdateSubmittedHomeworkClient => ApplicationFactory.UpdateSubmittedHomeworkClient();
     public UpdateSubmittedReviewGrpcClient UpdateSubmittedReviewClient => ApplicationFactory.UpdateSubmittedReviewClient();
     public SearchUsersGrpcClient SearchUsersClient => ApplicationFactory.SearchUsersClient();
+    public GetStudentGrpcClient GetStudentClient => ApplicationFactory.GetStudentClient();
+    public GetTeacherGrpcClient GetTeacherClient => ApplicationFactory.GetTeacherClient();
+    public UpdateStudentGrpcClient UpdateStudentClient => ApplicationFactory.UpdateStudentClient();
+    public UpdateTeacherGrpcClient UpdateTeacherClient => ApplicationFactory.UpdateTeacherClient();
 
     public async Task InitializeAsync()
     {

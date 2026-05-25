@@ -135,12 +135,12 @@ public sealed class FileAnonymizationServiceTests
     }
 
     [Fact]
-    public async Task AnonymizeAsync_StudentWithNullName_ShouldOnlyReplaceEmail()
+    public async Task AnonymizeAsync_StudentWithEmptyName_ShouldOnlyReplaceEmail()
     {
         // Arrange
         var email = _fixture.Create<string>();
         var content = $"Контакт {email} for details";
-        var student = CreateStudent(email, null);
+        var student = CreateStudent(email, string.Empty);
         var request = CreateRequest("file.txt", [student]);
         SetupStorageWithContent(request.OriginalStorageId, content);
 
@@ -182,7 +182,7 @@ public sealed class FileAnonymizationServiceTests
         };
     }
 
-    private Student CreateStudent(string email, string? name)
+    private Student CreateStudent(string email, string name)
     {
         return new Student
         {

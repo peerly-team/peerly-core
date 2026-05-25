@@ -8,6 +8,10 @@ option csharp_namespace = "Peerly.Core.V1.Proto";
 
 service UserService {
   rpc V1SearchUsers(V1SearchUsersRequest) returns (V1SearchUsersResponse);
+  rpc V1GetStudent(V1GetStudentRequest) returns (V1GetStudentResponse);
+  rpc V1GetTeacher(V1GetTeacherRequest) returns (V1GetTeacherResponse);
+  rpc V1UpdateStudent(V1UpdateStudentRequest) returns (V1UpdateStudentResponse);
+  rpc V1UpdateTeacher(V1UpdateTeacherRequest) returns (V1UpdateTeacherResponse);
 }
 
 message V1SearchUsersRequest {
@@ -29,4 +33,50 @@ message V1SearchUsersResponse {
     string name = 3;
     Role role = 4;
   }
+}
+
+message V1GetStudentRequest {
+  int64 student_id = 1;
+}
+
+message V1GetStudentResponse {
+  StudentInfo student_info = 1;
+}
+
+message V1GetTeacherRequest {
+  int64 teacher_id = 1;
+}
+
+message V1GetTeacherResponse {
+  TeacherInfo teacher_info = 1;
+}
+
+message V1UpdateStudentRequest {
+  int64 student_id = 1;
+  string name = 2;
+}
+
+message V1UpdateStudentResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}
+
+message V1UpdateTeacherRequest {
+  int64 teacher_id = 1;
+  string name = 2;
+}
+
+message V1UpdateTeacherResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
 }

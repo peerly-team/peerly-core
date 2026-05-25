@@ -54,7 +54,11 @@ using Peerly.Core.IntegrationTests.Features.V1.Submissions.ListAssignedReviews.I
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.ListSubmittedHomeworkOverview.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.UpdateSubmittedHomework.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.UpdateSubmittedReview.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Users.GetStudent.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Users.GetTeacher.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Users.SearchUsers.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Users.UpdateStudent.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Users.UpdateTeacher.Infrastructure;
 using Peerly.Core.Messaging.Extensions;
 using Peerly.Core.Persistence.Extensions;
 
@@ -252,6 +256,26 @@ public sealed class WebApplicationFactory : IAsyncDisposable
     public SearchUsersGrpcClient SearchUsersClient()
     {
         return new SearchUsersGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public GetStudentGrpcClient GetStudentClient()
+    {
+        return new GetStudentGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public GetTeacherGrpcClient GetTeacherClient()
+    {
+        return new GetTeacherGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public UpdateStudentGrpcClient UpdateStudentClient()
+    {
+        return new UpdateStudentGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public UpdateTeacherGrpcClient UpdateTeacherClient()
+    {
+        return new UpdateTeacherGrpcClient(GetOrCreateGrpcChannel());
     }
 
     public async Task StartAsync()

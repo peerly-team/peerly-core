@@ -94,7 +94,7 @@ internal sealed class FileAnonymizationService : IFileAnonymizationService
         {
             result.Add(new ReplacementModel(student.Email, emailReplacement));
 
-            if (student.Name is not null)
+            if (!string.IsNullOrEmpty(student.Name))
             {
                 result.Add(new ReplacementModel(student.Name, studentReplacement));
             }

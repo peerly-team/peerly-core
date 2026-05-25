@@ -244,7 +244,7 @@ internal static class CourseMappingMapper
         {
             TeacherId = (long)teacher.Id,
             Email = teacher.Email,
-            Name = teacher.Name ?? string.Empty
+            Name = teacher.Name
         };
     }
 
