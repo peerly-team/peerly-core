@@ -287,7 +287,7 @@ internal static class SubmissionControllerMapper
         {
             StudentId = (long)student.Id,
             Email = student.Email,
-            Name = student.Name ?? string.Empty
+            Name = student.Name
         };
     }
 

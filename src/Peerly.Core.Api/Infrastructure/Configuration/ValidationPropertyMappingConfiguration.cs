@@ -31,7 +31,9 @@ using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetTeacherSubmitte
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.ListAssignedReviews;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.ListSubmittedHomeworkOverview;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedHomework;
+using Peerly.Core.ApplicationServices.Features.V1.Students.UpdateStudent;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedReview;
+using Peerly.Core.ApplicationServices.Features.V1.Teachers.UpdateTeacher;
 using Peerly.Core.V1;
 
 namespace Peerly.Core.Api.Infrastructure.Configuration;
@@ -181,6 +183,14 @@ public static class ValidationPropertyMappingConfiguration
 
         ValidationPropertyMapping
             .AddMapping<CorrectSubmittedHomeworkMarkCommand, V1CorrectSubmittedHomeworkMarkRequest>()
+            .Build();
+
+        ValidationPropertyMapping
+            .AddMapping<UpdateStudentCommand, V1UpdateStudentRequest>()
+            .Build();
+
+        ValidationPropertyMapping
+            .AddMapping<UpdateTeacherCommand, V1UpdateTeacherRequest>()
             .Build();
     }
 }

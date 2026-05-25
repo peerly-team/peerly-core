@@ -104,7 +104,7 @@ internal static class ParticipantControllerMapper
         {
             TeacherId = (long)teacher.Id,
             Email = teacher.Email,
-            Name = teacher.Name ?? string.Empty
+            Name = teacher.Name
         };
     }
 
@@ -114,7 +114,7 @@ internal static class ParticipantControllerMapper
         {
             StudentId = (long)student.Id,
             Email = student.Email,
-            Name = student.Name ?? string.Empty
+            Name = student.Name
         };
     }
 }
