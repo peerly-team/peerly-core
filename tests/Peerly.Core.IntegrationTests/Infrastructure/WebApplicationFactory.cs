@@ -16,6 +16,7 @@ using Peerly.Core.Api.Controllers.Homeworks;
 using Peerly.Core.Api.Controllers.Participants;
 using Peerly.Core.Api.Controllers.Storage;
 using Peerly.Core.Api.Controllers.Submissions;
+using Peerly.Core.Api.Controllers.Rubrics;
 using Peerly.Core.Api.Controllers.Users;
 using Peerly.Core.Api.Extensions;
 using Peerly.Core.Api.Infrastructure.Configuration;
@@ -58,6 +59,12 @@ using Peerly.Core.IntegrationTests.Features.V1.Users.GetStudent.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Users.GetTeacher.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Users.SearchUsers.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Users.UpdateStudent.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Rubrics.CreateRubric.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Rubrics.DeleteRubric.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Rubrics.GetStudentRubric.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Rubrics.GetTeacherRubric.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Rubrics.ListTeacherRubrics.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Rubrics.UpdateRubric.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Users.UpdateTeacher.Infrastructure;
 using Peerly.Core.Messaging.Extensions;
 using Peerly.Core.Persistence.Extensions;
@@ -278,6 +285,36 @@ public sealed class WebApplicationFactory : IAsyncDisposable
         return new UpdateTeacherGrpcClient(GetOrCreateGrpcChannel());
     }
 
+    public CreateRubricGrpcClient CreateRubricClient()
+    {
+        return new CreateRubricGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public DeleteRubricGrpcClient DeleteRubricClient()
+    {
+        return new DeleteRubricGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public UpdateRubricGrpcClient UpdateRubricClient()
+    {
+        return new UpdateRubricGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public GetTeacherRubricGrpcClient GetTeacherRubricClient()
+    {
+        return new GetTeacherRubricGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public GetStudentRubricGrpcClient GetStudentRubricClient()
+    {
+        return new GetStudentRubricGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public ListTeacherRubricsGrpcClient ListTeacherRubricsClient()
+    {
+        return new ListTeacherRubricsGrpcClient(GetOrCreateGrpcChannel());
+    }
+
     public async Task StartAsync()
     {
         _host = await Host.CreateDefaultBuilder()
@@ -372,6 +409,7 @@ public sealed class WebApplicationFactory : IAsyncDisposable
                 endpoints.MapGrpcService<SubmissionController>();
                 endpoints.MapGrpcService<GroupController>();
                 endpoints.MapGrpcService<ParticipantController>();
+                endpoints.MapGrpcService<RubricController>();
                 endpoints.MapGrpcService<UserController>();
                 endpoints.MapGrpcReflectionService();
             });

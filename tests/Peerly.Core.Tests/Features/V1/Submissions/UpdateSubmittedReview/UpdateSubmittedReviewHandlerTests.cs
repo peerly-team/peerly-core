@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,6 +23,7 @@ public sealed class UpdateSubmittedReviewHandlerTests
 {
     private readonly Mock<ICommonUnitOfWork> _unitOfWorkMock = new();
     private readonly Mock<ISubmittedReviewRepository> _submittedReviewRepositoryMock = new();
+    private readonly Mock<ISubmittedReviewScoreRepository> _submittedReviewScoreRepositoryMock = new();
     private readonly Mock<ICommandValidator<UpdateSubmittedReviewCommand, Success>> _validatorMock = new();
     private readonly Fixture _fixture = new();
     private readonly UpdateSubmittedReviewHandler _handler;
@@ -41,9 +43,11 @@ public sealed class UpdateSubmittedReviewHandlerTests
             .Setup(validator => validator.ValidateAsync(command, It.IsAny<CancellationToken>()))
             .ReturnsAsync(CommandValidationResult.Ok());
 
+        var expectedMark = command.Scores.Sum(s => s.Score);
+
         var updateBuilderMock = new Mock<IUpdateBuilder<SubmittedReviewUpdateItem>>();
         updateBuilderMock
-            .Setup(builder => builder.Set(It.IsAny<Expression<Func<SubmittedReviewUpdateItem, int>>>(), command.Mark))
+            .Setup(builder => builder.Set(It.IsAny<Expression<Func<SubmittedReviewUpdateItem, int>>>(), expectedMark))
             .Returns(updateBuilderMock.Object);
         updateBuilderMock
             .Setup(builder => builder.Set(It.IsAny<Expression<Func<SubmittedReviewUpdateItem, string>>>(), command.Comment))
@@ -72,7 +76,7 @@ public sealed class UpdateSubmittedReviewHandlerTests
         updateBuilderMock.Verify(
             builder => builder.Set(
                 It.Is<Expression<Func<SubmittedReviewUpdateItem, int>>>(expression => IsPropertyExpression(expression, nameof(SubmittedReviewUpdateItem.Mark))),
-                command.Mark),
+                expectedMark),
             Times.Once);
         updateBuilderMock.Verify(
             builder => builder.Set(
@@ -136,9 +140,18 @@ public sealed class UpdateSubmittedReviewHandlerTests
             .Setup(factory => factory.CreateAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(_unitOfWorkMock.Object);
 
+        var operationSetMock = new Mock<IOperationSet>();
+        _unitOfWorkMock
+            .Setup(unitOfWork => unitOfWork.StartOperationSet(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(operationSetMock.Object);
+
         _unitOfWorkMock
             .SetupGet(unitOfWork => unitOfWork.SubmittedReviewRepository)
             .Returns(_submittedReviewRepositoryMock.Object);
+
+        _unitOfWorkMock
+            .SetupGet(unitOfWork => unitOfWork.SubmittedReviewScoreRepository)
+            .Returns(_submittedReviewScoreRepositoryMock.Object);
 
         return factoryMock.Object;
     }

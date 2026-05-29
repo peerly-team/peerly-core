@@ -18,6 +18,7 @@ public sealed class GetSubmittedReviewHandlerTests
     private readonly Mock<ICommonUnitOfWorkFactory> _unitOfWorkFactoryMock = new();
     private readonly Mock<ICommonReadOnlyUnitOfWork> _unitOfWorkMock = new();
     private readonly Mock<IReadOnlySubmittedReviewRepository> _submittedReviewRepositoryMock = new();
+    private readonly Mock<IReadOnlySubmittedReviewScoreRepository> _submittedReviewScoreRepositoryMock = new();
     private readonly Fixture _fixture = new();
     private readonly GetSubmittedReviewHandler _handler;
 
@@ -85,11 +86,14 @@ public sealed class GetSubmittedReviewHandlerTests
         var submittedReview = _fixture.Build<SubmittedReview>()
             .With(result => result.Id, query.SubmittedReviewId)
             .With(result => result.StudentId, query.StudentId)
+            .With(result => result.Scores, [])
             .Create();
         _submittedReviewRepositoryMock
             .Setup(repository => repository.GetAsync(query.SubmittedReviewId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(submittedReview);
-
+        _submittedReviewScoreRepositoryMock
+            .Setup(repository => repository.ListBySubmittedReviewIdAsync(query.SubmittedReviewId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
         return submittedReview;
     }
 
@@ -102,5 +106,8 @@ public sealed class GetSubmittedReviewHandlerTests
         _unitOfWorkMock
             .SetupGet(unitOfWork => unitOfWork.ReadOnlySubmittedReviewRepository)
             .Returns(_submittedReviewRepositoryMock.Object);
+        _unitOfWorkMock
+            .SetupGet(unitOfWork => unitOfWork.ReadOnlySubmittedReviewScoreRepository)
+            .Returns(_submittedReviewScoreRepositoryMock.Object);
     }
 }

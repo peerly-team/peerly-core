@@ -536,4 +536,49 @@ internal sealed class HomeworkRepository : IHomeworkRepository
             cancellationToken: cancellationToken);
         await _connectionContext.Connection.ExecuteAsync(command);
     }
+
+    public async Task<bool> ExistsByRubricIdAsync(RubricId rubricId, CancellationToken cancellationToken)
+    {
+        var queryParams = new { RubricId = (long)rubricId };
+
+        const string Query = $"""
+            select exists(
+                select 1
+                  from {HomeworkTable.TableName}
+                 where {HomeworkTable.RubricId} = @{nameof(queryParams.RubricId)});
+            """;
+
+        var command = new CommandDefinition(
+            Query,
+            queryParams,
+            _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+
+        return await _connectionContext.Connection.QuerySingleAsync<bool>(command);
+    }
+
+    public async Task<bool> ExistsPublishedByRubricIdAsync(RubricId rubricId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            RubricId = (long)rubricId
+        };
+
+        const string Query =
+            $"""
+            select exists(
+                select 1
+                  from {HomeworkTable.TableName}
+                 where {HomeworkTable.RubricId} = @{nameof(queryParams.RubricId)}
+                   and {HomeworkTable.Status} = 'Published');
+            """;
+
+        var command = new CommandDefinition(
+            Query,
+            queryParams,
+            _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+
+        return await _connectionContext.Connection.QuerySingleAsync<bool>(command);
+    }
 }

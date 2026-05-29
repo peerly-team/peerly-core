@@ -33,15 +33,18 @@ public sealed class CreateSubmittedReviewIntegrationTests : CreateSubmittedRevie
         await AddStudentInDbAsync(ownerStudentId);
         await AddStudentInDbAsync(reviewerStudentId);
 
-        var homeworkId = await AddHomeworkInDbAsync(courseId, teacherId, HomeworkStatusModel.Reviewing);
+        var rubricId = await AddRubricInDbAsync(teacherId);
+        var criterionId = await AddRubricCriterionInDbAsync(rubricId);
+
+        var homeworkId = await AddHomeworkInDbAsync(courseId, teacherId, HomeworkStatusModel.Reviewing, rubricId: rubricId);
         var submittedHomeworkId = await AddSubmittedHomeworkInDbAsync(homeworkId, ownerStudentId);
         await AddDistributionReviewerInDbAsync(submittedHomeworkId, reviewerStudentId);
 
         var request = _fixture.Build<V1CreateSubmittedReviewRequest>()
             .With(result => result.SubmittedHomeworkId, submittedHomeworkId)
             .With(result => result.StudentId, reviewerStudentId)
-            .With(result => result.Mark, 95)
             .Create();
+        request.Scores.Add(new SubmittedReviewScoreInput { RubricCriterionId = criterionId, Score = 95 });
 
         // Act
         var response = await CreateSubmittedReviewClient.V1CreateSubmittedReviewAsync(request);
@@ -51,7 +54,7 @@ public sealed class CreateSubmittedReviewIntegrationTests : CreateSubmittedRevie
         response.SuccessResponse.SubmittedReviewId.Should().BeGreaterThan(0);
 
         var submittedReview = await GetSubmittedReviewAsync(response.SuccessResponse.SubmittedReviewId);
-        submittedReview.Should().BeEquivalentTo((request.SubmittedHomeworkId, request.StudentId, request.Mark, request.Comment));
+        submittedReview.Should().BeEquivalentTo((request.SubmittedHomeworkId, request.StudentId, request.Comment));
     }
 
     [Fact]
@@ -61,8 +64,8 @@ public sealed class CreateSubmittedReviewIntegrationTests : CreateSubmittedRevie
         var request = _fixture.Build<V1CreateSubmittedReviewRequest>()
             .With(result => result.SubmittedHomeworkId, _fixture.Create<long>())
             .With(result => result.StudentId, _fixture.Create<long>())
-            .With(result => result.Mark, 95)
             .Create();
+        request.Scores.Add(new SubmittedReviewScoreInput { RubricCriterionId = 1, Score = 95 });
 
         // Act
         var response = await CreateSubmittedReviewClient.V1CreateSubmittedReviewAsync(request);
@@ -94,8 +97,8 @@ public sealed class CreateSubmittedReviewIntegrationTests : CreateSubmittedRevie
         var request = _fixture.Build<V1CreateSubmittedReviewRequest>()
             .With(result => result.SubmittedHomeworkId, submittedHomeworkId)
             .With(result => result.StudentId, reviewerStudentId)
-            .With(result => result.Mark, 95)
             .Create();
+        request.Scores.Add(new SubmittedReviewScoreInput { RubricCriterionId = 1, Score = 95 });
 
         // Act
         var response = await CreateSubmittedReviewClient.V1CreateSubmittedReviewAsync(request);
@@ -124,8 +127,8 @@ public sealed class CreateSubmittedReviewIntegrationTests : CreateSubmittedRevie
         var request = _fixture.Build<V1CreateSubmittedReviewRequest>()
             .With(result => result.SubmittedHomeworkId, submittedHomeworkId)
             .With(result => result.StudentId, reviewerStudentId)
-            .With(result => result.Mark, 95)
             .Create();
+        request.Scores.Add(new SubmittedReviewScoreInput { RubricCriterionId = 1, Score = 95 });
 
         // Act
         var response = await CreateSubmittedReviewClient.V1CreateSubmittedReviewAsync(request);
@@ -162,8 +165,8 @@ public sealed class CreateSubmittedReviewIntegrationTests : CreateSubmittedRevie
         var request = _fixture.Build<V1CreateSubmittedReviewRequest>()
             .With(result => result.SubmittedHomeworkId, submittedHomeworkId)
             .With(result => result.StudentId, reviewerStudentId)
-            .With(result => result.Mark, 95)
             .Create();
+        request.Scores.Add(new SubmittedReviewScoreInput { RubricCriterionId = 1, Score = 95 });
 
         // Act
         var response = await CreateSubmittedReviewClient.V1CreateSubmittedReviewAsync(request);
@@ -195,8 +198,8 @@ public sealed class CreateSubmittedReviewIntegrationTests : CreateSubmittedRevie
         var request = _fixture.Build<V1CreateSubmittedReviewRequest>()
             .With(result => result.SubmittedHomeworkId, submittedHomeworkId)
             .With(result => result.StudentId, reviewerStudentId)
-            .With(result => result.Mark, 95)
             .Create();
+        request.Scores.Add(new SubmittedReviewScoreInput { RubricCriterionId = 1, Score = 95 });
 
         // Act
         var response = await CreateSubmittedReviewClient.V1CreateSubmittedReviewAsync(request);
@@ -229,8 +232,8 @@ public sealed class CreateSubmittedReviewIntegrationTests : CreateSubmittedRevie
         var request = _fixture.Build<V1CreateSubmittedReviewRequest>()
             .With(result => result.SubmittedHomeworkId, submittedHomeworkId)
             .With(result => result.StudentId, reviewerStudentId)
-            .With(result => result.Mark, 95)
             .Create();
+        request.Scores.Add(new SubmittedReviewScoreInput { RubricCriterionId = 1, Score = 95 });
 
         // Act
         var response = await CreateSubmittedReviewClient.V1CreateSubmittedReviewAsync(request);
@@ -252,8 +255,8 @@ public sealed class CreateSubmittedReviewIntegrationTests : CreateSubmittedRevie
         var request = _fixture.Build<V1CreateSubmittedReviewRequest>()
             .With(result => result.SubmittedHomeworkId, submittedHomeworkId)
             .With(result => result.StudentId, 1)
-            .With(result => result.Mark, 95)
             .Create();
+        request.Scores.Add(new SubmittedReviewScoreInput { RubricCriterionId = 1, Score = 95 });
 
         // Act
         var act = async () => await CreateSubmittedReviewClient.V1CreateSubmittedReviewAsync(request);
@@ -273,8 +276,8 @@ public sealed class CreateSubmittedReviewIntegrationTests : CreateSubmittedRevie
         var request = _fixture.Build<V1CreateSubmittedReviewRequest>()
             .With(result => result.SubmittedHomeworkId, 1)
             .With(result => result.StudentId, studentId)
-            .With(result => result.Mark, 95)
             .Create();
+        request.Scores.Add(new SubmittedReviewScoreInput { RubricCriterionId = 1, Score = 95 });
 
         // Act
         var act = async () => await CreateSubmittedReviewClient.V1CreateSubmittedReviewAsync(request);
@@ -285,17 +288,15 @@ public sealed class CreateSubmittedReviewIntegrationTests : CreateSubmittedRevie
         exception.Which.Message.Should().Contain(nameof(request.StudentId));
     }
 
-    [Theory]
-    [InlineData(-1)]
-    [InlineData(101)]
-    public async Task V1CreateSubmittedReview_MarkOutOfRange_ShouldReturnInvalidArgument(int mark)
+    [Fact]
+    public async Task V1CreateSubmittedReview_ScoreOutOfRange_ShouldReturnInvalidArgument()
     {
         // Arrange
         var request = _fixture.Build<V1CreateSubmittedReviewRequest>()
             .With(result => result.SubmittedHomeworkId, 1)
             .With(result => result.StudentId, 1)
-            .With(result => result.Mark, mark)
             .Create();
+        request.Scores.Add(new SubmittedReviewScoreInput { RubricCriterionId = 1, Score = -1 });
 
         // Act
         var act = async () => await CreateSubmittedReviewClient.V1CreateSubmittedReviewAsync(request);
@@ -303,7 +304,7 @@ public sealed class CreateSubmittedReviewIntegrationTests : CreateSubmittedRevie
         // Assert
         var exception = await act.Should().ThrowAsync<RpcException>();
         exception.Which.StatusCode.Should().Be(StatusCode.InvalidArgument);
-        exception.Which.Message.Should().Contain(nameof(request.Mark));
+        exception.Which.Message.Should().Contain("Score");
     }
 
     [Fact]
@@ -313,9 +314,9 @@ public sealed class CreateSubmittedReviewIntegrationTests : CreateSubmittedRevie
         var request = _fixture.Build<V1CreateSubmittedReviewRequest>()
             .With(result => result.SubmittedHomeworkId, 1)
             .With(result => result.StudentId, 1)
-            .With(result => result.Mark, 95)
             .With(result => result.Comment, string.Empty)
             .Create();
+        request.Scores.Add(new SubmittedReviewScoreInput { RubricCriterionId = 1, Score = 95 });
 
         // Act
         var act = async () => await CreateSubmittedReviewClient.V1CreateSubmittedReviewAsync(request);
@@ -326,13 +327,13 @@ public sealed class CreateSubmittedReviewIntegrationTests : CreateSubmittedRevie
         exception.Which.Message.Should().Contain(nameof(request.Comment));
     }
 
-    private async Task<(long SubmittedHomeworkId, long StudentId, int Mark, string Comment)> GetSubmittedReviewAsync(long submittedReviewId)
+    private async Task<(long SubmittedHomeworkId, long StudentId, string Comment)> GetSubmittedReviewAsync(long submittedReviewId)
     {
         await using var connection = await Fixture.DataSource.OpenConnectionAsync();
         var row = await connection.QuerySingleAsync(
-            "select submitted_homework_id, student_id, mark, comment from submitted_reviews where id = @submittedReviewId",
+            "select submitted_homework_id, student_id, comment from submitted_reviews where id = @submittedReviewId",
             new { submittedReviewId });
-        return (row.submitted_homework_id, row.student_id, row.mark, row.comment);
+        return (row.submitted_homework_id, row.student_id, row.comment);
     }
 
     private async Task<int> GetSubmittedReviewsCountAsync(long submittedHomeworkId, long studentId)

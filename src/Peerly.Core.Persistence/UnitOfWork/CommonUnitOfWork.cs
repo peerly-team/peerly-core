@@ -26,6 +26,9 @@ internal sealed class CommonUnitOfWork : UnitOfWork, ICommonUnitOfWork, ICommonR
     private readonly Lazy<IStudentRepository> _studentRepository;
     private readonly Lazy<ITeacherRepository> _teacherRepository;
     private readonly Lazy<IReadOnlyUserSearchRepository> _userSearchRepository;
+    private readonly Lazy<IRubricRepository> _rubricRepository;
+    private readonly Lazy<IRubricCriterionRepository> _rubricCriterionRepository;
+    private readonly Lazy<ISubmittedReviewScoreRepository> _submittedReviewScoreRepository;
 
     public CommonUnitOfWork(
         DbConnection connection,
@@ -47,7 +50,10 @@ internal sealed class CommonUnitOfWork : UnitOfWork, ICommonUnitOfWork, ICommonR
         Func<IConnectionContext, ISubmittedHomeworkMarkRepository> submittedHomeworkMarkRepositoryFactory,
         Func<IConnectionContext, IStudentRepository> studentRepositoryFactory,
         Func<IConnectionContext, ITeacherRepository> teacherRepositoryFactory,
-        Func<IConnectionContext, IReadOnlyUserSearchRepository> userSearchRepositoryFactory) : base(connection)
+        Func<IConnectionContext, IReadOnlyUserSearchRepository> userSearchRepositoryFactory,
+        Func<IConnectionContext, IRubricRepository> rubricRepositoryFactory,
+        Func<IConnectionContext, IRubricCriterionRepository> rubricCriterionRepositoryFactory,
+        Func<IConnectionContext, ISubmittedReviewScoreRepository> submittedReviewScoreRepositoryFactory) : base(connection)
     {
         _courseRepository = new Lazy<ICourseRepository>(() => courseRepositoryFactory(this));
         _distributionReviewerRepository = new Lazy<IDistributionReviewerRepository>(() => distributionReviewerRepositoryFactory(this));
@@ -68,6 +74,9 @@ internal sealed class CommonUnitOfWork : UnitOfWork, ICommonUnitOfWork, ICommonR
         _studentRepository = new Lazy<IStudentRepository>(() => studentRepositoryFactory(this));
         _teacherRepository = new Lazy<ITeacherRepository>(() => teacherRepositoryFactory(this));
         _userSearchRepository = new Lazy<IReadOnlyUserSearchRepository>(() => userSearchRepositoryFactory(this));
+        _rubricRepository = new Lazy<IRubricRepository>(() => rubricRepositoryFactory(this));
+        _rubricCriterionRepository = new Lazy<IRubricCriterionRepository>(() => rubricCriterionRepositoryFactory(this));
+        _submittedReviewScoreRepository = new Lazy<ISubmittedReviewScoreRepository>(() => submittedReviewScoreRepositoryFactory(this));
     }
 
     public ICourseRepository CourseRepository => _courseRepository.Value;
@@ -88,6 +97,9 @@ internal sealed class CommonUnitOfWork : UnitOfWork, ICommonUnitOfWork, ICommonR
     public ISubmittedHomeworkMarkRepository SubmittedHomeworkMarkRepository => _submittedHomeworkMarkRepository.Value;
     public IStudentRepository StudentRepository => _studentRepository.Value;
     public ITeacherRepository TeacherRepository => _teacherRepository.Value;
+    public IRubricRepository RubricRepository => _rubricRepository.Value;
+    public IRubricCriterionRepository RubricCriterionRepository => _rubricCriterionRepository.Value;
+    public ISubmittedReviewScoreRepository SubmittedReviewScoreRepository => _submittedReviewScoreRepository.Value;
 
     public IReadOnlyCourseRepository ReadOnlyCourseRepository => _courseRepository.Value;
     public IReadOnlyDistributionReviewerRepository ReadOnlyDistributionReviewerRepository => _distributionReviewerRepository.Value;
@@ -108,4 +120,7 @@ internal sealed class CommonUnitOfWork : UnitOfWork, ICommonUnitOfWork, ICommonR
     public IReadOnlyStudentRepository ReadOnlyStudentRepository => _studentRepository.Value;
     public IReadOnlyTeacherRepository ReadOnlyTeacherRepository => _teacherRepository.Value;
     public IReadOnlyUserSearchRepository ReadOnlyUserSearchRepository => _userSearchRepository.Value;
+    public IReadOnlyRubricRepository ReadOnlyRubricRepository => _rubricRepository.Value;
+    public IReadOnlyRubricCriterionRepository ReadOnlyRubricCriterionRepository => _rubricCriterionRepository.Value;
+    public IReadOnlySubmittedReviewScoreRepository ReadOnlySubmittedReviewScoreRepository => _submittedReviewScoreRepository.Value;
 }

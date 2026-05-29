@@ -18,11 +18,14 @@ using Peerly.Core.Persistence.Repositories.Homeworks;
 using Peerly.Core.Persistence.Repositories.SubmittedHomeworkFiles;
 using Peerly.Core.Persistence.Repositories.HomeworkDistributions;
 using Peerly.Core.Persistence.Repositories.ReviewCompletions;
+using Peerly.Core.Persistence.Repositories.RubricCriteria;
 using Peerly.Core.Persistence.Repositories.SubmittedHomeworks;
 using Peerly.Core.Persistence.Repositories.SubmittedHomeworkMarks;
 using Peerly.Core.Persistence.Repositories.Students;
 using Peerly.Core.Persistence.Repositories.Teachers;
 using Peerly.Core.Persistence.Repositories.SubmittedReviews;
+using Peerly.Core.Persistence.Repositories.SubmittedReviewScores;
+using Peerly.Core.Persistence.Repositories.Rubrics;
 using Peerly.Core.Persistence.Repositories.UserSearch;
 using Peerly.Core.Tools.Abstractions;
 
@@ -58,6 +61,9 @@ public class UnitOfWorkInstaller : IInstaller
         services.AddRepositoryFactory<IStudentRepository, StudentRepository>();
         services.AddRepositoryFactory<ITeacherRepository, TeacherRepository>();
         services.AddRepositoryFactory<IReadOnlyUserSearchRepository, UserSearchRepository>();
+        services.AddRepositoryFactory<IRubricRepository, RubricRepository>();
+        services.AddRepositoryFactory<IRubricCriterionRepository, RubricCriterionRepository>();
+        services.AddRepositoryFactory<ISubmittedReviewScoreRepository, SubmittedReviewScoreRepository>();
 
         services.AddSingleton<NpgsqlDataSource>(sp =>
         {

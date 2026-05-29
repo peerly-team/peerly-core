@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
@@ -8,10 +9,12 @@ using Peerly.Core.Abstractions.ApplicationServices;
 using Peerly.Core.Abstractions.Repositories;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedReview;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.Shared.Models;
 using Peerly.Core.ApplicationServices.Features.Validations;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Identifiers;
 using Peerly.Core.Models.Homeworks;
+using Peerly.Core.Models.Rubrics;
 using Peerly.Core.Models.Submissions;
 using Xunit;
 
@@ -24,6 +27,7 @@ public sealed class CreateSubmittedReviewCommandValidatorTests
     private readonly Mock<IReadOnlyDistributionReviewerRepository> _distributionReviewerRepositoryMock = new();
     private readonly Mock<IReadOnlyHomeworkRepository> _homeworkRepositoryMock = new();
     private readonly Mock<IReadOnlySubmittedReviewRepository> _submittedReviewRepositoryMock = new();
+    private readonly Mock<IReadOnlyRubricCriterionRepository> _rubricCriterionRepositoryMock = new();
     private readonly Mock<IClock> _clockMock = new();
     private readonly Fixture _fixture = new();
     private readonly DateTimeOffset _currentTime = DateTimeOffset.UtcNow;
@@ -40,13 +44,34 @@ public sealed class CreateSubmittedReviewCommandValidatorTests
     public async Task ValidateAsync_AssignedReviewerAndHomeworkReviewingAndDeadlineInFuture_ShouldSuccess()
     {
         // Arrange
-        var command = _fixture.Create<CreateSubmittedReviewCommand>();
+        var rubricId = _fixture.Create<RubricId>();
+        var criterionId = _fixture.Create<RubricCriterionId>();
+
+        var criterion = _fixture.Build<RubricCriterion>()
+            .With(c => c.Id, criterionId)
+            .With(c => c.RubricId, rubricId)
+            .With(c => c.MaxScore, 10)
+            .With(c => c.CommentRequired, false)
+            .Create();
+
+        IReadOnlyCollection<SubmittedReviewScoreItem> scores = new List<SubmittedReviewScoreItem>
+        {
+            new() { RubricCriterionId = criterionId, Score = 5 },
+        };
+
+        var command = _fixture.Build<CreateSubmittedReviewCommand>()
+            .With(c => c.Scores, scores)
+            .Create();
 
         var submittedHomework = SetupSubmittedHomework(command.SubmittedHomeworkId);
-        SetupHomework(submittedHomework.HomeworkId, HomeworkStatus.Reviewing, _currentTime.AddDays(1));
+        SetupHomework(submittedHomework.HomeworkId, HomeworkStatus.Reviewing, _currentTime.AddDays(1), rubricId);
 
         var submittedHomeworkStudent = SetupAssignedReviewer(command, exists: true);
         SetupSubmittedReviewExists(submittedHomeworkStudent, exists: false);
+
+        _rubricCriterionRepositoryMock
+            .Setup(repository => repository.ListByRubricIdAsync(rubricId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync([criterion]);
 
         // Act
         var result = await _validator.ValidateAsync(command, CancellationToken.None);
@@ -218,12 +243,13 @@ public sealed class CreateSubmittedReviewCommandValidatorTests
         return submittedHomeworkStudent;
     }
 
-    private void SetupHomework(HomeworkId homeworkId, HomeworkStatus status, DateTimeOffset reviewDeadline)
+    private void SetupHomework(HomeworkId homeworkId, HomeworkStatus status, DateTimeOffset reviewDeadline, RubricId? rubricId = null)
     {
         var homework = _fixture.Build<Homework>()
             .With(result => result.Id, homeworkId)
             .With(result => result.Status, status)
             .With(result => result.ReviewDeadline, reviewDeadline)
+            .With(result => result.RubricId, rubricId)
             .Create();
         _homeworkRepositoryMock
             .Setup(repository => repository.GetAsync(homeworkId, It.IsAny<CancellationToken>()))
@@ -256,6 +282,9 @@ public sealed class CreateSubmittedReviewCommandValidatorTests
         _unitOfWorkMock
             .SetupGet(unitOfWork => unitOfWork.ReadOnlySubmittedReviewRepository)
             .Returns(_submittedReviewRepositoryMock.Object);
+        _unitOfWorkMock
+            .SetupGet(unitOfWork => unitOfWork.ReadOnlyRubricCriterionRepository)
+            .Returns(_rubricCriterionRepositoryMock.Object);
 
         return factoryMock.Object;
     }

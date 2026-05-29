@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Peerly.Core.Abstractions.ApplicationServices;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Abstractions;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.Shared.Validators;
 using Peerly.Core.ApplicationServices.Features.Validations;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Models.Homeworks;
@@ -21,9 +22,7 @@ internal sealed class CreateSubmittedReviewCommandValidator : ICommandValidator<
         _clock = clock;
     }
 
-    public async Task<CommandValidationResult> ValidateAsync(
-        CreateSubmittedReviewCommand command,
-        CancellationToken cancellationToken)
+    public async Task<CommandValidationResult> ValidateAsync(CreateSubmittedReviewCommand command, CancellationToken cancellationToken)
     {
         await using var unitOfWork = await _unitOfWorkFactory.CreateReadOnlyAsync(cancellationToken);
 
@@ -57,6 +56,13 @@ internal sealed class CreateSubmittedReviewCommandValidator : ICommandValidator<
             return OtherError.Conflict();
         }
 
-        return CommandValidationResult.Ok();
+        if (homework.RubricId is null)
+        {
+            return OtherError.NotFound(HomeworkErrors.HomeworkRubricNotFound);
+        }
+        var criteria = await unitOfWork.ReadOnlyRubricCriterionRepository.ListByRubricIdAsync(homework.RubricId.Value, cancellationToken);
+        var scoresValidation = SubmittedReviewCommonValidator.ValidateScoresAgainstCriteria(command.Scores, criteria);
+
+        return scoresValidation ?? CommandValidationResult.Ok();
     }
 }

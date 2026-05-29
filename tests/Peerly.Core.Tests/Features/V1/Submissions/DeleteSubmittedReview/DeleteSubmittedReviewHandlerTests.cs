@@ -19,6 +19,8 @@ public sealed class DeleteSubmittedReviewHandlerTests
 {
     private readonly Mock<ICommonUnitOfWork> _unitOfWorkMock = new();
     private readonly Mock<ISubmittedReviewRepository> _submittedReviewRepositoryMock = new();
+    private readonly Mock<ISubmittedReviewScoreRepository> _submittedReviewScoreRepositoryMock = new();
+    private readonly Mock<IOperationSet> _operationSetMock = new();
     private readonly Mock<ICommandValidator<DeleteSubmittedReviewCommand, Success>> _validatorMock = new();
     private readonly Fixture _fixture = new();
     private readonly DeleteSubmittedReviewHandler _handler;
@@ -100,6 +102,12 @@ public sealed class DeleteSubmittedReviewHandlerTests
         _unitOfWorkMock
             .SetupGet(unitOfWork => unitOfWork.SubmittedReviewRepository)
             .Returns(_submittedReviewRepositoryMock.Object);
+        _unitOfWorkMock
+            .SetupGet(unitOfWork => unitOfWork.SubmittedReviewScoreRepository)
+            .Returns(_submittedReviewScoreRepositoryMock.Object);
+        _unitOfWorkMock
+            .Setup(unitOfWork => unitOfWork.StartOperationSet(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(_operationSetMock.Object);
 
         return factoryMock.Object;
     }

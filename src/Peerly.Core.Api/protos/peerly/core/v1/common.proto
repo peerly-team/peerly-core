@@ -153,3 +153,26 @@ message TeacherSubmittedReviewInfo {
   SubmittedReviewInfo submitted_review = 1;
   StudentInfo reviewer = 2;
 }
+
+message RubricCriterionInfo {
+  int64 id = 1;
+  string name = 2;
+  optional string description = 3;
+  int32 max_score = 4;
+  bool comment_required = 5;
+  int32 position = 6;
+}
+
+message RubricInfo {
+  int64 id = 1;
+  int64 teacher_id = 2;
+  string name = 3;
+}
+
+message RubricCriterionInput {
+  string name = 1;
+  optional string description = 2;
+  int32 max_score = 3;
+  bool comment_required = 4;
+  int32 position = 5;
+}

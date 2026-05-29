@@ -189,6 +189,31 @@ public abstract class SubmissionIntegrationTestBase : IAsyncLifetime
             });
     }
 
+    protected async Task<long> AddRubricCriterionInDbAsync(long rubricId, int maxScore = 100)
+    {
+        await using var connection = await Fixture.DataSource.OpenConnectionAsync();
+
+        const string Query =
+            """
+            insert into rubric_criteria (rubric_id, name, description, max_score, comment_required, position, creation_time)
+            values (@rubricId, @name, @description, @maxScore, @commentRequired, @position, @creationTime)
+            returning id;
+            """;
+
+        return await connection.QuerySingleAsync<long>(
+            Query,
+            new
+            {
+                rubricId,
+                name = $"Criterion {Guid.NewGuid():N}",
+                description = "Test criterion",
+                maxScore,
+                commentRequired = false,
+                position = 1,
+                creationTime = DateTimeOffset.UtcNow
+            });
+    }
+
     protected async Task<long> AddSubmittedHomeworkInDbAsync(long homeworkId, long studentId, string comment = "Test comment")
     {
         await using var connection = await Fixture.DataSource.OpenConnectionAsync();

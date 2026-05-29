@@ -112,6 +112,30 @@ internal static class PeerlyCommonScheme
         public const string TeacherId = "teacher_id";
     }
 
+    public static class RubricTable
+    {
+        public const string TableName = "rubrics";
+        public const string Id = "id";
+        public const string TeacherId = "teacher_id";
+        public const string Name = "name";
+        public const string CreationTime = "creation_time";
+        public const string UpdateTime = "update_time";
+    }
+
+    public static class RubricCriterionTable
+    {
+        public const string TableName = "rubric_criteria";
+        public const string Id = "id";
+        public const string RubricId = "rubric_id";
+        public const string Name = "name";
+        public const string Description = "description";
+        public const string MaxScore = "max_score";
+        public const string CommentRequired = "comment_required";
+        public const string Position = "position";
+        public const string CreationTime = "creation_time";
+        public const string UpdateTime = "update_time";
+    }
+
     public static class SubmittedHomeworkTable
     {
         public const string TableName = "submitted_homeworks";
@@ -193,6 +217,17 @@ internal static class PeerlyCommonScheme
         public const string HasDiscrepancy = "has_discrepancy";
         public const string CreationTime = "creation_time";
         public const string UpdateTime = "update_time";
+    }
+
+    public static class SubmittedReviewScoreTable
+    {
+        public const string TableName = "submitted_review_scores";
+
+        public const string Id = "id";
+        public const string SubmittedReviewId = "submitted_review_id";
+        public const string RubricCriterionId = "rubric_criteria_id";
+        public const string Score = "score";
+        public const string Comment = "comment";
     }
 
     public static class FileTable
