@@ -8,7 +8,7 @@ public sealed record HomeworkUpdateItem
     public required HomeworkStatus Status { get; init; }
     public required int AmountOfReviewers { get; init; }
     public required string? Description { get; init; }
-    public required string Checklist { get; init; }
+    public required long? RubricId { get; init; }
     public required DateTimeOffset Deadline { get; init; }
     public required DateTimeOffset ReviewDeadline { get; init; }
     public required int DiscrepancyThreshold { get; init; }

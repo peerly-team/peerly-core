@@ -35,9 +35,9 @@ public sealed class GetTeacherHomeworkIntegrationTests : GetTeacherHomeworkInteg
         var courseId = await AddCourseInDbAsync();
         await AddCourseTeacherInDbAsync(courseId, teacherId);
 
+        var rubricId = await AddRubricInDbAsync(teacherId);
         var homeworkName = _fixture.Create<string>();
         var homeworkDescription = _fixture.Create<string>();
-        var homeworkChecklist = _fixture.Create<string>();
         var deadline = DateTimeOffset.UtcNow.AddDays(5);
         var reviewDeadline = DateTimeOffset.UtcNow.AddDays(10);
         var homeworkId = await AddHomeworkInDbAsync(
@@ -46,11 +46,11 @@ public sealed class GetTeacherHomeworkIntegrationTests : GetTeacherHomeworkInteg
             HomeworkStatusModel.Published,
             name: homeworkName,
             description: homeworkDescription,
-            checklist: homeworkChecklist,
             deadline: deadline,
             reviewDeadline: reviewDeadline,
             amountOfReviewers: 4,
-            discrepancyThreshold: 15);
+            discrepancyThreshold: 15,
+            rubricId: rubricId);
         var firstFile = await AddHomeworkFileInDbAsync(homeworkId, teacherId, _fixture.Create<string>(), 1024);
         var secondFile = await AddHomeworkFileInDbAsync(homeworkId, teacherId, _fixture.Create<string>(), 2048);
         await AddSubmittedHomeworkInDbAsync(homeworkId, firstStudentId);
@@ -68,12 +68,13 @@ public sealed class GetTeacherHomeworkIntegrationTests : GetTeacherHomeworkInteg
         response.TeacherHomeworkInfo.Id.Should().Be(homeworkId);
         response.TeacherHomeworkInfo.Name.Should().Be(homeworkName);
         response.TeacherHomeworkInfo.Description.Should().Be(homeworkDescription);
-        response.TeacherHomeworkInfo.Checklist.Should().Be(homeworkChecklist);
         response.TeacherHomeworkInfo.Status.Should().Be(ProtoHomeworkStatus.Published);
         response.TeacherHomeworkInfo.Deadline.ToDateTimeOffset().Should().BeCloseTo(deadline, TimeSpan.FromMilliseconds(1));
         response.TeacherHomeworkInfo.ReviewDeadline.ToDateTimeOffset().Should().BeCloseTo(reviewDeadline, TimeSpan.FromMilliseconds(1));
         response.TeacherHomeworkInfo.AmountOfReviewers.Should().Be(4);
         response.TeacherHomeworkInfo.DiscrepancyThreshold.Should().Be(15);
+        response.TeacherHomeworkInfo.HasRubricId.Should().BeTrue();
+        response.TeacherHomeworkInfo.RubricId.Should().Be(rubricId);
         response.HasSubmittedCount.Should().BeTrue();
         response.SubmittedCount.Should().Be(2);
         response.HomeworkFiles

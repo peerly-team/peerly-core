@@ -131,7 +131,8 @@ public abstract class CreateSubmittedHomeworkFileIntegrationTestBase : IAsyncLif
         long teacherId,
         HomeworkStatus status,
         long? groupId = null,
-        DateTimeOffset? deadline = null)
+        DateTimeOffset? deadline = null,
+        long? rubricId = null)
     {
         await using var connection = await Fixture.DataSource.OpenConnectionAsync();
 
@@ -139,23 +140,23 @@ public abstract class CreateSubmittedHomeworkFileIntegrationTestBase : IAsyncLif
             ? """
               insert into homeworks (
                   course_id, group_id, teacher_id, name, status,
-                  amount_of_reviewers, description, checklist,
-                  deadline, review_deadline, discrepancy_threshold, creation_time)
+                  amount_of_reviewers, description,
+                  deadline, review_deadline, discrepancy_threshold, rubric_id, creation_time)
               values (
                   @courseId, @groupId, @teacherId, @name, @status,
-                  @amountOfReviewers, @description, @checklist,
-                  @deadline, @reviewDeadline, @discrepancyThreshold, @creationTime)
+                  @amountOfReviewers, @description,
+                  @deadline, @reviewDeadline, @discrepancyThreshold, @rubricId, @creationTime)
               returning id;
               """
             : """
               insert into homeworks (
                   course_id, teacher_id, name, status,
-                  amount_of_reviewers, description, checklist,
-                  deadline, review_deadline, discrepancy_threshold, creation_time)
+                  amount_of_reviewers, description,
+                  deadline, review_deadline, discrepancy_threshold, rubric_id, creation_time)
               values (
                   @courseId, @teacherId, @name, @status,
-                  @amountOfReviewers, @description, @checklist,
-                  @deadline, @reviewDeadline, @discrepancyThreshold, @creationTime)
+                  @amountOfReviewers, @description,
+                  @deadline, @reviewDeadline, @discrepancyThreshold, @rubricId, @creationTime)
               returning id;
               """;
 
@@ -166,10 +167,10 @@ public abstract class CreateSubmittedHomeworkFileIntegrationTestBase : IAsyncLif
         parameters.Add("status", status.ToString());
         parameters.Add("amountOfReviewers", 2);
         parameters.Add("description", "Description");
-        parameters.Add("checklist", "Checklist");
         parameters.Add("deadline", deadline ?? DateTimeOffset.UtcNow.AddDays(7));
         parameters.Add("reviewDeadline", DateTimeOffset.UtcNow.AddDays(14));
         parameters.Add("discrepancyThreshold", 2);
+        parameters.Add("rubricId", rubricId);
         parameters.Add("creationTime", DateTimeOffset.UtcNow);
         if (groupId.HasValue)
         {

@@ -34,9 +34,9 @@ public sealed class GetStudentHomeworkIntegrationTests : GetStudentHomeworkInteg
         var groupId = await AddGroupInDbAsync(courseId);
         await AddGroupStudentInDbAsync(groupId, studentId);
 
+        var rubricId = await AddRubricInDbAsync(teacherId);
         var homeworkName = _fixture.Create<string>();
         var homeworkDescription = _fixture.Create<string>();
-        var homeworkChecklist = _fixture.Create<string>();
         var deadline = DateTimeOffset.UtcNow.AddDays(5);
         var reviewDeadline = DateTimeOffset.UtcNow.AddDays(10);
         var homeworkId = await AddHomeworkInDbAsync(
@@ -45,10 +45,10 @@ public sealed class GetStudentHomeworkIntegrationTests : GetStudentHomeworkInteg
             HomeworkStatusModel.Published,
             name: homeworkName,
             description: homeworkDescription,
-            checklist: homeworkChecklist,
             deadline: deadline,
             reviewDeadline: reviewDeadline,
-            amountOfReviewers: 4);
+            amountOfReviewers: 4,
+            rubricId: rubricId);
         var firstFile = await AddHomeworkFileInDbAsync(homeworkId, teacherId, _fixture.Create<string>(), 1024);
         var secondFile = await AddHomeworkFileInDbAsync(homeworkId, teacherId, _fixture.Create<string>(), 2048);
 
@@ -64,9 +64,10 @@ public sealed class GetStudentHomeworkIntegrationTests : GetStudentHomeworkInteg
         response.StudentHomeworkInfo.Id.Should().Be(homeworkId);
         response.StudentHomeworkInfo.Name.Should().Be(homeworkName);
         response.StudentHomeworkInfo.Description.Should().Be(homeworkDescription);
-        response.StudentHomeworkInfo.Checklist.Should().Be(homeworkChecklist);
         response.StudentHomeworkInfo.Status.Should().Be(ProtoHomeworkStatus.Published);
         response.StudentHomeworkInfo.AmountOfReviewers.Should().Be(4);
+        response.StudentHomeworkInfo.HasRubricId.Should().BeTrue();
+        response.StudentHomeworkInfo.RubricId.Should().Be(rubricId);
         response.StudentHomeworkInfo.IsHomeworkSubmitted.Should().BeFalse();
         response.HasSubmittedHomeworkId.Should().BeFalse();
         response.HomeworkFiles

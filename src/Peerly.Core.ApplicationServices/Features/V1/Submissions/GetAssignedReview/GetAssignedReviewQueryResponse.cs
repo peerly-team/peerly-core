@@ -8,7 +8,7 @@ public sealed record GetAssignedReviewQueryResponse
 {
     public required SubmittedHomeworkId SubmittedHomeworkId { get; init; }
     public required string Comment { get; init; }
-    public required string Checklist { get; init; }
+    public required RubricId? RubricId { get; init; }
     public required IReadOnlyCollection<File> Files { get; init; }
     public required SubmittedReviewId? SubmittedReviewId { get; init; }
 }

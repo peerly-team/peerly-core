@@ -42,9 +42,9 @@ public sealed class SearchTeacherHomeworksIntegrationTests : SearchTeacherHomewo
         var otherCourseId = await AddCourseInDbAsync();
         await AddCourseTeacherInDbAsync(otherCourseId, otherTeacherId);
 
+        var rubricId = await AddRubricInDbAsync(teacherId);
         var homeworkName = _fixture.Create<string>();
         var homeworkDescription = _fixture.Create<string>();
-        var homeworkChecklist = _fixture.Create<string>();
         var deadline = DateTimeOffset.UtcNow.AddDays(10);
         var reviewDeadline = DateTimeOffset.UtcNow.AddDays(15);
         var courseHomeworkId = await AddHomeworkInDbAsync(
@@ -53,11 +53,11 @@ public sealed class SearchTeacherHomeworksIntegrationTests : SearchTeacherHomewo
             HomeworkStatusModel.Published,
             name: homeworkName,
             description: homeworkDescription,
-            checklist: homeworkChecklist,
             deadline: deadline,
             reviewDeadline: reviewDeadline,
             amountOfReviewers: 4,
-            discrepancyThreshold: 20);
+            discrepancyThreshold: 20,
+            rubricId: rubricId);
         var courseGroupHomeworkId = await AddHomeworkInDbAsync(
             courseId,
             teacherId,
@@ -109,12 +109,13 @@ public sealed class SearchTeacherHomeworksIntegrationTests : SearchTeacherHomewo
         var courseHomeworkInfo = response.TeacherHomeworkInfos.Single(homeworkInfo => homeworkInfo.Id == courseHomeworkId);
         courseHomeworkInfo.Name.Should().Be(homeworkName);
         courseHomeworkInfo.Description.Should().Be(homeworkDescription);
-        courseHomeworkInfo.Checklist.Should().Be(homeworkChecklist);
         courseHomeworkInfo.Status.Should().Be(ProtoHomeworkStatus.Published);
         courseHomeworkInfo.Deadline.ToDateTimeOffset().Should().BeCloseTo(deadline, TimeSpan.FromMilliseconds(1));
         courseHomeworkInfo.ReviewDeadline.ToDateTimeOffset().Should().BeCloseTo(reviewDeadline, TimeSpan.FromMilliseconds(1));
         courseHomeworkInfo.AmountOfReviewers.Should().Be(4);
         courseHomeworkInfo.DiscrepancyThreshold.Should().Be(20);
+        courseHomeworkInfo.HasRubricId.Should().BeTrue();
+        courseHomeworkInfo.RubricId.Should().Be(rubricId);
 
         response.TeacherHomeworkInfos.Single(homeworkInfo => homeworkInfo.Id == courseGroupHomeworkId)
             .Status.Should().Be(ProtoHomeworkStatus.Draft);

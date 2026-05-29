@@ -19,8 +19,9 @@ internal sealed class V1UpdateDraftHomeworkRequestValidator : AbstractValidator<
         RuleFor(x => x.AmountOfReviewers)
             .GreaterThan(0);
 
-        RuleFor(x => x.Checklist)
-            .NotEmpty();
+        RuleFor(x => x.RubricId)
+            .GreaterThan(0)
+            .When(x => x.HasRubricId);
 
         RuleFor(x => x.DiscrepancyThreshold)
             .InclusiveBetween(1, 100);

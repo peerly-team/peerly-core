@@ -306,9 +306,13 @@ internal static class SubmissionControllerMapper
         {
             SubmittedHomeworkId = (long)queryResponse.SubmittedHomeworkId,
             Comment = queryResponse.Comment,
-            Checklist = queryResponse.Checklist,
             Files = { queryResponse.Files.ToArrayBy(file => file.ToProto()) }
         };
+
+        if (queryResponse.RubricId is { } rubricId)
+        {
+            submission.RubricId = (long)rubricId;
+        }
 
         if (queryResponse.SubmittedReviewId is { } submittedReviewId)
         {

@@ -95,7 +95,7 @@ internal static class PeerlyCommonScheme
         public const string Status = "status";
         public const string AmountOfReviewers = "amount_of_reviewers";
         public const string Description = "description";
-        public const string Checklist = "checklist";
+        public const string RubricId = "rubric_id";
         public const string Deadline = "deadline";
         public const string ReviewDeadline = "review_deadline";
         public const string DiscrepancyThreshold = "discrepancy_threshold";

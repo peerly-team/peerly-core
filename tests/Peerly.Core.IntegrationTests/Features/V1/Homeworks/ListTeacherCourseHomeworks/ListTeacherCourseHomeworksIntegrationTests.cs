@@ -38,9 +38,9 @@ public sealed class ListTeacherCourseHomeworksIntegrationTests : ListTeacherCour
         var otherCourseId = await AddCourseInDbAsync();
         await AddCourseTeacherInDbAsync(otherCourseId, teacherId);
 
+        var rubricId = await AddRubricInDbAsync(teacherId);
         var homeworkName = _fixture.Create<string>();
         var homeworkDescription = _fixture.Create<string>();
-        var homeworkChecklist = _fixture.Create<string>();
         var homeworkDeadline = DateTimeOffset.UtcNow.AddDays(10);
         var homeworkReviewDeadline = DateTimeOffset.UtcNow.AddDays(15);
         var courseHomeworkId = await AddHomeworkInDbAsync(
@@ -49,11 +49,11 @@ public sealed class ListTeacherCourseHomeworksIntegrationTests : ListTeacherCour
             HomeworkStatusModel.Published,
             name: homeworkName,
             description: homeworkDescription,
-            checklist: homeworkChecklist,
             deadline: homeworkDeadline,
             reviewDeadline: homeworkReviewDeadline,
             amountOfReviewers: 4,
-            discrepancyThreshold: 15);
+            discrepancyThreshold: 15,
+            rubricId: rubricId);
         var firstGroupHomeworkId = await AddHomeworkInDbAsync(courseId, otherTeacherId, HomeworkStatusModel.Reviewing, groupId: firstGroupId);
         var secondGroupHomeworkId = await AddHomeworkInDbAsync(courseId, otherTeacherId, HomeworkStatusModel.Draft, groupId: secondGroupId);
         await AddHomeworkInDbAsync(otherCourseId, teacherId, HomeworkStatusModel.Published);
@@ -74,12 +74,13 @@ public sealed class ListTeacherCourseHomeworksIntegrationTests : ListTeacherCour
         var courseHomeworkInfo = response.TeacherHomeworkInfos.Single(homeworkInfo => homeworkInfo.Id == courseHomeworkId);
         courseHomeworkInfo.Name.Should().Be(homeworkName);
         courseHomeworkInfo.Description.Should().Be(homeworkDescription);
-        courseHomeworkInfo.Checklist.Should().Be(homeworkChecklist);
         courseHomeworkInfo.Status.Should().Be(ProtoHomeworkStatus.Published);
         courseHomeworkInfo.Deadline.ToDateTimeOffset().Should().BeCloseTo(homeworkDeadline, TimeSpan.FromMilliseconds(1));
         courseHomeworkInfo.ReviewDeadline.ToDateTimeOffset().Should().BeCloseTo(homeworkReviewDeadline, TimeSpan.FromMilliseconds(1));
         courseHomeworkInfo.AmountOfReviewers.Should().Be(4);
         courseHomeworkInfo.DiscrepancyThreshold.Should().Be(15);
+        courseHomeworkInfo.HasRubricId.Should().BeTrue();
+        courseHomeworkInfo.RubricId.Should().Be(rubricId);
     }
 
     [Fact]

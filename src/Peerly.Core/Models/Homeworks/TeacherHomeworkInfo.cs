@@ -8,7 +8,7 @@ public sealed record TeacherHomeworkInfo
     public required HomeworkId Id { get; init; }
     public required string Name { get; init; }
     public required HomeworkStatus Status { get; init; }
-    public required string CheckList { get; init; }
+    public required RubricId? RubricId { get; init; }
     public required string? Description { get; init; }
     public required DateTimeOffset Deadline { get; init; }
     public required DateTimeOffset ReviewDeadline { get; init; }

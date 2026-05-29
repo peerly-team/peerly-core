@@ -12,7 +12,7 @@ public sealed record Homework
     public required string Name { get; init; }
     public required HomeworkStatus Status { get; init; }
     public required int AmountOfReviewers { get; init; }
-    public required string CheckList { get; init; }
+    public required RubricId? RubricId { get; init; }
     public required DateTimeOffset Deadline { get; init; }
     public required DateTimeOffset ReviewDeadline { get; init; }
     public required int DiscrepancyThreshold { get; init; }

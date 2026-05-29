@@ -137,6 +137,27 @@ public abstract class ListTeacherCourseHomeworksIntegrationTestBase : IAsyncLife
             });
     }
 
+    protected async Task<long> AddRubricInDbAsync(long teacherId)
+    {
+        await using var connection = await Fixture.DataSource.OpenConnectionAsync();
+
+        const string Query =
+            """
+            insert into rubrics (teacher_id, name, creation_time)
+            values (@teacherId, @name, @creationTime)
+            returning id;
+            """;
+
+        return await connection.QuerySingleAsync<long>(
+            Query,
+            new
+            {
+                teacherId,
+                name = $"Rubric {Guid.NewGuid():N}",
+                creationTime = DateTimeOffset.UtcNow
+            });
+    }
+
     protected async Task<long> AddHomeworkInDbAsync(
         long courseId,
         long teacherId,
@@ -144,11 +165,11 @@ public abstract class ListTeacherCourseHomeworksIntegrationTestBase : IAsyncLife
         long? groupId = null,
         string? name = null,
         string? description = null,
-        string? checklist = null,
         DateTimeOffset? deadline = null,
         DateTimeOffset? reviewDeadline = null,
         int amountOfReviewers = 2,
-        int discrepancyThreshold = 2)
+        int discrepancyThreshold = 2,
+        long? rubricId = null)
     {
         await using var connection = await Fixture.DataSource.OpenConnectionAsync();
 
@@ -156,12 +177,12 @@ public abstract class ListTeacherCourseHomeworksIntegrationTestBase : IAsyncLife
             """
             insert into homeworks (
                 course_id, group_id, teacher_id, name, status,
-                amount_of_reviewers, description, checklist,
-                deadline, review_deadline, discrepancy_threshold, creation_time)
+                amount_of_reviewers, description,
+                deadline, review_deadline, discrepancy_threshold, rubric_id, creation_time)
             values (
                 @courseId, @groupId, @teacherId, @name, @status,
-                @amountOfReviewers, @description, @checklist,
-                @deadline, @reviewDeadline, @discrepancyThreshold, @creationTime)
+                @amountOfReviewers, @description,
+                @deadline, @reviewDeadline, @discrepancyThreshold, @rubricId, @creationTime)
             returning id;
             """;
 
@@ -176,10 +197,10 @@ public abstract class ListTeacherCourseHomeworksIntegrationTestBase : IAsyncLife
                 status = status.ToString(),
                 amountOfReviewers,
                 description = description ?? "Description",
-                checklist = checklist ?? "Checklist",
                 deadline = deadline ?? DateTimeOffset.UtcNow.AddDays(7),
                 reviewDeadline = reviewDeadline ?? DateTimeOffset.UtcNow.AddDays(14),
                 discrepancyThreshold,
+                rubricId,
                 creationTime = DateTimeOffset.UtcNow
             });
     }

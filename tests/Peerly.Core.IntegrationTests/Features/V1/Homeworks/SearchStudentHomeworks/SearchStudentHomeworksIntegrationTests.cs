@@ -40,9 +40,9 @@ public sealed class SearchStudentHomeworksIntegrationTests : SearchStudentHomewo
         var otherGroupId = await AddGroupInDbAsync(otherCourseId);
         await AddGroupStudentInDbAsync(otherGroupId, otherStudentId);
 
+        var rubricId = await AddRubricInDbAsync(teacherId);
         var publishedHomeworkName = _fixture.Create<string>();
         var publishedHomeworkDescription = _fixture.Create<string>();
-        var publishedHomeworkChecklist = _fixture.Create<string>();
         var publishedHomeworkDeadline = DateTimeOffset.UtcNow.AddDays(10);
         var publishedHomeworkReviewDeadline = DateTimeOffset.UtcNow.AddDays(15);
         var publishedHomeworkId = await AddHomeworkInDbAsync(
@@ -51,10 +51,10 @@ public sealed class SearchStudentHomeworksIntegrationTests : SearchStudentHomewo
             HomeworkStatusModel.Published,
             name: publishedHomeworkName,
             description: publishedHomeworkDescription,
-            checklist: publishedHomeworkChecklist,
             deadline: publishedHomeworkDeadline,
             reviewDeadline: publishedHomeworkReviewDeadline,
-            amountOfReviewers: 4);
+            amountOfReviewers: 4,
+            rubricId: rubricId);
         var reviewingHomeworkId = await AddHomeworkInDbAsync(
             courseId,
             teacherId,
@@ -87,9 +87,10 @@ public sealed class SearchStudentHomeworksIntegrationTests : SearchStudentHomewo
         var publishedHomeworkInfo = response.StudentHomeworkInfos.Single(homeworkInfo => homeworkInfo.Id == publishedHomeworkId);
         publishedHomeworkInfo.Name.Should().Be(publishedHomeworkName);
         publishedHomeworkInfo.Description.Should().Be(publishedHomeworkDescription);
-        publishedHomeworkInfo.Checklist.Should().Be(publishedHomeworkChecklist);
         publishedHomeworkInfo.Status.Should().Be(ProtoHomeworkStatus.Published);
         publishedHomeworkInfo.AmountOfReviewers.Should().Be(4);
+        publishedHomeworkInfo.HasRubricId.Should().BeTrue();
+        publishedHomeworkInfo.RubricId.Should().Be(rubricId);
         publishedHomeworkInfo.IsHomeworkSubmitted.Should().BeTrue();
 
         var reviewingHomeworkInfo = response.StudentHomeworkInfos.Single(homeworkInfo => homeworkInfo.Id == reviewingHomeworkId);

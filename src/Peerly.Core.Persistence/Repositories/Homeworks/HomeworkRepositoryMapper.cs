@@ -19,7 +19,7 @@ internal static class HomeworkRepositoryMapper
             Status = Enum.Parse<HomeworkStatus>(homeworkDb.Status),
             AmountOfReviewers = homeworkDb.AmountOfReviewers,
             Description = homeworkDb.Description,
-            CheckList = homeworkDb.CheckList,
+            RubricId = homeworkDb.RubricId is not null ? new RubricId(homeworkDb.RubricId.Value) : null,
             Deadline = homeworkDb.Deadline,
             ReviewDeadline = homeworkDb.ReviewDeadline,
             DiscrepancyThreshold = homeworkDb.DiscrepancyThreshold
@@ -35,7 +35,7 @@ internal static class HomeworkRepositoryMapper
             Status = Enum.Parse<HomeworkStatus>(homeworkDb.Status),
             AmountOfReviewers = homeworkDb.AmountOfReviewers,
             Description = homeworkDb.Description,
-            CheckList = homeworkDb.CheckList,
+            RubricId = homeworkDb.RubricId is not null ? new RubricId(homeworkDb.RubricId.Value) : null,
             Deadline = homeworkDb.Deadline,
             ReviewDeadline = homeworkDb.ReviewDeadline,
             DiscrepancyThreshold = homeworkDb.DiscrepancyThreshold
@@ -51,7 +51,7 @@ internal static class HomeworkRepositoryMapper
             Status = Enum.Parse<HomeworkStatus>(homeworkInfoDb.Status),
             AmountOfReviewers = homeworkInfoDb.AmountOfReviewers,
             Description = homeworkInfoDb.Description,
-            CheckList = homeworkInfoDb.CheckList,
+            RubricId = homeworkInfoDb.RubricId is not null ? new RubricId(homeworkInfoDb.RubricId.Value) : null,
             Deadline = homeworkInfoDb.Deadline,
             ReviewDeadline = homeworkInfoDb.ReviewDeadline,
             IsHomeworkSubmitted = homeworkInfoDb.IsHomeworkSubmitted

@@ -41,7 +41,7 @@ internal sealed class UpdateDraftHomeworkHandler : ICommandHandler<UpdateDraftHo
                 .Set(item => item.Name, command.Name)
                 .Set(item => item.AmountOfReviewers, command.AmountOfReviewers)
                 .Set(item => item.Description, command.Description)
-                .Set(item => item.Checklist, command.Checklist)
+                .Set(item => item.RubricId, (long?)command.RubricId)
                 .Set(item => item.Deadline, command.Deadline)
                 .Set(item => item.ReviewDeadline, command.ReviewDeadline)
                 .Set(item => item.DiscrepancyThreshold, command.DiscrepancyThreshold),

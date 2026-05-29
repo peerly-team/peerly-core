@@ -52,7 +52,6 @@ public sealed class GetAssignedReviewIntegrationTests : GetAssignedReviewIntegra
         // Assert
         response.Submission.SubmittedHomeworkId.Should().Be(submittedHomeworkId);
         response.Submission.Comment.Should().Be("Test comment");
-        response.Submission.Checklist.Should().Be("Checklist");
         response.Submission.SubmittedReviewId.Should().Be(submittedReviewId);
         response.Submission.Files.Should().ContainSingle().Which
             .Should().BeEquivalentTo(new { anonymizedFile.Id, anonymizedFile.Name, anonymizedFile.Size });
