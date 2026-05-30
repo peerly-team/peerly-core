@@ -19,6 +19,7 @@ using Peerly.Core.IntegrationTests.Features.V1.Homeworks.ListStudentCourseHomewo
 using Peerly.Core.IntegrationTests.Features.V1.Homeworks.ListTeacherCourseHomeworks.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Homeworks.SearchStudentHomeworks.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Homeworks.SearchTeacherHomeworks.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Participants.BulkAddGroupStudents.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CorrectSubmittedHomeworkMark.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CreateSubmittedHomework.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CreateSubmittedHomeworkFile.Infrastructure;
@@ -79,6 +80,7 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
     public PublishCourseGrpcClient PublishCourseClient => ApplicationFactory.PublishCourseClient();
     public DeleteCourseGrpcClient DeleteCourseClient => ApplicationFactory.DeleteCourseClient();
     public CreateGroupGrpcClient CreateGroupClient => ApplicationFactory.CreateGroupClient();
+    public BulkAddGroupStudentsGrpcClient BulkAddGroupStudentsClient => ApplicationFactory.BulkAddGroupStudentsClient();
     public DeleteHomeworkGrpcClient DeleteHomeworkClient => ApplicationFactory.DeleteHomeworkClient();
     public DeleteHomeworkFileGrpcClient DeleteHomeworkFileClient => ApplicationFactory.DeleteHomeworkFileClient();
     public GetStudentHomeworkGrpcClient GetStudentHomeworkClient => ApplicationFactory.GetStudentHomeworkClient();

@@ -40,6 +40,7 @@ using Peerly.Core.IntegrationTests.Features.V1.Homeworks.ListStudentCourseHomewo
 using Peerly.Core.IntegrationTests.Features.V1.Homeworks.ListTeacherCourseHomeworks.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Homeworks.SearchStudentHomeworks.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Homeworks.SearchTeacherHomeworks.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Participants.BulkAddGroupStudents.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CorrectSubmittedHomeworkMark.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CreateSubmittedHomework.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CreateSubmittedHomeworkFile.Infrastructure;
@@ -143,6 +144,11 @@ public sealed class WebApplicationFactory : IAsyncDisposable
     public CreateGroupGrpcClient CreateGroupClient()
     {
         return new CreateGroupGrpcClient(GetOrCreateGrpcChannel());
+    }
+
+    public BulkAddGroupStudentsGrpcClient BulkAddGroupStudentsClient()
+    {
+        return new BulkAddGroupStudentsGrpcClient(GetOrCreateGrpcChannel());
     }
 
     public DeleteHomeworkGrpcClient DeleteHomeworkClient()

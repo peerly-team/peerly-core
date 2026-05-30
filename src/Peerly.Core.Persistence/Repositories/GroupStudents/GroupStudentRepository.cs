@@ -51,6 +51,39 @@ internal sealed class GroupStudentRepository : IGroupStudentRepository
         await _connectionContext.Connection.ExecuteAsync(command);
     }
 
+    public async Task<IReadOnlyCollection<StudentId>> BulkAddAsync(GroupStudentBulkAddItem item, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            GroupId = (long)item.GroupId,
+            StudentIds = item.StudentIds.ToArrayBy(studentId => (long)studentId),
+            item.CreationTime
+        };
+
+        const string Query =
+            $"""
+             insert into {GroupStudentTable.TableName} (
+                         {GroupStudentTable.GroupId},
+                         {GroupStudentTable.StudentId},
+                         {GroupStudentTable.CreationTime})
+                  select @{nameof(queryParams.GroupId)},
+                         {GroupStudentTable.StudentId},
+                         @{nameof(queryParams.CreationTime)}
+                    from unnest(@{nameof(queryParams.StudentIds)}) as {GroupStudentTable.StudentId}
+             on conflict ({GroupStudentTable.GroupId}, {GroupStudentTable.StudentId}) do nothing
+               returning {GroupStudentTable.StudentId};
+             """;
+
+        var command = new CommandDefinition(
+            Query,
+            queryParams,
+            _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+        var studentIds = await _connectionContext.Connection.QueryAsync<long>(command);
+
+        return studentIds.ToArrayBy(studentId => new StudentId(studentId));
+    }
+
     public async Task<bool> ExistsAsync(GroupStudent groupStudent, CancellationToken cancellationToken)
     {
         var queryParams = new
