@@ -330,24 +330,7 @@ public sealed class CreateSubmittedHomeworkIntegrationTests : CreateSubmittedHom
         exception.Which.Message.Should().Contain(nameof(request.StudentId));
     }
 
-    [Fact]
-    public async Task V1CreateSubmittedHomework_EmptyComment_ShouldReturnInvalidArgument()
-    {
-        // Arrange
-        var request = _fixture.Build<V1CreateSubmittedHomeworkRequest>()
-            .With(result => result.Comment, string.Empty)
-            .Create();
-
-        // Act
-        var act = async () => await CreateSubmittedHomeworkClient.V1CreateSubmittedHomeworkAsync(request);
-
-        // Assert
-        var exception = await act.Should().ThrowAsync<RpcException>();
-        exception.Which.StatusCode.Should().Be(StatusCode.InvalidArgument);
-        exception.Which.Message.Should().Contain(nameof(request.Comment));
-    }
-
-    private async Task<(long HomeworkId, long StudentId, string Comment)> GetSubmittedHomeworkAsync(long submittedHomeworkId)
+    private async Task<(long HomeworkId, long StudentId, string? Comment)> GetSubmittedHomeworkAsync(long submittedHomeworkId)
     {
         await using var connection = await Fixture.DataSource.OpenConnectionAsync();
         var row = await connection.QuerySingleAsync(

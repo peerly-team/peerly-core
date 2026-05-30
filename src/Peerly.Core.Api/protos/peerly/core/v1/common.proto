@@ -125,7 +125,7 @@ message File {
 
 message SubmittedHomeworkInfo {
   int64 id = 1;
-  string comment = 2;
+  google.protobuf.StringValue comment = 2;
   repeated File files = 3;
 }
 
