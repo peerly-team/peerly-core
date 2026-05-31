@@ -37,7 +37,7 @@ internal static class HomeworkControllerMapper
             Name = request.Name,
             AmountOfReviewers = request.AmountOfReviewers,
             Description = request.Description,
-            Checklist = request.Checklist,
+            RubricId = request.HasRubricId ? new RubricId(request.RubricId) : null,
             Deadline = request.Deadline.ToDateTimeOffset(),
             ReviewDeadline = request.ReviewDeadline.ToDateTimeOffset(),
             DiscrepancyThreshold = request.DiscrepancyThreshold
@@ -71,7 +71,7 @@ internal static class HomeworkControllerMapper
             Name = request.Name,
             AmountOfReviewers = request.AmountOfReviewers,
             Description = request.Description,
-            Checklist = request.Checklist,
+            RubricId = request.HasRubricId ? new RubricId(request.RubricId) : null,
             Deadline = request.Deadline.ToDateTimeOffset(),
             ReviewDeadline = request.ReviewDeadline.ToDateTimeOffset(),
             DiscrepancyThreshold = request.DiscrepancyThreshold
@@ -177,7 +177,7 @@ internal static class HomeworkControllerMapper
             Name = request.Name,
             AmountOfReviewers = request.AmountOfReviewers,
             Description = request.Description,
-            Checklist = request.Checklist,
+            RubricId = request.HasRubricId ? new RubricId(request.RubricId) : null,
             Deadline = request.Deadline.ToDateTimeOffset(),
             ReviewDeadline = request.ReviewDeadline.ToDateTimeOffset(),
             DiscrepancyThreshold = request.DiscrepancyThreshold
@@ -386,34 +386,46 @@ internal static class HomeworkControllerMapper
 
     private static Proto.StudentHomeworkInfo ToProto(this StudentHomeworkInfo hw)
     {
-        return new Proto.StudentHomeworkInfo
+        var proto = new Proto.StudentHomeworkInfo
         {
             Id = (long)hw.Id,
             Name = hw.Name,
             Status = hw.Status.ToProto(),
             Description = hw.Description,
-            Checklist = hw.CheckList,
             Deadline = hw.Deadline.ToTimestamp(),
             ReviewDeadline = hw.ReviewDeadline.ToTimestamp(),
             AmountOfReviewers = hw.AmountOfReviewers,
             IsHomeworkSubmitted = hw.IsHomeworkSubmitted
         };
+
+        if (hw.RubricId is not null)
+        {
+            proto.RubricId = (long)hw.RubricId.Value;
+        }
+
+        return proto;
     }
 
     private static Proto.TeacherHomeworkInfo ToProto(this TeacherHomeworkInfo hw)
     {
-        return new Proto.TeacherHomeworkInfo
+        var proto = new Proto.TeacherHomeworkInfo
         {
             Id = (long)hw.Id,
             Name = hw.Name,
             Status = hw.Status.ToProto(),
             Description = hw.Description,
-            Checklist = hw.CheckList,
             Deadline = hw.Deadline.ToTimestamp(),
             ReviewDeadline = hw.ReviewDeadline.ToTimestamp(),
             AmountOfReviewers = hw.AmountOfReviewers,
             DiscrepancyThreshold = hw.DiscrepancyThreshold
         };
+
+        if (hw.RubricId is not null)
+        {
+            proto.RubricId = (long)hw.RubricId.Value;
+        }
+
+        return proto;
     }
 
     private static SearchStudentHomeworksQueryFilter ToSearchStudentHomeworksFilter(this Proto.SearchHomeworksFilter filterProto)

@@ -31,7 +31,7 @@ service SubmissionService {
 message V1CreateSubmittedHomeworkRequest {
   int64 homework_id = 1;
   int64 student_id = 2;
-  string comment = 3;
+  google.protobuf.StringValue comment = 3;
 }
 
 message V1CreateSubmittedHomeworkResponse {
@@ -69,7 +69,7 @@ message V1CreateSubmittedHomeworkFileResponse {
 message V1UpdateSubmittedHomeworkRequest {
   int64 submitted_homework_id = 1;
   int64 student_id = 2;
-  string comment = 3;
+  google.protobuf.StringValue comment = 3;
 }
 
 message V1UpdateSubmittedHomeworkResponse {
@@ -149,10 +149,10 @@ message V1GetAssignedReviewResponse {
 
   message SubmissionForReview {
     int64 submitted_homework_id = 1;
-    string comment = 2;
+    google.protobuf.StringValue comment = 2;
     // NOTE: если файл содержит персональные данные, то передаем анонимизированную копию файла
     repeated File files = 3;
-    string checklist = 4;
+    optional int64 rubric_id = 4;
     optional int64 submitted_review_id = 5;
   }
 }
@@ -160,7 +160,7 @@ message V1GetAssignedReviewResponse {
 message V1CreateSubmittedReviewRequest {
   int64 submitted_homework_id = 1;
   int64 student_id = 2;
-  int32 mark = 3;
+  repeated SubmittedReviewScoreInput scores = 3;
   string comment = 4;
 }
 
@@ -179,7 +179,7 @@ message V1CreateSubmittedReviewResponse {
 message V1UpdateSubmittedReviewRequest {
   int64 submitted_review_id = 1;
   int64 student_id = 2;
-  int32 mark = 3;
+  repeated SubmittedReviewScoreInput scores = 3;
   string comment = 4;
 }
 

@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using Peerly.Core.Abstractions.ApplicationServices;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Abstractions;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.Shared;
 using Peerly.Core.ApplicationServices.Models.Common;
-using Peerly.Core.Models.Submissions;
 
 namespace Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedReview;
 
@@ -35,16 +35,15 @@ internal sealed class CreateSubmittedReviewHandler : ICommandHandler<CreateSubmi
         }
 
         await using var unitOfWork = await _commonUnitOfWorkFactory.CreateAsync(cancellationToken);
+        await using var operationSet = await unitOfWork.StartOperationSet(cancellationToken);
 
-        var submittedReviewAddItem = new SubmittedReviewAddItem
-        {
-            SubmittedHomeworkId = command.SubmittedHomeworkId,
-            StudentId = command.StudentId,
-            Mark = command.Mark,
-            Comment = command.Comment,
-            CreationTime = _clock.GetCurrentTime()
-        };
+        var submittedReviewAddItem = command.ToSubmittedReviewAddItem(_clock.GetCurrentTime());
         var submittedReviewId = await unitOfWork.SubmittedReviewRepository.AddAsync(submittedReviewAddItem, cancellationToken);
+
+        var scoreAddItems = command.Scores.ToSubmittedReviewScoreAddItems(submittedReviewId);
+        await unitOfWork.SubmittedReviewScoreRepository.BatchAddAsync(scoreAddItems, cancellationToken);
+
+        await operationSet.Complete(cancellationToken);
 
         return new CreateSubmittedReviewCommandResponse
         {

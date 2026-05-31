@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
@@ -28,6 +29,7 @@ public sealed class GetTeacherSubmittedHomeworkHandlerTests
     private readonly Mock<IReadOnlyStudentRepository> _studentRepositoryMock = new();
     private readonly Mock<IReadOnlyHomeworkRepository> _homeworkRepositoryMock = new();
     private readonly Mock<IReadOnlySubmittedHomeworkMarkRepository> _submittedHomeworkMarkRepositoryMock = new();
+    private readonly Mock<IReadOnlySubmittedReviewScoreRepository> _submittedReviewScoreRepositoryMock = new();
     private readonly Mock<IQueryValidator<GetTeacherSubmittedHomeworkQuery, GetTeacherSubmittedHomeworkQueryResponse>> _validatorMock = new();
 
     private readonly Fixture _fixture = new();
@@ -57,6 +59,7 @@ public sealed class GetTeacherSubmittedHomeworkHandlerTests
             _fixture.Build<SubmittedReview>()
                 .With(result => result.SubmittedHomeworkId, query.SubmittedHomeworkId)
                 .With(result => result.StudentId, reviewer.Id)
+                .With(result => result.Scores, [])
                 .Create()
         };
         var submittedHomeworkMark = _fixture.Build<SubmittedHomeworkMark>()
@@ -182,6 +185,13 @@ public sealed class GetTeacherSubmittedHomeworkHandlerTests
         _unitOfWorkMock
             .SetupGet(unitOfWork => unitOfWork.ReadOnlySubmittedHomeworkMarkRepository)
             .Returns(_submittedHomeworkMarkRepositoryMock.Object);
+        _unitOfWorkMock
+            .SetupGet(unitOfWork => unitOfWork.ReadOnlySubmittedReviewScoreRepository)
+            .Returns(_submittedReviewScoreRepositoryMock.Object);
+
+        _submittedReviewScoreRepositoryMock
+            .Setup(repository => repository.ListBySubmittedReviewIdsAsync(It.IsAny<IReadOnlyCollection<SubmittedReviewId>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
     }
 
     private void SetupValidatorSuccess(GetTeacherSubmittedHomeworkQuery query)

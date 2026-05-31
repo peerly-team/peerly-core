@@ -4,6 +4,7 @@ using OneOf.Types;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PublishHomework.Abstractions;
+using Peerly.Core.ApplicationServices.Features.Validations;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Models.Homeworks;
 
@@ -37,6 +38,11 @@ internal sealed class PublishHomeworkHandler : ICommandHandler<PublishHomeworkCo
         if (homework.Status is not HomeworkStatus.Draft)
         {
             return OtherError.Conflict();
+        }
+
+        if (homework.RubricId is null)
+        {
+            return ValidationError.From(RubricErrors.RubricNotFound);
         }
 
         await using var operationSet = await unitOfWork.StartOperationSet(cancellationToken);

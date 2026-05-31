@@ -33,6 +33,9 @@ public interface IReadOnlyHomeworkRepository
         PaginationInfo paginationInfo,
         CancellationToken cancellationToken);
 
+    Task<bool> ExistsByRubricIdAsync(RubricId rubricId, CancellationToken cancellationToken);
+    Task<bool> ExistsPublishedByRubricIdAsync(RubricId rubricId, CancellationToken cancellationToken);
+
     Task<StudentHomeworkInfo?> GetStudentHomeworkInfoAsync(HomeworkStudent homeworkStudent, CancellationToken cancellationToken);
     Task<IReadOnlyCollection<StudentHomeworkInfo>> ListStudentHomeworkInfosAsync(CourseStudent courseStudent, CancellationToken cancellationToken);
     Task<IReadOnlyCollection<StudentHomeworkInfo>> SearchStudentHomeworkInfosAsync(

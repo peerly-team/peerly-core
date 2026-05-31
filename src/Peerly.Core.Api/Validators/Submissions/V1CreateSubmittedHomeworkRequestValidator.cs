@@ -12,8 +12,5 @@ internal sealed class V1CreateSubmittedHomeworkRequestValidator : AbstractValida
 
         RuleFor(x => x.StudentId)
             .GreaterThan(0);
-
-        RuleFor(x => x.Comment)
-            .NotEmpty();
     }
 }

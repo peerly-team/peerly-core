@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
@@ -25,6 +26,7 @@ public sealed class GetSubmittedHomeworkHandlerTests
     private readonly Mock<IReadOnlySubmittedHomeworkFileRepository> _submittedHomeworkFileRepositoryMock = new();
     private readonly Mock<IReadOnlySubmittedReviewRepository> _submittedReviewRepositoryMock = new();
     private readonly Mock<IReadOnlySubmittedHomeworkMarkRepository> _submittedHomeworkMarkRepositoryMock = new();
+    private readonly Mock<IReadOnlySubmittedReviewScoreRepository> _submittedReviewScoreRepositoryMock = new();
     private readonly Fixture _fixture = new();
     private readonly GetSubmittedHomeworkHandler _handler;
 
@@ -48,8 +50,8 @@ public sealed class GetSubmittedHomeworkHandlerTests
         };
         var reviews = new[]
         {
-            _fixture.Build<SubmittedReview>().With(result => result.SubmittedHomeworkId, query.SubmittedHomeworkId).Create(),
-            _fixture.Build<SubmittedReview>().With(result => result.SubmittedHomeworkId, query.SubmittedHomeworkId).Create()
+            _fixture.Build<SubmittedReview>().With(result => result.SubmittedHomeworkId, query.SubmittedHomeworkId).With(result => result.Scores, []).Create(),
+            _fixture.Build<SubmittedReview>().With(result => result.SubmittedHomeworkId, query.SubmittedHomeworkId).With(result => result.Scores, []).Create()
         };
         var submittedHomeworkMark = _fixture.Build<SubmittedHomeworkMark>()
             .With(result => result.SubmittedHomeworkId, query.SubmittedHomeworkId)
@@ -293,5 +295,12 @@ public sealed class GetSubmittedHomeworkHandlerTests
         _unitOfWorkMock
             .SetupGet(unitOfWork => unitOfWork.ReadOnlySubmittedHomeworkMarkRepository)
             .Returns(_submittedHomeworkMarkRepositoryMock.Object);
+        _unitOfWorkMock
+            .SetupGet(unitOfWork => unitOfWork.ReadOnlySubmittedReviewScoreRepository)
+            .Returns(_submittedReviewScoreRepositoryMock.Object);
+
+        _submittedReviewScoreRepositoryMock
+            .Setup(repository => repository.ListBySubmittedReviewIdsAsync(It.IsAny<IReadOnlyCollection<SubmittedReviewId>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
     }
 }

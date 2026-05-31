@@ -42,7 +42,7 @@ internal sealed class HomeworkRepository : IHomeworkRepository
                     {HomeworkTable.Status},
                     {HomeworkTable.AmountOfReviewers},
                     {HomeworkTable.Description},
-                    {HomeworkTable.Checklist},
+                    {HomeworkTable.RubricId},
                     {HomeworkTable.Deadline},
                     {HomeworkTable.ReviewDeadline},
                     {HomeworkTable.DiscrepancyThreshold}
@@ -75,7 +75,7 @@ internal sealed class HomeworkRepository : IHomeworkRepository
                     h.{HomeworkTable.Status},
                     h.{HomeworkTable.AmountOfReviewers},
                     h.{HomeworkTable.Description},
-                    h.{HomeworkTable.Checklist},
+                    h.{HomeworkTable.RubricId},
                     h.{HomeworkTable.Deadline},
                     h.{HomeworkTable.ReviewDeadline},
                     (sh.{SubmittedHomeworkTable.HomeworkId} is not null) as is_homework_submitted
@@ -138,7 +138,7 @@ internal sealed class HomeworkRepository : IHomeworkRepository
                     {HomeworkTable.Status},
                     {HomeworkTable.AmountOfReviewers},
                     {HomeworkTable.Description},
-                    {HomeworkTable.Checklist},
+                    {HomeworkTable.RubricId},
                     {HomeworkTable.Deadline},
                     {HomeworkTable.ReviewDeadline},
                     {HomeworkTable.DiscrepancyThreshold}
@@ -175,7 +175,7 @@ internal sealed class HomeworkRepository : IHomeworkRepository
                     h.{HomeworkTable.Status},
                     h.{HomeworkTable.AmountOfReviewers},
                     h.{HomeworkTable.Description},
-                    h.{HomeworkTable.Checklist},
+                    h.{HomeworkTable.RubricId},
                     h.{HomeworkTable.Deadline},
                     h.{HomeworkTable.ReviewDeadline},
                     h.{HomeworkTable.DiscrepancyThreshold}
@@ -218,7 +218,7 @@ internal sealed class HomeworkRepository : IHomeworkRepository
                      h.{HomeworkTable.Status},
                      h.{HomeworkTable.AmountOfReviewers},
                      h.{HomeworkTable.Description},
-                     h.{HomeworkTable.Checklist},
+                     h.{HomeworkTable.RubricId},
                      h.{HomeworkTable.Deadline},
                      h.{HomeworkTable.ReviewDeadline},
                      (sh.{SubmittedHomeworkTable.HomeworkId} is not null) as is_homework_submitted
@@ -261,7 +261,7 @@ internal sealed class HomeworkRepository : IHomeworkRepository
                     h.{HomeworkTable.Status},
                     h.{HomeworkTable.AmountOfReviewers},
                     h.{HomeworkTable.Description},
-                    h.{HomeworkTable.Checklist},
+                    h.{HomeworkTable.RubricId},
                     h.{HomeworkTable.Deadline},
                     h.{HomeworkTable.ReviewDeadline},
                     h.{HomeworkTable.DiscrepancyThreshold}
@@ -312,7 +312,7 @@ internal sealed class HomeworkRepository : IHomeworkRepository
                     h.{HomeworkTable.Status},
                     h.{HomeworkTable.AmountOfReviewers},
                     h.{HomeworkTable.Description},
-                    h.{HomeworkTable.Checklist},
+                    h.{HomeworkTable.RubricId},
                     h.{HomeworkTable.Deadline},
                     h.{HomeworkTable.ReviewDeadline},
                     h.{HomeworkTable.DiscrepancyThreshold}
@@ -358,7 +358,7 @@ internal sealed class HomeworkRepository : IHomeworkRepository
                     h.{HomeworkTable.Status},
                     h.{HomeworkTable.AmountOfReviewers},
                     h.{HomeworkTable.Description},
-                    h.{HomeworkTable.Checklist},
+                    h.{HomeworkTable.RubricId},
                     h.{HomeworkTable.Deadline},
                     h.{HomeworkTable.ReviewDeadline},
                     (sh.{SubmittedHomeworkTable.HomeworkId} is not null) as is_homework_submitted
@@ -395,7 +395,7 @@ internal sealed class HomeworkRepository : IHomeworkRepository
             Status = item.Status.ToString(),
             item.AmountOfReviewers,
             item.Description,
-            item.Checklist,
+            RubricId = (long?)item.RubricId,
             item.Deadline,
             item.ReviewDeadline,
             item.DiscrepancyThreshold,
@@ -412,7 +412,7 @@ internal sealed class HomeworkRepository : IHomeworkRepository
                          {HomeworkTable.Status},
                          {HomeworkTable.AmountOfReviewers},
                          {HomeworkTable.Description},
-                         {HomeworkTable.Checklist},
+                         {HomeworkTable.RubricId},
                          {HomeworkTable.Deadline},
                          {HomeworkTable.ReviewDeadline},
                          {HomeworkTable.DiscrepancyThreshold},
@@ -425,7 +425,7 @@ internal sealed class HomeworkRepository : IHomeworkRepository
                          @{nameof(queryParams.Status)},
                          @{nameof(queryParams.AmountOfReviewers)},
                          @{nameof(queryParams.Description)},
-                         @{nameof(queryParams.Checklist)},
+                         @{nameof(queryParams.RubricId)},
                          @{nameof(queryParams.Deadline)},
                          @{nameof(queryParams.ReviewDeadline)},
                          @{nameof(queryParams.DiscrepancyThreshold)},
@@ -474,10 +474,10 @@ internal sealed class HomeworkRepository : IHomeworkRepository
                     then {configuration.GetParamName(item => item.Status)}
                     else {HomeworkTable.Status}
                     end,
-                    {HomeworkTable.Checklist} = case
-                    when {configuration.GetFlagParamName(item => item.Checklist)}
-                    then {configuration.GetParamName(item => item.Checklist)}
-                    else {HomeworkTable.Checklist}
+                    {HomeworkTable.RubricId} = case
+                    when {configuration.GetFlagParamName(item => item.RubricId)}
+                    then {configuration.GetParamName(item => item.RubricId)}
+                    else {HomeworkTable.RubricId}
                     end,
                     {HomeworkTable.AmountOfReviewers} = case
                     when {configuration.GetFlagParamName(item => item.AmountOfReviewers)}
@@ -535,5 +535,50 @@ internal sealed class HomeworkRepository : IHomeworkRepository
             transaction: _connectionContext.Transaction,
             cancellationToken: cancellationToken);
         await _connectionContext.Connection.ExecuteAsync(command);
+    }
+
+    public async Task<bool> ExistsByRubricIdAsync(RubricId rubricId, CancellationToken cancellationToken)
+    {
+        var queryParams = new { RubricId = (long)rubricId };
+
+        const string Query = $"""
+            select exists(
+                select 1
+                  from {HomeworkTable.TableName}
+                 where {HomeworkTable.RubricId} = @{nameof(queryParams.RubricId)});
+            """;
+
+        var command = new CommandDefinition(
+            Query,
+            queryParams,
+            _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+
+        return await _connectionContext.Connection.QuerySingleAsync<bool>(command);
+    }
+
+    public async Task<bool> ExistsPublishedByRubricIdAsync(RubricId rubricId, CancellationToken cancellationToken)
+    {
+        var queryParams = new
+        {
+            RubricId = (long)rubricId
+        };
+
+        const string Query =
+            $"""
+            select exists(
+                select 1
+                  from {HomeworkTable.TableName}
+                 where {HomeworkTable.RubricId} = @{nameof(queryParams.RubricId)}
+                   and {HomeworkTable.Status} = 'Published');
+            """;
+
+        var command = new CommandDefinition(
+            Query,
+            queryParams,
+            _connectionContext.Transaction,
+            cancellationToken: cancellationToken);
+
+        return await _connectionContext.Connection.QuerySingleAsync<bool>(command);
     }
 }

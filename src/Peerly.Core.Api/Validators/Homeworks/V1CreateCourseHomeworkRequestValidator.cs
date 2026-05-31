@@ -19,8 +19,9 @@ internal sealed class V1CreateCourseHomeworkRequestValidator : AbstractValidator
         RuleFor(x => x.Name)
             .NotEmpty();
 
-        RuleFor(x => x.Checklist)
-            .NotEmpty();
+        RuleFor(x => x.RubricId)
+            .GreaterThan(0)
+            .When(x => x.HasRubricId);
 
         RuleFor(x => x.DiscrepancyThreshold)
             .InclusiveBetween(1, 100);

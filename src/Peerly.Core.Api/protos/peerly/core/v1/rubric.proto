@@ -1,0 +1,92 @@
+syntax = "proto3";
+import "peerly/core/v1/common.proto";
+
+package peerly.core.v1;
+
+option csharp_namespace = "Peerly.Core.V1";
+
+service RubricService {
+  rpc V1CreateRubric(V1CreateRubricRequest) returns (V1CreateRubricResponse);
+  rpc V1UpdateRubric(V1UpdateRubricRequest) returns (V1UpdateRubricResponse);
+  rpc V1DeleteRubric(V1DeleteRubricRequest) returns (V1DeleteRubricResponse);
+  rpc V1GetTeacherRubric(V1GetTeacherRubricRequest) returns (V1GetTeacherRubricResponse);
+  rpc V1ListTeacherRubrics(V1ListTeacherRubricsRequest) returns (V1ListTeacherRubricsResponse);
+  rpc V1GetStudentRubric(V1GetStudentRubricRequest) returns (V1GetStudentRubricResponse);
+}
+
+message V1CreateRubricRequest {
+  int64 teacher_id = 1;
+  string name = 2;
+  repeated RubricCriterionInput criteria = 3;
+}
+
+message V1CreateRubricResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {
+    int64 rubric_id = 1;
+  }
+}
+
+message V1UpdateRubricRequest {
+  int64 rubric_id = 1;
+  int64 teacher_id = 2;
+  string name = 3;
+  repeated RubricCriterionInput criteria = 4;
+}
+
+message V1UpdateRubricResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}
+
+message V1DeleteRubricRequest {
+  int64 rubric_id = 1;
+  int64 teacher_id = 2;
+}
+
+message V1DeleteRubricResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {}
+}
+
+message V1GetTeacherRubricRequest {
+  int64 rubric_id = 1;
+  int64 teacher_id = 2;
+}
+
+message V1GetTeacherRubricResponse {
+  RubricInfo rubric = 1;
+  repeated RubricCriterionInfo criteria = 2;
+}
+
+message V1GetStudentRubricRequest {
+  int64 rubric_id = 1;
+  int64 student_id = 2;
+}
+
+message V1GetStudentRubricResponse {
+  repeated RubricCriterionInfo criteria = 1;
+}
+
+message V1ListTeacherRubricsRequest {
+  int64 teacher_id = 1;
+}
+
+message V1ListTeacherRubricsResponse {
+  repeated RubricInfo rubrics = 1;
+}

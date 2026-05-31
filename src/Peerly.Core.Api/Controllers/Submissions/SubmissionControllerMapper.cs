@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using OneOf.Types;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CorrectSubmittedHomeworkMark;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomework;
@@ -13,6 +14,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetSubmittedReview
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.GetTeacherSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.ListAssignedReviews;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.ListSubmittedHomeworkOverview;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.Shared.Models;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.UpdateSubmittedReview;
 using Peerly.Core.ApplicationServices.Models.Common;
@@ -201,12 +203,33 @@ internal static class SubmissionControllerMapper
 
     private static Proto.SubmittedReviewInfo ToProto(this SubmittedReview review)
     {
-        return new Proto.SubmittedReviewInfo
+        var proto = new Proto.SubmittedReviewInfo
         {
             Id = (long)review.Id,
             Mark = review.Mark,
             Comment = review.Comment
         };
+
+        proto.Scores.AddRange(review.Scores.Select(ToProto));
+
+        return proto;
+    }
+
+    private static Proto.SubmittedReviewScoreInfo ToProto(this SubmittedReviewScore score)
+    {
+        var proto = new Proto.SubmittedReviewScoreInfo
+        {
+            Id = (long)score.Id,
+            RubricCriterionId = (long)score.RubricCriterionId,
+            Score = score.Score
+        };
+
+        if (score.Comment is { } comment)
+        {
+            proto.Comment = comment;
+        }
+
+        return proto;
     }
 
     public static ListAssignedReviewsQuery ToListAssignedReviewsQuery(this Proto.V1ListAssignedReviewsRequest request)
@@ -306,9 +329,13 @@ internal static class SubmissionControllerMapper
         {
             SubmittedHomeworkId = (long)queryResponse.SubmittedHomeworkId,
             Comment = queryResponse.Comment,
-            Checklist = queryResponse.Checklist,
             Files = { queryResponse.Files.ToArrayBy(file => file.ToProto()) }
         };
+
+        if (queryResponse.RubricId is { } rubricId)
+        {
+            submission.RubricId = (long)rubricId;
+        }
 
         if (queryResponse.SubmittedReviewId is { } submittedReviewId)
         {
@@ -316,6 +343,16 @@ internal static class SubmissionControllerMapper
         }
 
         return new Proto.V1GetAssignedReviewResponse { Submission = submission };
+    }
+
+    private static SubmittedReviewScoreItem ToScoreItem(this Proto.SubmittedReviewScoreInput input)
+    {
+        return new SubmittedReviewScoreItem
+        {
+            RubricCriterionId = new RubricCriterionId(input.RubricCriterionId),
+            Score = input.Score,
+            Comment = input.HasComment ? input.Comment : null
+        };
     }
 
     public static GetTeacherSubmittedHomeworkQuery ToGetTeacherSubmittedHomeworkQuery(this Proto.V1GetTeacherSubmittedHomeworkRequest request)
@@ -393,7 +430,7 @@ internal static class SubmissionControllerMapper
         {
             SubmittedReviewId = new SubmittedReviewId(request.SubmittedReviewId),
             StudentId = new StudentId(request.StudentId),
-            Mark = request.Mark,
+            Scores = request.Scores.Select(s => s.ToScoreItem()).ToArray(),
             Comment = request.Comment
         };
     }
@@ -418,7 +455,7 @@ internal static class SubmissionControllerMapper
         {
             SubmittedHomeworkId = new SubmittedHomeworkId(request.SubmittedHomeworkId),
             StudentId = new StudentId(request.StudentId),
-            Mark = request.Mark,
+            Scores = request.Scores.Select(s => s.ToScoreItem()).ToArray(),
             Comment = request.Comment
         };
     }

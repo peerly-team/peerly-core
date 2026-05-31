@@ -8,5 +8,5 @@ public sealed record UpdateSubmittedHomeworkCommand : ICommand<Success>
 {
     public required SubmittedHomeworkId SubmittedHomeworkId { get; init; }
     public required StudentId StudentId { get; init; }
-    public required string Comment { get; init; }
+    public required string? Comment { get; init; }
 }

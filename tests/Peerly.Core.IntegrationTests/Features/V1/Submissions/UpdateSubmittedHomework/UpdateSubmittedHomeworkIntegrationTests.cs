@@ -336,22 +336,7 @@ public sealed class UpdateSubmittedHomeworkIntegrationTests : UpdateSubmittedHom
         exception.Which.Message.Should().Contain(nameof(request.StudentId));
     }
 
-    [Fact]
-    public async Task V1UpdateSubmittedHomework_EmptyComment_ShouldReturnInvalidArgument()
-    {
-        // Arrange
-        var request = CreateValidRequest(1, 1, string.Empty);
-
-        // Act
-        var act = async () => await UpdateSubmittedHomeworkClient.V1UpdateSubmittedHomeworkAsync(request);
-
-        // Assert
-        var exception = await act.Should().ThrowAsync<RpcException>();
-        exception.Which.StatusCode.Should().Be(StatusCode.InvalidArgument);
-        exception.Which.Message.Should().Contain(nameof(request.Comment));
-    }
-
-    private static V1UpdateSubmittedHomeworkRequest CreateValidRequest(long submittedHomeworkId, long studentId, string comment)
+    private static V1UpdateSubmittedHomeworkRequest CreateValidRequest(long submittedHomeworkId, long studentId, string? comment)
     {
         return new V1UpdateSubmittedHomeworkRequest
         {
@@ -361,10 +346,10 @@ public sealed class UpdateSubmittedHomeworkIntegrationTests : UpdateSubmittedHom
         };
     }
 
-    private async Task<string> GetSubmittedHomeworkCommentAsync(long submittedHomeworkId)
+    private async Task<string?> GetSubmittedHomeworkCommentAsync(long submittedHomeworkId)
     {
         await using var connection = await Fixture.DataSource.OpenConnectionAsync();
-        return await connection.QuerySingleAsync<string>(
+        return await connection.QuerySingleAsync<string?>(
             "select comment from submitted_homeworks where id = @submittedHomeworkId",
             new { submittedHomeworkId });
     }

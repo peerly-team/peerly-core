@@ -41,6 +41,11 @@ internal sealed class GetTeacherSubmittedHomeworkHandler : IQueryHandler<GetTeac
         var files = await unitOfWork.ReadOnlySubmittedHomeworkFileRepository.ListBySubmittedHomeworkAsync(submittedHomeworkId, cancellationToken);
         var reviews = await unitOfWork.ReadOnlySubmittedReviewRepository.ListBySubmittedHomeworkAsync(submittedHomeworkId, cancellationToken);
 
+        var reviewIds = reviews.ToArrayBy(r => r.Id);
+        var allScores = await unitOfWork.ReadOnlySubmittedReviewScoreRepository.ListBySubmittedReviewIdsAsync(reviewIds, cancellationToken);
+        var scoresByReview = allScores.ToLookup(s => s.SubmittedReviewId);
+        var enrichedReviews = reviews.ToArrayBy(r => r with { Scores = scoresByReview[r.Id].ToArray() });
+
         var studentById = await GetStudentByIdAsync(unitOfWork, reviews, submittedHomework.StudentId, cancellationToken);
 
         var homework = await unitOfWork.ReadOnlyHomeworkRepository.GetAsync(submittedHomework.HomeworkId, cancellationToken);
@@ -53,7 +58,7 @@ internal sealed class GetTeacherSubmittedHomeworkHandler : IQueryHandler<GetTeac
             SubmittedHomework = submittedHomework,
             Student = studentById[submittedHomework.StudentId],
             Files = files,
-            SubmittedReviews = reviews.ToArrayBy(review => review.ToTeacherSubmittedReview(studentById[review.StudentId])),
+            SubmittedReviews = enrichedReviews.ToArrayBy(review => review.ToTeacherSubmittedReview(studentById[review.StudentId])),
             ReviewersMark = submittedHomeworkMark?.ReviewersMark,
             TeacherMark = submittedHomeworkMark?.TeacherMark
         };

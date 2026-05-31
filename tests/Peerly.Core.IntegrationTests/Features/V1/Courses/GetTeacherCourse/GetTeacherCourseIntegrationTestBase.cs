@@ -227,7 +227,7 @@ public abstract class GetTeacherCourseIntegrationTestBase : IAsyncLifetime
             });
     }
 
-    protected async Task AddHomeworkInDbAsync(long courseId, long teacherId, string name)
+    protected async Task AddHomeworkInDbAsync(long courseId, long teacherId, string name, long? rubricId = null)
     {
         await using var connection = await Fixture.DataSource.OpenConnectionAsync();
 
@@ -240,10 +240,10 @@ public abstract class GetTeacherCourseIntegrationTestBase : IAsyncLifetime
                 status,
                 amount_of_reviewers,
                 description,
-                checklist,
                 deadline,
                 review_deadline,
                 discrepancy_threshold,
+                rubric_id,
                 creation_time)
             values (
                 @courseId,
@@ -252,10 +252,10 @@ public abstract class GetTeacherCourseIntegrationTestBase : IAsyncLifetime
                 @status,
                 @amountOfReviewers,
                 @description,
-                @checklist,
                 @deadline,
                 @reviewDeadline,
                 @discrepancyThreshold,
+                @rubricId,
                 @creationTime);
             """;
 
@@ -269,10 +269,10 @@ public abstract class GetTeacherCourseIntegrationTestBase : IAsyncLifetime
                 status = HomeworkStatusModel.Draft.ToString(),
                 amountOfReviewers = 1,
                 description = $"Description {name}",
-                checklist = $"Checklist {name}",
                 deadline = DateTimeOffset.UtcNow.AddDays(7),
                 reviewDeadline = DateTimeOffset.UtcNow.AddDays(14),
                 discrepancyThreshold = 1,
+                rubricId,
                 creationTime = DateTimeOffset.UtcNow
             });
     }

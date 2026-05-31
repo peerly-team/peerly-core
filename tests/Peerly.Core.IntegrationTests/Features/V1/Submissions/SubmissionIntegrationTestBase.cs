@@ -125,13 +125,35 @@ public abstract class SubmissionIntegrationTestBase : IAsyncLifetime
         await connection.ExecuteAsync(Query, new { groupId, studentId, creationTime = DateTimeOffset.UtcNow });
     }
 
+    protected async Task<long> AddRubricInDbAsync(long teacherId)
+    {
+        await using var connection = await Fixture.DataSource.OpenConnectionAsync();
+
+        const string Query =
+            """
+            insert into rubrics (teacher_id, name, creation_time)
+            values (@teacherId, @name, @creationTime)
+            returning id;
+            """;
+
+        return await connection.QuerySingleAsync<long>(
+            Query,
+            new
+            {
+                teacherId,
+                name = $"Rubric {Guid.NewGuid():N}",
+                creationTime = DateTimeOffset.UtcNow
+            });
+    }
+
     protected async Task<long> AddHomeworkInDbAsync(
         long courseId,
         long teacherId,
         HomeworkStatus status,
         DateTimeOffset? reviewDeadline = null,
         long? groupId = null,
-        DateTimeOffset? deadline = null)
+        DateTimeOffset? deadline = null,
+        long? rubricId = null)
     {
         await using var connection = await Fixture.DataSource.OpenConnectionAsync();
 
@@ -139,12 +161,12 @@ public abstract class SubmissionIntegrationTestBase : IAsyncLifetime
             """
             insert into homeworks (
                 course_id, group_id, teacher_id, name, status,
-                amount_of_reviewers, description, checklist,
-                deadline, review_deadline, discrepancy_threshold, creation_time)
+                amount_of_reviewers, description,
+                deadline, review_deadline, discrepancy_threshold, rubric_id, creation_time)
             values (
                 @courseId, @groupId, @teacherId, @name, @status,
-                @amountOfReviewers, @description, @checklist,
-                @deadline, @reviewDeadline, @discrepancyThreshold, @creationTime)
+                @amountOfReviewers, @description,
+                @deadline, @reviewDeadline, @discrepancyThreshold, @rubricId, @creationTime)
             returning id;
             """;
 
@@ -159,10 +181,35 @@ public abstract class SubmissionIntegrationTestBase : IAsyncLifetime
                 status = status.ToString(),
                 amountOfReviewers = 2,
                 description = "Description",
-                checklist = "Checklist",
                 deadline = deadline ?? DateTimeOffset.UtcNow.AddDays(7),
                 reviewDeadline = reviewDeadline ?? DateTimeOffset.UtcNow.AddDays(14),
                 discrepancyThreshold = 2,
+                rubricId,
+                creationTime = DateTimeOffset.UtcNow
+            });
+    }
+
+    protected async Task<long> AddRubricCriterionInDbAsync(long rubricId, int maxScore = 100)
+    {
+        await using var connection = await Fixture.DataSource.OpenConnectionAsync();
+
+        const string Query =
+            """
+            insert into rubric_criteria (rubric_id, name, description, max_score, comment_required, position, creation_time)
+            values (@rubricId, @name, @description, @maxScore, @commentRequired, @position, @creationTime)
+            returning id;
+            """;
+
+        return await connection.QuerySingleAsync<long>(
+            Query,
+            new
+            {
+                rubricId,
+                name = $"Criterion {Guid.NewGuid():N}",
+                description = "Test criterion",
+                maxScore,
+                commentRequired = false,
+                position = 1,
                 creationTime = DateTimeOffset.UtcNow
             });
     }

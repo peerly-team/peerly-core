@@ -38,7 +38,7 @@ internal sealed class GetAssignedReviewHandler : IQueryHandler<GetAssignedReview
         {
             SubmittedHomeworkId = submission.Id,
             Comment = submission.Comment,
-            Checklist = homework.CheckList,
+            RubricId = homework.RubricId,
             Files = files,
             SubmittedReviewId = submittedReviewId
         };

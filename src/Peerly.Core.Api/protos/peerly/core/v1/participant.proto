@@ -8,6 +8,7 @@ option csharp_namespace = "Peerly.Core.V1.Proto";
 
 service ParticipantService {
   rpc V1AddGroupStudent(V1AddGroupStudentRequest) returns (V1AddGroupStudentResponse);
+  rpc V1BulkAddGroupStudents(V1BulkAddGroupStudentsRequest) returns (V1BulkAddGroupStudentsResponse);
   rpc V1AddGroupTeacher(V1AddGroupTeacherRequest) returns (V1AddGroupTeacherResponse);
   rpc V1ListCourseParticipants(V1ListCourseParticipantsRequest) returns (V1ListCourseParticipantsResponse);
   rpc V1ListGroupParticipants(V1ListGroupParticipantsRequest) returns (V1ListGroupParticipantsResponse);
@@ -27,6 +28,36 @@ message V1AddGroupStudentResponse {
   }
 
   message Success {}
+}
+
+message V1BulkAddGroupStudentsRequest {
+  int64 group_id = 1;
+  repeated int64 student_ids = 2;
+  int64 teacher_id = 3;
+}
+
+message V1BulkAddGroupStudentsResponse {
+  oneof response {
+    Success success_response = 1;
+    ValidationError validation_error = 2;
+    OtherError other_error = 3;
+  }
+
+  message Success {
+    repeated int64 added_student_ids = 1;
+    repeated SkippedStudentInfo skipped_student_infos = 2;
+  }
+
+  message SkippedStudentInfo {
+    int64 student_id = 1;
+    SkipReason reason = 2;
+  }
+
+  enum SkipReason {
+    SKIP_REASON_UNSPECIFIED = 0;
+    SKIP_REASON_ALREADY_IN_GROUP = 1;
+    SKIP_REASON_NOT_FOUND = 2;
+  }
 }
 
 message V1AddGroupTeacherRequest {

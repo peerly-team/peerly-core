@@ -4,6 +4,7 @@ using OneOf.Types;
 using Peerly.Core.Abstractions.ApplicationServices;
 using Peerly.Core.Abstractions.UnitOfWork;
 using Peerly.Core.ApplicationServices.Abstractions;
+using Peerly.Core.ApplicationServices.Features.V1.Submissions.Shared.Validators;
 using Peerly.Core.ApplicationServices.Features.Validations;
 using Peerly.Core.ApplicationServices.Models.Common;
 using Peerly.Core.Models.Homeworks;
@@ -53,6 +54,14 @@ internal sealed class UpdateSubmittedReviewCommandValidator : ICommandValidator<
             return ValidationError.From(HomeworkErrors.HomeworkNotAcceptingReviews);
         }
 
-        return CommandValidationResult.Ok();
+        if (homework.RubricId is null)
+        {
+            return OtherError.NotFound(HomeworkErrors.HomeworkRubricNotFound);
+        }
+
+        var criteria = await unitOfWork.ReadOnlyRubricCriterionRepository.ListByRubricIdAsync(homework.RubricId.Value, cancellationToken);
+        var scoresValidation = SubmittedReviewCommonValidator.ValidateScoresAgainstCriteria(command.Scores, criteria);
+
+        return scoresValidation ?? CommandValidationResult.Ok();
     }
 }

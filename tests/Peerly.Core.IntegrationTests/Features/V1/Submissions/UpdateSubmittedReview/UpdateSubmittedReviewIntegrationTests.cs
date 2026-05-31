@@ -35,16 +35,19 @@ public sealed class UpdateSubmittedReviewIntegrationTests : UpdateSubmittedRevie
         await AddStudentInDbAsync(reviewerStudentId);
         await AddStudentInDbAsync(otherReviewerStudentId);
 
-        var homeworkId = await AddHomeworkInDbAsync(courseId, teacherId, HomeworkStatusModel.Reviewing);
+        var rubricId = await AddRubricInDbAsync(teacherId);
+        var criterionId = await AddRubricCriterionInDbAsync(rubricId);
+
+        var homeworkId = await AddHomeworkInDbAsync(courseId, teacherId, HomeworkStatusModel.Reviewing, rubricId: rubricId);
         var submittedHomeworkId = await AddSubmittedHomeworkInDbAsync(homeworkId, ownerStudentId);
         var submittedReviewId = await AddSubmittedReviewInDbAsync(submittedHomeworkId, reviewerStudentId, mark: 50, comment: "Old comment");
         var otherSubmittedReviewId = await AddSubmittedReviewInDbAsync(submittedHomeworkId, otherReviewerStudentId, mark: 70, comment: "Other comment");
         var request = _fixture.Build<V1UpdateSubmittedReviewRequest>()
             .With(result => result.SubmittedReviewId, submittedReviewId)
             .With(result => result.StudentId, reviewerStudentId)
-            .With(result => result.Mark, 95)
             .With(result => result.Comment, "Updated comment")
             .Create();
+        request.Scores.Add(new SubmittedReviewScoreInput { RubricCriterionId = criterionId, Score = 95 });
 
         // Act
         var response = await UpdateSubmittedReviewClient.V1UpdateSubmittedReviewAsync(request);
@@ -53,11 +56,9 @@ public sealed class UpdateSubmittedReviewIntegrationTests : UpdateSubmittedRevie
         response.ResponseCase.Should().Be(V1UpdateSubmittedReviewResponse.ResponseOneofCase.SuccessResponse);
 
         var targetSubmittedReview = await GetSubmittedReviewAsync(submittedReviewId);
-        targetSubmittedReview.Mark.Should().Be(request.Mark);
         targetSubmittedReview.Comment.Should().Be(request.Comment);
 
         var otherSubmittedReview = await GetSubmittedReviewAsync(otherSubmittedReviewId);
-        otherSubmittedReview.Mark.Should().Be(70);
         otherSubmittedReview.Comment.Should().Be("Other comment");
     }
 
@@ -68,8 +69,8 @@ public sealed class UpdateSubmittedReviewIntegrationTests : UpdateSubmittedRevie
         var request = _fixture.Build<V1UpdateSubmittedReviewRequest>()
             .With(result => result.SubmittedReviewId, _fixture.Create<long>())
             .With(result => result.StudentId, _fixture.Create<long>())
-            .With(result => result.Mark, 95)
             .Create();
+        request.Scores.Add(new SubmittedReviewScoreInput { RubricCriterionId = 1, Score = 95 });
 
         // Act
         var response = await UpdateSubmittedReviewClient.V1UpdateSubmittedReviewAsync(request);
@@ -101,9 +102,9 @@ public sealed class UpdateSubmittedReviewIntegrationTests : UpdateSubmittedRevie
         var request = _fixture.Build<V1UpdateSubmittedReviewRequest>()
             .With(result => result.SubmittedReviewId, submittedReviewId)
             .With(result => result.StudentId, requestingStudentId)
-            .With(result => result.Mark, 95)
             .With(result => result.Comment, "Updated comment")
             .Create();
+        request.Scores.Add(new SubmittedReviewScoreInput { RubricCriterionId = 1, Score = 95 });
 
         // Act
         var response = await UpdateSubmittedReviewClient.V1UpdateSubmittedReviewAsync(request);
@@ -113,7 +114,6 @@ public sealed class UpdateSubmittedReviewIntegrationTests : UpdateSubmittedRevie
         response.OtherError.Type.Should().Be(OtherError.Types.ErrorType.PermissionDenied);
 
         var submittedReview = await GetSubmittedReviewAsync(submittedReviewId);
-        submittedReview.Mark.Should().Be(50);
         submittedReview.Comment.Should().Be("Old comment");
     }
 
@@ -130,9 +130,9 @@ public sealed class UpdateSubmittedReviewIntegrationTests : UpdateSubmittedRevie
         var request = _fixture.Build<V1UpdateSubmittedReviewRequest>()
             .With(result => result.SubmittedReviewId, submittedReviewId)
             .With(result => result.StudentId, reviewerStudentId)
-            .With(result => result.Mark, 95)
             .With(result => result.Comment, "Updated comment")
             .Create();
+        request.Scores.Add(new SubmittedReviewScoreInput { RubricCriterionId = 1, Score = 95 });
 
         // Act
         var response = await UpdateSubmittedReviewClient.V1UpdateSubmittedReviewAsync(request);
@@ -143,7 +143,6 @@ public sealed class UpdateSubmittedReviewIntegrationTests : UpdateSubmittedRevie
         response.OtherError.Message.Should().Be("Отправленный ответ к домашнему заданию не найден");
 
         var submittedReview = await GetSubmittedReviewAsync(submittedReviewId);
-        submittedReview.Mark.Should().Be(50);
         submittedReview.Comment.Should().Be("Old comment");
     }
 
@@ -163,9 +162,9 @@ public sealed class UpdateSubmittedReviewIntegrationTests : UpdateSubmittedRevie
         var request = _fixture.Build<V1UpdateSubmittedReviewRequest>()
             .With(result => result.SubmittedReviewId, submittedReviewId)
             .With(result => result.StudentId, reviewerStudentId)
-            .With(result => result.Mark, 95)
             .With(result => result.Comment, "Updated comment")
             .Create();
+        request.Scores.Add(new SubmittedReviewScoreInput { RubricCriterionId = 1, Score = 95 });
 
         // Act
         var response = await UpdateSubmittedReviewClient.V1UpdateSubmittedReviewAsync(request);
@@ -176,7 +175,6 @@ public sealed class UpdateSubmittedReviewIntegrationTests : UpdateSubmittedRevie
         response.OtherError.Message.Should().Be("Домашнее задание не найдено");
 
         var submittedReview = await GetSubmittedReviewAsync(submittedReviewId);
-        submittedReview.Mark.Should().Be(50);
         submittedReview.Comment.Should().Be("Old comment");
     }
 
@@ -203,9 +201,9 @@ public sealed class UpdateSubmittedReviewIntegrationTests : UpdateSubmittedRevie
         var request = _fixture.Build<V1UpdateSubmittedReviewRequest>()
             .With(result => result.SubmittedReviewId, submittedReviewId)
             .With(result => result.StudentId, reviewerStudentId)
-            .With(result => result.Mark, 95)
             .With(result => result.Comment, "Updated comment")
             .Create();
+        request.Scores.Add(new SubmittedReviewScoreInput { RubricCriterionId = 1, Score = 95 });
 
         // Act
         var response = await UpdateSubmittedReviewClient.V1UpdateSubmittedReviewAsync(request);
@@ -215,7 +213,6 @@ public sealed class UpdateSubmittedReviewIntegrationTests : UpdateSubmittedRevie
         response.ValidationError.Errors.Should().ContainSingle("Проверка домашнего задания закрыта");
 
         var submittedReview = await GetSubmittedReviewAsync(submittedReviewId);
-        submittedReview.Mark.Should().Be(50);
         submittedReview.Comment.Should().Be("Old comment");
     }
 
@@ -238,9 +235,9 @@ public sealed class UpdateSubmittedReviewIntegrationTests : UpdateSubmittedRevie
         var request = _fixture.Build<V1UpdateSubmittedReviewRequest>()
             .With(result => result.SubmittedReviewId, submittedReviewId)
             .With(result => result.StudentId, reviewerStudentId)
-            .With(result => result.Mark, 95)
             .With(result => result.Comment, "Updated comment")
             .Create();
+        request.Scores.Add(new SubmittedReviewScoreInput { RubricCriterionId = 1, Score = 95 });
 
         // Act
         var response = await UpdateSubmittedReviewClient.V1UpdateSubmittedReviewAsync(request);
@@ -250,7 +247,6 @@ public sealed class UpdateSubmittedReviewIntegrationTests : UpdateSubmittedRevie
         response.ValidationError.Errors.Should().ContainSingle("Проверка домашнего задания закрыта");
 
         var submittedReview = await GetSubmittedReviewAsync(submittedReviewId);
-        submittedReview.Mark.Should().Be(50);
         submittedReview.Comment.Should().Be("Old comment");
     }
 
@@ -263,8 +259,8 @@ public sealed class UpdateSubmittedReviewIntegrationTests : UpdateSubmittedRevie
         var request = _fixture.Build<V1UpdateSubmittedReviewRequest>()
             .With(result => result.SubmittedReviewId, submittedReviewId)
             .With(result => result.StudentId, 1)
-            .With(result => result.Mark, 95)
             .Create();
+        request.Scores.Add(new SubmittedReviewScoreInput { RubricCriterionId = 1, Score = 95 });
 
         // Act
         var act = async () => await UpdateSubmittedReviewClient.V1UpdateSubmittedReviewAsync(request);
@@ -284,8 +280,8 @@ public sealed class UpdateSubmittedReviewIntegrationTests : UpdateSubmittedRevie
         var request = _fixture.Build<V1UpdateSubmittedReviewRequest>()
             .With(result => result.SubmittedReviewId, 1)
             .With(result => result.StudentId, studentId)
-            .With(result => result.Mark, 95)
             .Create();
+        request.Scores.Add(new SubmittedReviewScoreInput { RubricCriterionId = 1, Score = 95 });
 
         // Act
         var act = async () => await UpdateSubmittedReviewClient.V1UpdateSubmittedReviewAsync(request);
@@ -296,17 +292,15 @@ public sealed class UpdateSubmittedReviewIntegrationTests : UpdateSubmittedRevie
         exception.Which.Message.Should().Contain(nameof(request.StudentId));
     }
 
-    [Theory]
-    [InlineData(-1)]
-    [InlineData(101)]
-    public async Task V1UpdateSubmittedReview_MarkOutOfRange_ShouldReturnInvalidArgument(int mark)
+    [Fact]
+    public async Task V1UpdateSubmittedReview_ScoreOutOfRange_ShouldReturnInvalidArgument()
     {
         // Arrange
         var request = _fixture.Build<V1UpdateSubmittedReviewRequest>()
             .With(result => result.SubmittedReviewId, 1)
             .With(result => result.StudentId, 1)
-            .With(result => result.Mark, mark)
             .Create();
+        request.Scores.Add(new SubmittedReviewScoreInput { RubricCriterionId = 1, Score = -1 });
 
         // Act
         var act = async () => await UpdateSubmittedReviewClient.V1UpdateSubmittedReviewAsync(request);
@@ -314,7 +308,7 @@ public sealed class UpdateSubmittedReviewIntegrationTests : UpdateSubmittedRevie
         // Assert
         var exception = await act.Should().ThrowAsync<RpcException>();
         exception.Which.StatusCode.Should().Be(StatusCode.InvalidArgument);
-        exception.Which.Message.Should().Contain(nameof(request.Mark));
+        exception.Which.Message.Should().Contain("Score");
     }
 
     [Fact]
@@ -324,9 +318,9 @@ public sealed class UpdateSubmittedReviewIntegrationTests : UpdateSubmittedRevie
         var request = _fixture.Build<V1UpdateSubmittedReviewRequest>()
             .With(result => result.SubmittedReviewId, 1)
             .With(result => result.StudentId, 1)
-            .With(result => result.Mark, 95)
             .With(result => result.Comment, string.Empty)
             .Create();
+        request.Scores.Add(new SubmittedReviewScoreInput { RubricCriterionId = 1, Score = 95 });
 
         // Act
         var act = async () => await UpdateSubmittedReviewClient.V1UpdateSubmittedReviewAsync(request);
@@ -337,12 +331,12 @@ public sealed class UpdateSubmittedReviewIntegrationTests : UpdateSubmittedRevie
         exception.Which.Message.Should().Contain(nameof(request.Comment));
     }
 
-    private async Task<(int Mark, string Comment)> GetSubmittedReviewAsync(long submittedReviewId)
+    private async Task<(string Comment, long Id)> GetSubmittedReviewAsync(long submittedReviewId)
     {
         await using var connection = await Fixture.DataSource.OpenConnectionAsync();
         var row = await connection.QuerySingleAsync(
-            "select mark, comment from submitted_reviews where id = @submittedReviewId",
+            "select comment, id from submitted_reviews where id = @submittedReviewId",
             new { submittedReviewId });
-        return (row.mark, row.comment);
+        return (row.comment, row.id);
     }
 }

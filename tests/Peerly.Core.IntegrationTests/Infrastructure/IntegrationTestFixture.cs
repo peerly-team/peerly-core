@@ -19,6 +19,7 @@ using Peerly.Core.IntegrationTests.Features.V1.Homeworks.ListStudentCourseHomewo
 using Peerly.Core.IntegrationTests.Features.V1.Homeworks.ListTeacherCourseHomeworks.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Homeworks.SearchStudentHomeworks.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Homeworks.SearchTeacherHomeworks.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Participants.BulkAddGroupStudents.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CorrectSubmittedHomeworkMark.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CreateSubmittedHomework.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.CreateSubmittedHomeworkFile.Infrastructure;
@@ -34,6 +35,12 @@ using Peerly.Core.IntegrationTests.Features.V1.Submissions.ListAssignedReviews.I
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.ListSubmittedHomeworkOverview.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.UpdateSubmittedHomework.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Submissions.UpdateSubmittedReview.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Rubrics.CreateRubric.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Rubrics.DeleteRubric.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Rubrics.GetStudentRubric.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Rubrics.GetTeacherRubric.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Rubrics.ListTeacherRubrics.Infrastructure;
+using Peerly.Core.IntegrationTests.Features.V1.Rubrics.UpdateRubric.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Users.GetStudent.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Users.GetTeacher.Infrastructure;
 using Peerly.Core.IntegrationTests.Features.V1.Users.SearchUsers.Infrastructure;
@@ -73,6 +80,7 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
     public PublishCourseGrpcClient PublishCourseClient => ApplicationFactory.PublishCourseClient();
     public DeleteCourseGrpcClient DeleteCourseClient => ApplicationFactory.DeleteCourseClient();
     public CreateGroupGrpcClient CreateGroupClient => ApplicationFactory.CreateGroupClient();
+    public BulkAddGroupStudentsGrpcClient BulkAddGroupStudentsClient => ApplicationFactory.BulkAddGroupStudentsClient();
     public DeleteHomeworkGrpcClient DeleteHomeworkClient => ApplicationFactory.DeleteHomeworkClient();
     public DeleteHomeworkFileGrpcClient DeleteHomeworkFileClient => ApplicationFactory.DeleteHomeworkFileClient();
     public GetStudentHomeworkGrpcClient GetStudentHomeworkClient => ApplicationFactory.GetStudentHomeworkClient();
@@ -101,6 +109,12 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
     public GetTeacherGrpcClient GetTeacherClient => ApplicationFactory.GetTeacherClient();
     public UpdateStudentGrpcClient UpdateStudentClient => ApplicationFactory.UpdateStudentClient();
     public UpdateTeacherGrpcClient UpdateTeacherClient => ApplicationFactory.UpdateTeacherClient();
+    public CreateRubricGrpcClient CreateRubricClient => ApplicationFactory.CreateRubricClient();
+    public DeleteRubricGrpcClient DeleteRubricClient => ApplicationFactory.DeleteRubricClient();
+    public UpdateRubricGrpcClient UpdateRubricClient => ApplicationFactory.UpdateRubricClient();
+    public GetTeacherRubricGrpcClient GetTeacherRubricClient => ApplicationFactory.GetTeacherRubricClient();
+    public GetStudentRubricGrpcClient GetStudentRubricClient => ApplicationFactory.GetStudentRubricClient();
+    public ListTeacherRubricsGrpcClient ListTeacherRubricsClient => ApplicationFactory.ListTeacherRubricsClient();
 
     public async Task InitializeAsync()
     {

@@ -27,7 +27,7 @@ internal static class CreateGroupHomeworkHandlerMapper
             Status = HomeworkStatus.Draft,
             AmountOfReviewers = command.AmountOfReviewers,
             Description = command.Description,
-            Checklist = command.Checklist,
+            RubricId = command.RubricId,
             Deadline = command.Deadline,
             ReviewDeadline = command.ReviewDeadline,
             DiscrepancyThreshold = command.DiscrepancyThreshold,

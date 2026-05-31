@@ -73,7 +73,7 @@ public abstract class DeleteHomeworkIntegrationTestBase : IAsyncLifetime
             });
     }
 
-    protected async Task<long> AddHomeworkInDbAsync(long courseId, long teacherId, HomeworkStatus status)
+    protected async Task<long> AddHomeworkInDbAsync(long courseId, long teacherId, HomeworkStatus status, long? rubricId = null)
     {
         await using var connection = await Fixture.DataSource.OpenConnectionAsync();
 
@@ -81,12 +81,12 @@ public abstract class DeleteHomeworkIntegrationTestBase : IAsyncLifetime
             """
             insert into homeworks (
                 course_id, teacher_id, name, status,
-                amount_of_reviewers, description, checklist,
-                deadline, review_deadline, discrepancy_threshold, creation_time)
+                amount_of_reviewers, description,
+                deadline, review_deadline, discrepancy_threshold, rubric_id, creation_time)
             values (
                 @courseId, @teacherId, @name, @status,
-                @amountOfReviewers, @description, @checklist,
-                @deadline, @reviewDeadline, @discrepancyThreshold, @creationTime)
+                @amountOfReviewers, @description,
+                @deadline, @reviewDeadline, @discrepancyThreshold, @rubricId, @creationTime)
             returning id;
             """;
 
@@ -100,10 +100,10 @@ public abstract class DeleteHomeworkIntegrationTestBase : IAsyncLifetime
                 status = status.ToString(),
                 amountOfReviewers = 2,
                 description = "Description",
-                checklist = "Checklist",
                 deadline = DateTimeOffset.UtcNow.AddDays(7),
                 reviewDeadline = DateTimeOffset.UtcNow.AddDays(14),
                 discrepancyThreshold = 2,
+                rubricId,
                 creationTime = DateTimeOffset.UtcNow
             });
     }

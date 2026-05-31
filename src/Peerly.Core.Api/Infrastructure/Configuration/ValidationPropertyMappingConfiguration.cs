@@ -1,4 +1,10 @@
 using Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourse;
+using Peerly.Core.ApplicationServices.Features.V1.Rubrics.CreateRubric;
+using Peerly.Core.ApplicationServices.Features.V1.Rubrics.DeleteRubric;
+using Peerly.Core.ApplicationServices.Features.V1.Rubrics.GetStudentRubric;
+using Peerly.Core.ApplicationServices.Features.V1.Rubrics.GetTeacherRubric;
+using Peerly.Core.ApplicationServices.Features.V1.Rubrics.ListTeacherRubrics;
+using Peerly.Core.ApplicationServices.Features.V1.Rubrics.UpdateRubric;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.CreateCourseFile;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.DeleteCourse;
 using Peerly.Core.ApplicationServices.Features.V1.Courses.PublishCourse;
@@ -17,6 +23,7 @@ using Peerly.Core.ApplicationServices.Features.V1.Homeworks.PublishHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Homeworks.UpdateDraftHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Participants.AddGroupStudent;
 using Peerly.Core.ApplicationServices.Features.V1.Participants.AddGroupTeacher;
+using Peerly.Core.ApplicationServices.Features.V1.Participants.BulkAddGroupStudents;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CorrectSubmittedHomeworkMark;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomework;
 using Peerly.Core.ApplicationServices.Features.V1.Submissions.CreateSubmittedHomeworkFile;
@@ -106,6 +113,10 @@ public static class ValidationPropertyMappingConfiguration
             .Build();
 
         ValidationPropertyMapping
+            .AddMapping<BulkAddGroupStudentsCommand, V1BulkAddGroupStudentsRequest>()
+            .Build();
+
+        ValidationPropertyMapping
             .AddMapping<AddGroupTeacherCommand, V1AddGroupTeacherRequest>()
             .Build();
 
@@ -191,6 +202,30 @@ public static class ValidationPropertyMappingConfiguration
 
         ValidationPropertyMapping
             .AddMapping<UpdateTeacherCommand, V1UpdateTeacherRequest>()
+            .Build();
+
+        ValidationPropertyMapping
+            .AddMapping<CreateRubricCommand, V1CreateRubricRequest>()
+            .Build();
+
+        ValidationPropertyMapping
+            .AddMapping<UpdateRubricCommand, V1UpdateRubricRequest>()
+            .Build();
+
+        ValidationPropertyMapping
+            .AddMapping<DeleteRubricCommand, V1DeleteRubricRequest>()
+            .Build();
+
+        ValidationPropertyMapping
+            .AddMapping<GetTeacherRubricQuery, V1GetTeacherRubricRequest>()
+            .Build();
+
+        ValidationPropertyMapping
+            .AddMapping<GetStudentRubricQuery, V1GetStudentRubricRequest>()
+            .Build();
+
+        ValidationPropertyMapping
+            .AddMapping<ListTeacherRubricsQuery, V1ListTeacherRubricsRequest>()
             .Build();
     }
 }

@@ -23,9 +23,11 @@ internal sealed class GetSubmittedReviewHandler : IQueryHandler<GetSubmittedRevi
         if (submittedReview is null || submittedReview.StudentId != query.StudentId)
             throw new NotFoundException();
 
+        var scores = await unitOfWork.ReadOnlySubmittedReviewScoreRepository.ListBySubmittedReviewIdAsync(query.SubmittedReviewId, cancellationToken);
+
         return new GetSubmittedReviewQueryResponse
         {
-            SubmittedReview = submittedReview
+            SubmittedReview = submittedReview with { Scores = scores }
         };
     }
 }

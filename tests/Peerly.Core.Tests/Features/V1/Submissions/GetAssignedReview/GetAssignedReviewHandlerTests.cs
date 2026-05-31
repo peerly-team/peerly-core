@@ -75,7 +75,7 @@ public sealed class GetAssignedReviewHandlerTests
         // Assert
         response.SubmittedHomeworkId.Should().Be(submittedHomework.Id);
         response.Comment.Should().Be(submittedHomework.Comment);
-        response.Checklist.Should().Be(homework.CheckList);
+        response.RubricId.Should().Be(homework.RubricId);
         response.Files.Should().BeEquivalentTo(files);
         response.SubmittedReviewId.Should().Be(submittedReviewId);
         _validatorMock.Verify(

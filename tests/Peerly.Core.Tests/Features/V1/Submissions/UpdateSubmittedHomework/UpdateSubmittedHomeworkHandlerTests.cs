@@ -44,7 +44,7 @@ public sealed class UpdateSubmittedHomeworkHandlerTests
         var updateBuilderMock = new Mock<IUpdateBuilder<SubmittedHomeworkUpdateItem>>();
         updateBuilderMock
             .Setup(builder => builder.Set(
-                It.Is<Expression<Func<SubmittedHomeworkUpdateItem, string>>>(expression => IsCommentExpression(expression)),
+                It.Is<Expression<Func<SubmittedHomeworkUpdateItem, string?>>>(expression => IsCommentExpression(expression)),
                 command.Comment))
             .Returns(updateBuilderMock.Object);
 
@@ -70,7 +70,7 @@ public sealed class UpdateSubmittedHomeworkHandlerTests
             Times.Once);
         updateBuilderMock.Verify(
             builder => builder.Set(
-                It.Is<Expression<Func<SubmittedHomeworkUpdateItem, string>>>(expression => IsCommentExpression(expression)),
+                It.Is<Expression<Func<SubmittedHomeworkUpdateItem, string?>>>(expression => IsCommentExpression(expression)),
                 command.Comment),
             Times.Once);
     }
@@ -137,7 +137,7 @@ public sealed class UpdateSubmittedHomeworkHandlerTests
         return unitOfWorkFactoryMock.Object;
     }
 
-    private static bool IsCommentExpression(Expression<Func<SubmittedHomeworkUpdateItem, string>> expression)
+    private static bool IsCommentExpression(Expression<Func<SubmittedHomeworkUpdateItem, string?>> expression)
     {
         return expression.Body is MemberExpression { Member.Name: nameof(SubmittedHomeworkUpdateItem.Comment) };
     }

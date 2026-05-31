@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
@@ -20,6 +21,7 @@ public sealed class CreateSubmittedReviewHandlerTests
 {
     private readonly Mock<ICommonUnitOfWork> _unitOfWorkMock = new();
     private readonly Mock<ISubmittedReviewRepository> _submittedReviewRepositoryMock = new();
+    private readonly Mock<ISubmittedReviewScoreRepository> _submittedReviewScoreRepositoryMock = new();
     private readonly Mock<IClock> _clockMock = new();
     private readonly Mock<ICommandValidator<CreateSubmittedReviewCommand, CreateSubmittedReviewCommandResponse>> _validatorMock = new();
     private readonly Fixture _fixture = new();
@@ -45,12 +47,14 @@ public sealed class CreateSubmittedReviewHandlerTests
             .Setup(validator => validator.ValidateAsync(command, It.IsAny<CancellationToken>()))
             .ReturnsAsync(CommandValidationResult.Ok);
 
+        var expectedMark = command.Scores.Sum(s => s.Score);
+
         _submittedReviewRepositoryMock
             .Setup(repository => repository.AddAsync(
                 It.Is<SubmittedReviewAddItem>(item =>
                     item.SubmittedHomeworkId == command.SubmittedHomeworkId &&
                     item.StudentId == command.StudentId &&
-                    item.Mark == command.Mark &&
+                    item.Mark == expectedMark &&
                     item.Comment == command.Comment &&
                     item.CreationTime == _currentTime),
                 It.IsAny<CancellationToken>()))
@@ -115,9 +119,18 @@ public sealed class CreateSubmittedReviewHandlerTests
             .Setup(factory => factory.CreateAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(_unitOfWorkMock.Object);
 
+        var operationSetMock = new Mock<IOperationSet>();
+        _unitOfWorkMock
+            .Setup(unitOfWork => unitOfWork.StartOperationSet(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(operationSetMock.Object);
+
         _unitOfWorkMock
             .SetupGet(unitOfWork => unitOfWork.SubmittedReviewRepository)
             .Returns(_submittedReviewRepositoryMock.Object);
+
+        _unitOfWorkMock
+            .SetupGet(unitOfWork => unitOfWork.SubmittedReviewScoreRepository)
+            .Returns(_submittedReviewScoreRepositoryMock.Object);
 
         return factoryMock.Object;
     }

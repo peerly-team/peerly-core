@@ -29,8 +29,12 @@ internal sealed class DeleteSubmittedReviewHandler : ICommandHandler<DeleteSubmi
         }
 
         await using var unitOfWork = await _commonUnitOfWorkFactory.CreateAsync(cancellationToken);
+        await using var operationSet = await unitOfWork.StartOperationSet(cancellationToken);
 
+        await unitOfWork.SubmittedReviewScoreRepository.DeleteBySubmittedReviewIdAsync(command.SubmittedReviewId, cancellationToken);
         await unitOfWork.SubmittedReviewRepository.DeleteAsync(command.SubmittedReviewId, cancellationToken);
+
+        await operationSet.Complete(cancellationToken);
 
         return new Success();
     }

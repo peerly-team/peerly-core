@@ -7,5 +7,5 @@ public sealed record CreateSubmittedHomeworkCommand : ICommand<CreateSubmittedHo
 {
     public required HomeworkId HomeworkId { get; init; }
     public required StudentId StudentId { get; init; }
-    public required string Comment { get; init; }
+    public required string? Comment { get; init; }
 }

@@ -5,6 +5,7 @@ using OneOf.Types;
 using Peerly.Core.ApplicationServices.Abstractions;
 using Peerly.Core.ApplicationServices.Features.V1.Participants.AddGroupStudent;
 using Peerly.Core.ApplicationServices.Features.V1.Participants.AddGroupTeacher;
+using Peerly.Core.ApplicationServices.Features.V1.Participants.BulkAddGroupStudents;
 using Peerly.Core.ApplicationServices.Features.V1.Participants.ListCourseParticipants;
 using Peerly.Core.ApplicationServices.Features.V1.Participants.ListGroupParticipants;
 using Peerly.Core.V1;
@@ -17,17 +18,20 @@ public sealed class ParticipantController : ParticipantService.ParticipantServic
     private readonly IQueryHandler<ListCourseParticipantsQuery, ListCourseParticipantsQueryResponse> _listCourseParticipantsHandler;
     private readonly IQueryHandler<ListGroupParticipantsQuery, ListGroupParticipantsQueryResponse> _listGroupParticipantsHandler;
     private readonly ICommandHandler<AddGroupStudentCommand, Success> _addGroupStudentHandler;
+    private readonly ICommandHandler<BulkAddGroupStudentsCommand, BulkAddGroupStudentsCommandResponse> _bulkAddGroupStudentsHandler;
     private readonly ICommandHandler<AddGroupTeacherCommand, Success> _addGroupTeacherHandler;
 
     public ParticipantController(
         IQueryHandler<ListCourseParticipantsQuery, ListCourseParticipantsQueryResponse> listCourseParticipantsHandler,
         IQueryHandler<ListGroupParticipantsQuery, ListGroupParticipantsQueryResponse> listGroupParticipantsHandler,
         ICommandHandler<AddGroupStudentCommand, Success> addGroupStudentHandler,
+        ICommandHandler<BulkAddGroupStudentsCommand, BulkAddGroupStudentsCommandResponse> bulkAddGroupStudentsHandler,
         ICommandHandler<AddGroupTeacherCommand, Success> addGroupTeacherHandler)
     {
         _listCourseParticipantsHandler = listCourseParticipantsHandler;
         _listGroupParticipantsHandler = listGroupParticipantsHandler;
         _addGroupStudentHandler = addGroupStudentHandler;
+        _bulkAddGroupStudentsHandler = bulkAddGroupStudentsHandler;
         _addGroupTeacherHandler = addGroupTeacherHandler;
     }
 
@@ -50,6 +54,15 @@ public sealed class ParticipantController : ParticipantService.ParticipantServic
         var command = request.ToAddGroupStudentCommand();
         var commandResponse = await _addGroupStudentHandler.ExecuteAsync(command, context.CancellationToken);
         return commandResponse.ToV1AddGroupStudentResponse();
+    }
+
+    public override async Task<V1BulkAddGroupStudentsResponse> V1BulkAddGroupStudents(
+        V1BulkAddGroupStudentsRequest request,
+        ServerCallContext context)
+    {
+        var command = request.ToBulkAddGroupStudentsCommand();
+        var commandResponse = await _bulkAddGroupStudentsHandler.ExecuteAsync(command, context.CancellationToken);
+        return commandResponse.ToV1BulkAddGroupStudentsResponse();
     }
 
     public override async Task<V1AddGroupTeacherResponse> V1AddGroupTeacher(V1AddGroupTeacherRequest request, ServerCallContext context)
